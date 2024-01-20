@@ -1,29 +1,18 @@
-import { User, UserRole } from '@modules/user';
+import { IUserProps, UserRole } from '@modules/user';
 import { User as PrismaUser } from '@prisma/client';
 
 export class UserMapper {
-  static toDomain(orm: PrismaUser): User {
-    const domainResult = User.create(
-      {
-        name: orm.name,
-        email: orm.email,
-        password: orm.password,
-        role: orm.role as UserRole,
-      },
-      orm.id,
-    );
-    if (!domainResult.isSuccess())
-      throw new Error(`Error mapping user: ${domainResult.error}`);
-    return domainResult.value;
+  static toDomain(orm: PrismaUser): IUserProps {
+    const { id, name, email, password } = orm;
+    const role = orm.role as UserRole;
+    const createdAt = new Date();
+    const updatedAt = null;
+    const removedAt = null;
+    return { id, name, email, password, role, createdAt, updatedAt, removedAt };
   }
 
-  static toORM(domain: User): PrismaUser {
-    return {
-      id: domain.id,
-      name: domain.name,
-      email: domain.email,
-      password: domain.password,
-      role: domain.role,
-    };
+  static toORM(domain: IUserProps): PrismaUser {
+    const { id, name, email, password, role } = domain;
+    return { id, name, email, password, role };
   }
 }

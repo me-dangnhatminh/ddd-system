@@ -1,5 +1,4 @@
 import * as UserModule from '@modules/user';
-import * as Prisma from '@prisma/client';
 import { UserRepository } from 'src/modules/user/interfaces/user-repository.interface';
 import { PrismaService } from './prisma.service';
 import { UserMapper } from './mappers';
@@ -10,26 +9,22 @@ export class PrismaUserRepository implements UserRepository {
     @Inject(PrismaService) private readonly prismaService: PrismaService,
   ) {}
 
-  create(data: UserModule.IUserProps): Promise<UserModule.User> {
+  create(input: UserModule.IUserProps): Promise<UserModule.IUserProps> {
+    // ignore id
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, ...data } = UserMapper.toORM(input);
     const user = this.prismaService.user.create({ data });
     return user.then((u) => UserMapper.toDomain(u));
   }
 
-  getAll(): Promise<UserModule.User[]> {
+  getAll(): Promise<UserModule.IUserProps[]> {
     const users = this.prismaService.user.findMany();
-    return users.then((us) => us.map((u) => UserMapper.toDomain(u)));
+    return users.then((u) => u.map((user) => UserMapper.toDomain(user)));
   }
 
-  save(user: UserModule.User): Promise<void> {
-    const userORM: Prisma.User = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      password: user.password,
-    };
-    this.prismaService.user.create({ data: userORM });
-    return Promise.resolve();
+  save(user: UserModule.IUserProps): Promise<void> {
+    const data = UserMapper.toORM(user);
+    return this.prismaService.user.create({ data }).then();
   }
   exists(id: string): Promise<boolean> {
     return this.prismaService.user
@@ -37,11 +32,11 @@ export class PrismaUserRepository implements UserRepository {
       .then((user) => !!user);
   }
 
-  getUserById(id: string): Promise<UserModule.User | null> {
+  getUserById(id: string): Promise<UserModule.IUserProps | null> {
     const user = this.prismaService.user.findFirst({ where: { id } });
     return user.then((u) => (u ? UserMapper.toDomain(u) : null));
   }
-  getUserByEmail(email: string): Promise<UserModule.User> {
+  getUserByEmail(email: string): Promise<UserModule.IUserProps> {
     const user = this.prismaService.user.findFirst({ where: { email } });
     return user.then((u) => (u ? UserMapper.toDomain(u) : null));
   }

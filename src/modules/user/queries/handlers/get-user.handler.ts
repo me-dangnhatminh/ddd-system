@@ -12,6 +12,10 @@ export class GetUserHandler
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: GetUserQuery): Promise<User> {
-    return this.userRepository.getUserById(query.id);
+    return this.userRepository.getUserById(query.id).then((u) => {
+      const user = User.create(u, false);
+      if (!user.isSuccess()) throw new Error(user.error);
+      return user.value;
+    });
   }
 }

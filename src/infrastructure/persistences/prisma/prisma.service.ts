@@ -6,8 +6,8 @@ export class PrismaService
   extends PrismaClient
   implements OnApplicationBootstrap
 {
-  async onApplicationBootstrap() {
-    await this.$connect()
+  onApplicationBootstrap() {
+    return this.$connect()
       .then(() => {
         const mess = 'Prisma connected successfully';
         Logger.log(mess, 'PrismaClient');
