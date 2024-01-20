@@ -1,26 +1,29 @@
-import { Entity, Result } from '@common';
+import { IEntity } from '@common/interfaces';
+import { Result } from '@common';
+
 import { CreatedUserEvent } from './events';
 import { DeletedUserEvent } from './events/deleted-user.event';
 import { UserRole } from './user-role';
+import { v4 as uuid } from 'uuid';
+import { AggregateRoot } from '@nestjs/cqrs';
 
 export interface IUserProps {
-  id: string;
   name: string;
   email: string;
   password: string;
   role: UserRole;
 }
 
-export class User extends Entity<string> {
-  private readonly _id: string;
-  private readonly _name: string;
-  private readonly _email: string;
-  private readonly _password: string;
-  private readonly _role: UserRole;
+export class User extends AggregateRoot implements IEntity<string> {
+  private _id: string;
+  private _name: string;
+  private _email: string;
+  private _password: string;
+  private _role: UserRole;
 
-  private constructor(props: IUserProps) {
+  private constructor(props: IUserProps, id?: string) {
     super();
-    this._id = props.id;
+    this._id = id ?? uuid();
     this._name = props.name;
     this._email = props.email;
     this._password = props.password;
@@ -47,14 +50,17 @@ export class User extends Entity<string> {
     return this._role;
   }
 
-  static create(props: IUserProps): Result<User> {
-    const user = new User(props);
-    this.apply(new CreatedUserEvent(user));
+  static create(props: IUserProps, id?: string): Result<User> {
+    const user = new User(props, id);
+    user.apply(new CreatedUserEvent(user));
     return Result.success(user);
   }
 
   static delete(id: string): Result<undefined> {
-    this.apply(new DeletedUserEvent(id));
+    return Result.success();
+  }
+
+  private validate(): Result<undefined> {
     return Result.success();
   }
 }

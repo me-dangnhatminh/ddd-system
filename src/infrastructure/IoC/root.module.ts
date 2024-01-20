@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user.module';
 import { CqrsModule } from './cqrs.module';
-import { InfrastructureModule } from './infrastructure.module';
+import { PersistencesModule } from './persistences.module';
 
 @Module({
-  imports: [InfrastructureModule, CqrsModule, UserModule],
+  imports: [PersistencesModule, CqrsModule, UserModule],
 })
 export class RootModule {}

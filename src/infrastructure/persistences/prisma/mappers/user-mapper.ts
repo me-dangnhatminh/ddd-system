@@ -3,13 +3,15 @@ import { User as PrismaUser } from '@prisma/client';
 
 export class UserMapper {
   static toDomain(orm: PrismaUser): User {
-    const domainResult = User.create({
-      id: orm.id,
-      name: orm.name,
-      email: orm.email,
-      password: orm.password,
-      role: orm.role as UserRole,
-    });
+    const domainResult = User.create(
+      {
+        name: orm.name,
+        email: orm.email,
+        password: orm.password,
+        role: orm.role as UserRole,
+      },
+      orm.id,
+    );
     if (!domainResult.isSuccess())
       throw new Error(`Error mapping user: ${domainResult.error}`);
     return domainResult.value;

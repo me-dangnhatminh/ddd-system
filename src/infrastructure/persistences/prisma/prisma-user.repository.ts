@@ -9,6 +9,12 @@ export class PrismaUserRepository implements UserRepository {
   constructor(
     @Inject(PrismaService) private readonly prismaService: PrismaService,
   ) {}
+
+  create(data: UserModule.IUserProps): Promise<UserModule.User> {
+    const user = this.prismaService.user.create({ data });
+    return user.then((u) => UserMapper.toDomain(u));
+  }
+
   getAll(): Promise<UserModule.User[]> {
     const users = this.prismaService.user.findMany();
     return users.then((us) => us.map((u) => UserMapper.toDomain(u)));

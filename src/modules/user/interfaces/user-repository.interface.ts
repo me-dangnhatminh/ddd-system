@@ -1,9 +1,10 @@
 import { IRepository } from '@common/interfaces/repository.interface';
-import { User } from '../domain/user';
+import { IUserProps, User } from '../domain/user';
 
 export abstract class UserRepository implements IRepository<User> {
   abstract getAll(): Promise<User[]>;
   abstract save(user: User): Promise<void>;
+  abstract create(data: IUserProps): Promise<User>;
   abstract exists(id: string): Promise<boolean>;
   /**
    * @param {string} id The user id to search for.
