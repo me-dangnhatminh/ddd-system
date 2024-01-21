@@ -2,14 +2,13 @@ import * as UserModule from '@modules/user';
 import { UserRepository } from 'src/modules/user/interfaces/user-repository.interface';
 import { PrismaService } from './prisma.service';
 import { UserMapper } from './mappers';
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PrismaUserRepository implements UserRepository {
-  constructor(
-    @Inject(PrismaService) private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  create(input: UserModule.IUserProps): Promise<UserModule.IUserProps> {
+  create(input: UserModule.IUserProps): Promise<UserModule.User> {
     // ignore id
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...data } = UserMapper.toORM(input);
@@ -17,7 +16,7 @@ export class PrismaUserRepository implements UserRepository {
     return user.then((u) => UserMapper.toDomain(u));
   }
 
-  getAll(): Promise<UserModule.IUserProps[]> {
+  getAll(): Promise<UserModule.User[]> {
     const users = this.prismaService.user.findMany();
     return users.then((u) => u.map((user) => UserMapper.toDomain(user)));
   }
@@ -32,11 +31,11 @@ export class PrismaUserRepository implements UserRepository {
       .then((user) => !!user);
   }
 
-  getUserById(id: string): Promise<UserModule.IUserProps | null> {
+  getUserById(id: string): Promise<UserModule.User | null> {
     const user = this.prismaService.user.findFirst({ where: { id } });
     return user.then((u) => (u ? UserMapper.toDomain(u) : null));
   }
-  getUserByEmail(email: string): Promise<UserModule.IUserProps> {
+  getUserByEmail(email: string): Promise<UserModule.User> {
     const user = this.prismaService.user.findFirst({ where: { email } });
     return user.then((u) => (u ? UserMapper.toDomain(u) : null));
   }

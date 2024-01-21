@@ -1,11 +1,11 @@
-import { IRepository } from '@common/interfaces/repository.interface';
+import { IRepository } from '@common/interfaces/persistence';
 import { IUserProps, TCreateUserInput, User } from '../domain/user';
 
-export abstract class UserRepository implements IRepository<User> {
-  abstract getAll(): Promise<IUserProps[]>;
+export abstract class UserRepository implements IRepository {
   abstract save(user: IUserProps): Promise<void>;
-  abstract create(input: TCreateUserInput): Promise<IUserProps>;
+  abstract create(input: TCreateUserInput): Promise<User>;
   abstract exists(id: string): Promise<boolean>;
-  abstract getUserById(id: string): Promise<IUserProps | null>;
-  abstract getUserByEmail(email: string): Promise<IUserProps | null>;
+  abstract getAll(): Promise<User[]>;
+  abstract getUserById(id: string): Promise<User | null>;
+  abstract getUserByEmail(email: string): Promise<User | null>;
 }

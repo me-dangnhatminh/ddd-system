@@ -6,6 +6,10 @@ export class PrismaService
   extends PrismaClient
   implements OnApplicationBootstrap
 {
+  constructor() {
+    super();
+  }
+
   onApplicationBootstrap() {
     return this.$connect()
       .then(() => {
