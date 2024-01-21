@@ -14,11 +14,11 @@ export class PrismaService
     return this.$connect()
       .then(() => {
         const mess = 'Prisma connected successfully';
-        Logger.log(mess, 'PrismaClient');
+        Logger.log(mess, PrismaService.name);
       })
       .catch((err) => {
         const mess = `Prisma connection failed: ${err}`;
-        Logger.error(mess, 'PrismaClient');
+        Logger.error(mess, PrismaService.name);
       });
   }
 }

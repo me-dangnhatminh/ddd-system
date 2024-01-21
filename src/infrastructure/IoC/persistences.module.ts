@@ -14,12 +14,8 @@ const UserRepositoryProvider: Provider = {
   scope: Scope.DEFAULT,
 };
 
-const Providers: Provider[] = [PrismaProvider, UserRepositoryProvider];
+const providers: Provider[] = [PrismaProvider, UserRepositoryProvider];
 
 @Global()
-@Module({
-  imports: [],
-  providers: [...Providers],
-  exports: [...Providers],
-})
+@Module({ providers, exports: providers })
 export class PersistencesModule {}

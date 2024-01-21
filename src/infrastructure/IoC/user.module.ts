@@ -8,7 +8,6 @@ import { CreateUserHandler } from '@modules/user/commands';
 import { UsersController } from '@infrastructure/controllers';
 
 import { Module, Provider } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 
 const HandlersProvider: Provider[] = [
   GetUserHandler,
@@ -18,8 +17,8 @@ const HandlersProvider: Provider[] = [
 ];
 
 @Module({
-  imports: [JwtModule],
-  providers: [...HandlersProvider],
+  imports: [],
   controllers: [UsersController],
+  providers: [...HandlersProvider],
 })
 export class UserModule {}

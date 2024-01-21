@@ -21,7 +21,7 @@ export const ValidationRules = {
   PASSWORD_VALIDATION_REGEXP: /^[a-zA-Z0-9]{6,30}$/,
 };
 
-const ErrorMessages = {
+export const ErrorMessages = {
   USER_REMOVED: 'User already removed',
   NAME_INVALID_FORMAT: 'Name must be between 3 and 30 characters',
   PASSWORD_INVALID: 'Invalid password',
