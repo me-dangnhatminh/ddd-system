@@ -1,5 +1,5 @@
-import { CreateUserCommand } from '@modules/user/commands';
 import { GetUserReponseDTO } from '@modules/user/dtos';
+import { CreateUserCommand } from '@modules/user/application/commands';
 import {
   GetUsersQuery,
   LoginUserQuery,

@@ -1,16 +1,7 @@
 import { Result } from '@common';
-import {
-  CreatedUserEvent,
-  DeletedUserEvent,
-  PasswordChangedEvent,
-} from './events';
 import { UserRole } from './user-role';
 
 // external dependencies
-import { v4 as uuid } from 'uuid';
-import { AggregateRoot } from '@nestjs/cqrs';
-import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
-
 export type TValidatesUserInput = {
   name?: string;
   password?: string;
@@ -35,72 +26,75 @@ export interface IUserProps {
   password: string;
   role: UserRole;
   createdAt: Date;
+  isAuthenticated: boolean;
   updatedAt: Date | null;
   removedAt: Date | null;
 }
 
-export type TCreateUserInput = Partial<IUserProps> & {
+export interface ICreateUserPOJC {
   name: string;
   email: string;
   password: string;
   role: UserRole;
-};
+  id: string;
+  createdAt?: Date;
+  updatedAt?: Date | null;
+  removedAt?: Date | null;
+}
 
-export class User extends AggregateRoot implements IUserProps {
+export class User implements IUserProps {
   get id() {
     return this.props.id;
   }
-
   get name(): string {
     return this.props.name;
   }
-
   get email(): string {
     return this.props.email;
   }
-
   get password(): string {
     return this.props.password;
   }
-
   get role(): UserRole {
     return this.props.role;
   }
-
   get createdAt(): Date {
     return this.props.createdAt;
   }
-
-  get updatedAt(): Date {
+  get updatedAt(): Date | null {
     return this.props.updatedAt;
   }
-
-  get removedAt(): Date {
+  get removedAt(): Date | null {
     return this.props.removedAt;
   }
-
   get isRemoved(): boolean {
     return Boolean(this.props.removedAt);
   }
-
-  private constructor(private props: IUserProps) {
-    super();
+  get isAuthenticated(): boolean {
+    return Boolean(this.props.isAuthenticated);
   }
 
-  static create(input: TCreateUserInput, isnew: boolean = true): Result<User> {
-    const user = new User({
-      id: input.id ?? uuid(),
-      name: input.name,
-      email: input.email,
-      password: this.hashPassword(input.password),
-      role: input.role,
-      createdAt: input.createdAt ?? new Date(),
-      updatedAt: input.updatedAt ?? null,
-      removedAt: input.removedAt ?? null,
-    });
-    if (isnew) user.apply(new CreatedUserEvent(user));
+  private constructor(private props: IUserProps) {}
 
-    user.commit();
+  static create(pojc: ICreateUserPOJC): Result<User, string> {
+    const nameResult = User.validateName(pojc.name);
+    if (nameResult.isFailure()) return Result.failure(nameResult.error);
+    const passwordResult = User.validatePassword(pojc.password);
+    if (passwordResult.isFailure()) return Result.failure(passwordResult.error);
+    const emailResult = User.validateEmail(pojc.email);
+    if (emailResult.isFailure()) return Result.failure(emailResult.error);
+
+    const user = new User({
+      id: pojc.id,
+      name: pojc.name,
+      email: pojc.email,
+      password: pojc.password,
+      role: pojc.role,
+      isAuthenticated: false,
+      createdAt: pojc.createdAt ?? new Date(),
+      updatedAt: pojc.updatedAt ?? null,
+      removedAt: pojc.removedAt ?? null,
+    });
     return Result.success(user);
   }
 
@@ -108,7 +102,6 @@ export class User extends AggregateRoot implements IUserProps {
     const isremoved = Boolean(this.props.removedAt);
     if (isremoved) return Result.failure(ErrorMessages.USER_REMOVED);
     this.props.removedAt = new Date();
-    this.apply(new DeletedUserEvent(this.props.id));
     return Result.success();
   }
 
@@ -117,37 +110,27 @@ export class User extends AggregateRoot implements IUserProps {
     const isPasswordValid = this.comparePassword(oldPass);
     if (!isPasswordValid) return Result.failure('Invalid password');
 
-    this.props.password = User.hashPassword(newPass);
-
-    this.apply(new PasswordChangedEvent(this.props.id, this.props.password));
+    this.props.password = newPass;
     return Result.success();
   }
 
-  static validate(input: TValidatesUserInput): Result<undefined, string> {
-    const { name, password } = input;
-    const isNameValid =
-      name !== undefined
-        ? ValidationRules.NAME_VALIDATION_REGEXP.test(name)
-        : true;
-    const isPasswordValid =
-      password !== undefined
-        ? ValidationRules.PASSWORD_VALIDATION_REGEXP.test(password)
-        : true;
-
-    if (!isNameValid) return Result.failure(ErrorMessages.NAME_INVALID_FORMAT);
-    if (!isPasswordValid)
-      return Result.failure(ErrorMessages.PASSWORD_INVALID_FORMAT);
-    return Result.success();
+  comparePassword(pass: string): boolean {
+    return this.password === pass;
   }
 
-  public comparePassword(pass: string): boolean {
-    const hashedPassword = this.props.password;
-    return compareSync(pass, hashedPassword);
+  static validatePassword(pass: string): Result<string, string> {
+    const isValid = ValidationRules.PASSWORD_VALIDATION_REGEXP.test(pass);
+    if (!isValid) return Result.failure(ErrorMessages.PASSWORD_INVALID_FORMAT);
+    return Result.success(pass);
   }
 
-  private static hashPassword(pass: string): string {
-    const salt = genSaltSync(10);
-    const hashedPassword = hashSync(pass, salt);
-    return hashedPassword;
+  static validateName(name: string): Result<string, string> {
+    const isValid = ValidationRules.NAME_VALIDATION_REGEXP.test(name);
+    if (!isValid) return Result.failure(ErrorMessages.NAME_INVALID_FORMAT);
+    return Result.success(name);
+  }
+
+  static validateEmail(email: string): Result<string, string> {
+    return Result.success(email);
   }
 }

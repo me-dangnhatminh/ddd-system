@@ -1,4 +1,3 @@
-import { LoginUserQuery } from '@modules/user/queries';
 import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
 
 export class LoginUserBody implements LoginUserQuery {

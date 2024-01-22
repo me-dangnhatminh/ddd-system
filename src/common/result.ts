@@ -3,6 +3,7 @@ export const Result = Object.freeze({ success, failure });
 
 interface IResult<S, F> {
   isSuccess(): this is Success<S>;
+  isFailure(): this is Failure<F>;
   map<U>(func: (r: S | F) => U): Result<U, F> | Result<S, U>;
   endThen<T, U>(func: (r: S | F) => Result<T, U>): Result<T, U>;
 }
@@ -10,6 +11,9 @@ interface IResult<S, F> {
 class Success<S> implements IResult<S, never> {
   isSuccess(): this is Success<S> {
     return true;
+  }
+  isFailure(): this is never {
+    return false;
   }
 
   constructor(public readonly value: S) {}
@@ -25,7 +29,11 @@ class Failure<F> implements IResult<never, F> {
   isSuccess(): this is never {
     return false;
   }
+  isFailure(): this is Failure<F> {
+    return true;
+  }
   constructor(public readonly error: F) {}
+
   map<U>(func: (r: F) => U): Failure<U> {
     return new Failure(func(this.error));
   }

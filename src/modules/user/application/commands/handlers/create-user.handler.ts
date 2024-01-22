@@ -1,4 +1,4 @@
-import { User } from '../../domain';
+import { User } from '@modules/user';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../create-user.command';
 import { UserRepository } from '@modules/user/interfaces';

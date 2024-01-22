@@ -1,5 +1,6 @@
+import { UserRole } from '@modules/user';
+
 import { ICommand } from '@nestjs/cqrs';
-import { UserRole } from '../domain';
 export class CreateUserCommand implements ICommand {
   constructor(
     public readonly name: string,

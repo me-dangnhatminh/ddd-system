@@ -1,5 +1,5 @@
 import { IRepository } from '@common/interfaces/persistence';
-import { IUserProps, TCreateUserInput, User } from '../domain/user';
+import { IUserProps, TCreateUserInput, User } from '../user';
 
 export abstract class UserRepository implements IRepository {
   abstract save(user: IUserProps): Promise<void>;
