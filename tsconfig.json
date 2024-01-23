@@ -18,14 +18,10 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@users": ["src/modules/user"],
-      "@users/*": ["src/modules/user/*"],
       "@common": ["src/common"],
       "@common/*": ["src/common/*"],
-      "@user": ["src/modules/user"],
-      "@user/*": ["src/modules/user/*"],
-      "@infrastructure": ["src/infrastructure"],
-      "@infrastructure/*": ["src/infrastructure/*"],
+      "@modules/user": ["src/modules/user"],
+      "@modules/user/*": ["src/modules/user/*"],
     },
   },
 }

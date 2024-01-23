@@ -1,5 +1,4 @@
 import { UserRole } from '@modules/user';
-
 import { ICommand } from '@nestjs/cqrs';
 export class CreateUserCommand implements ICommand {
   constructor(

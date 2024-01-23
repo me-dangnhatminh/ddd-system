@@ -1,10 +1,11 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { Entity } from '../common/entity';
+
 import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
 
 export interface IUserProps {
+  id: string;
   name: UserName;
   email: string;
   password: UserPassword;
@@ -15,6 +16,7 @@ export interface IUserProps {
 export class User extends AggregateRoot {
   private constructor(protected readonly props: IUserProps) {
     super();
+    this.autoCommit = false;
   }
 
   public create(user: IUserProps): User {

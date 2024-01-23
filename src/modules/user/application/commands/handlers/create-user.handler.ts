@@ -1,7 +1,9 @@
-import { User } from '@modules/user';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
+import { User } from '@modules/user';
 import { CreateUserCommand } from '../create-user.command';
-import { UserRepository } from '@modules/user/interfaces';
+import { UserRepository } from '@modules/user/domain/interfaces';
+import { UserCreatedEvent } from '@modules/user/domain/events';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -20,6 +22,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         if (!u.isSuccess()) throw new Error(u.error);
         return u.value;
       });
+
+    user.apply(new UserCreatedEvent(user));
+    user.commit();
 
     return user;
   }

@@ -1,5 +1,9 @@
+import { AggregateRoot } from '@nestjs/cqrs';
+import { v4 as uuid } from 'uuid';
+
 import { Result } from '@common';
 import { UserRole } from './user-role';
+import { UserPermissions } from './user-permissions';
 
 // external dependencies
 export type TValidatesUserInput = {
@@ -31,18 +35,24 @@ export interface IUserProps {
   removedAt: Date | null;
 }
 
-export interface ICreateUserPOJC {
+export interface ICreateUserPOCO {
   name: string;
   email: string;
   password: string;
   role: UserRole;
-  id: string;
+  id?: string;
   createdAt?: Date;
   updatedAt?: Date | null;
   removedAt?: Date | null;
 }
 
-export class User implements IUserProps {
+export interface IUpdateUserPOCO {
+  name?: string;
+  email?: string;
+  role?: UserRole;
+}
+
+export class User extends AggregateRoot {
   get id() {
     return this.props.id;
   }
@@ -74,39 +84,67 @@ export class User implements IUserProps {
     return Boolean(this.props.isAuthenticated);
   }
 
-  private constructor(private props: IUserProps) {}
+  private constructor(private props: IUserProps) {
+    super();
+    this.autoCommit = false;
+  }
 
-  static create(pojc: ICreateUserPOJC): Result<User, string> {
-    const nameResult = User.validateName(pojc.name);
+  static create(poco: ICreateUserPOCO): Result<User, string> {
+    const nameResult = User.validateName(poco.name);
     if (nameResult.isFailure()) return Result.failure(nameResult.error);
-    const passwordResult = User.validatePassword(pojc.password);
+    const passwordResult = User.validatePassword(poco.password);
     if (passwordResult.isFailure()) return Result.failure(passwordResult.error);
-    const emailResult = User.validateEmail(pojc.email);
+    const emailResult = User.validateEmail(poco.email);
     if (emailResult.isFailure()) return Result.failure(emailResult.error);
 
     const user = new User({
-      id: pojc.id,
-      name: pojc.name,
-      email: pojc.email,
-      password: pojc.password,
-      role: pojc.role,
+      id: poco.id ?? uuid(),
+      name: poco.name,
+      email: poco.email,
+      password: poco.password,
+      role: poco.role,
       isAuthenticated: false,
-      createdAt: pojc.createdAt ?? new Date(),
-      updatedAt: pojc.updatedAt ?? null,
-      removedAt: pojc.removedAt ?? null,
+      createdAt: poco.createdAt ?? new Date(),
+      updatedAt: poco.updatedAt ?? null,
+      removedAt: poco.removedAt ?? null,
     });
     return Result.success(user);
   }
 
-  remove(): Result<undefined, string> {
-    const isremoved = Boolean(this.props.removedAt);
-    if (isremoved) return Result.failure(ErrorMessages.USER_REMOVED);
-    this.props.removedAt = new Date();
+  update(poco: IUpdateUserPOCO): Result<undefined, string> {
+    if (this.isRemoved)
+      throw new Error('User already removed, please check isRemoved property');
+    if (poco.name) {
+      const nameResult = User.validateName(poco.name);
+      if (nameResult.isFailure()) return Result.failure(nameResult.error);
+      this.props.name = poco.name;
+    }
+    if (poco.email) {
+      const emailResult = User.validateEmail(poco.email);
+      if (emailResult.isFailure()) return Result.failure(emailResult.error);
+      this.props.email = poco.email;
+    }
+    if (poco.role) this.props.role = poco.role;
+    this.props.updatedAt = new Date();
     return Result.success();
   }
 
+  getPermissions(user: User = this): UserPermissions {
+    if (user.id === this.id) return new UserPermissions(true, false, true);
+    if (this.role === UserRole.ADMIN)
+      return new UserPermissions(true, true, true);
+    return new UserPermissions(false, false, false);
+  }
+
+  remove(): void {
+    if (this.isRemoved)
+      throw new Error('User already removed, please check isRemoved property');
+    this.props.removedAt = new Date();
+  }
+
   changePassword(oldPass: string, newPass: string): Result<undefined, string> {
-    if (this.isRemoved) throw new Error(ErrorMessages.USER_REMOVED);
+    if (this.isRemoved)
+      throw new Error('User already removed, please check isRemoved property');
     const isPasswordValid = this.comparePassword(oldPass);
     if (!isPasswordValid) return Result.failure('Invalid password');
 
@@ -133,4 +171,6 @@ export class User implements IUserProps {
   static validateEmail(email: string): Result<string, string> {
     return Result.success(email);
   }
+
+  private checkPermissionsAndThrowError(): void {}
 }
