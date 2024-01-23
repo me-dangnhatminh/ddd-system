@@ -18,6 +18,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@users": ["src/modules/user"],
+      "@users/*": ["src/modules/user/*"],
       "@common": ["src/common"],
       "@common/*": ["src/common/*"],
       "@user": ["src/modules/user"],
