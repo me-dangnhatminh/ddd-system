@@ -1,13 +1,11 @@
+import { CreateUserHandler } from '@modules/user/application/commands';
 import {
   GetUserHandler,
   GetUsersHandler,
   LoginUserHanlder,
-} from '@modules/user/queries';
-import { CreateUserHandler } from '@modules/user/commands';
-
-import { UsersController } from '@infrastructure/controllers';
-
+} from '@modules/user/application/queries';
 import { Module, Provider } from '@nestjs/common';
+import { UsersController } from '../controllers';
 
 const HandlersProvider: Provider[] = [
   GetUserHandler,

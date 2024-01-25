@@ -12,13 +12,13 @@ export type TValidatesUserInput = {
 };
 
 export const ValidationRules = {
-  NAME_VALIDATION_REGEXP: /^[a-zA-Z0-9]{3,30}$/,
+  NAME_VALIDATION_REGEXP: /^[a-zA-Z0-9]{1,30}$/,
   PASSWORD_VALIDATION_REGEXP: /^[a-zA-Z0-9]{6,30}$/,
 };
 
 export const ErrorMessages = {
   USER_REMOVED: 'User already removed',
-  NAME_INVALID_FORMAT: 'Name must be between 3 and 30 characters',
+  NAME_INVALID_FORMAT: 'Name must be between 1 and 30 characters',
   PASSWORD_INVALID: 'Invalid password',
   PASSWORD_INVALID_FORMAT: 'Password must be between 6 and 30 characters',
 };
@@ -90,12 +90,12 @@ export class User extends AggregateRoot {
   }
 
   static create(poco: ICreateUserPOCO): Result<User, string> {
-    const nameResult = User.validateName(poco.name);
-    if (nameResult.isFailure()) return Result.failure(nameResult.error);
-    const passwordResult = User.validatePassword(poco.password);
-    if (passwordResult.isFailure()) return Result.failure(passwordResult.error);
-    const emailResult = User.validateEmail(poco.email);
-    if (emailResult.isFailure()) return Result.failure(emailResult.error);
+    // const nameResult = User.validateName(poco.name);
+    // if (nameResult.isFailure()) return Result.failure(nameResult.error);
+    // const passwordResult = User.validatePassword(poco.password);
+    // if (passwordResult.isFailure()) return Result.failure(passwordResult.error);
+    // const emailResult = User.validateEmail(poco.email);
+    // if (emailResult.isFailure()) return Result.failure(emailResult.error);
 
     const user = new User({
       id: poco.id ?? uuid(),

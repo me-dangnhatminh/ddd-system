@@ -2,9 +2,9 @@ import {
   GetUsersQuery,
   LoginUserQuery,
   LoginUserQueryResult,
-} from '@user/application/queries';
-import { CreateUserCommand } from '@user/application/commands';
-import { GetUserReponseDTO } from '@user/application/dtos';
+} from '@modules/user/application/queries';
+import { CreateUserCommand } from '@modules/user/application/commands';
+import { GetUserReponseDTO } from '@modules/user/application/dtos';
 
 import { CreateUserBody } from './models/create-user.model';
 import { LoginUserBody } from './models/login-user.model';

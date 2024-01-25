@@ -1,6 +1,6 @@
+import { User } from '@modules/user/domain';
+import { UserRepository } from '@modules/user/domain/interfaces';
 import { GetUserQuery } from '../get-user.query';
-import { UserRepository } from '../../interfaces';
-import { User } from '../../domain/user';
 import { IQueryHandler, IQueryResult, QueryHandler } from '@nestjs/cqrs';
 
 interface GetUserResult extends IQueryResult {}
@@ -13,7 +13,8 @@ export class GetUserHandler
 
   async execute(query: GetUserQuery): Promise<User> {
     return this.userRepository.getUserById(query.id).then((u) => {
-      const user = User.create(u, false);
+      if (!u) throw new Error('User not found');
+      const user = User.create(u);
       if (!user.isSuccess()) throw new Error(user.error);
       return user.value;
     });

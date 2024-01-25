@@ -28,7 +28,7 @@ class ServerApplication {
           const message: { [key: string]: string } = {};
           errors.forEach((error) => {
             const prop = error.property;
-            message[prop] = Object.values(error.constraints).join(', ');
+            message[prop] = Object.values(error.constraints ?? {}).join(', ');
           });
           return new HttpException(message, HttpStatus.BAD_REQUEST);
         },

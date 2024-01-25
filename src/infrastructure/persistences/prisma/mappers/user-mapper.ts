@@ -9,10 +9,16 @@ export class UserMapper {
     const updatedAt = null;
     const removedAt = null;
 
-    const userResult = User.create(
-      { id, name, email, password, role, createdAt, updatedAt, removedAt },
-      false,
-    );
+    const userResult = User.create({
+      id,
+      name,
+      email,
+      password,
+      role,
+      createdAt,
+      updatedAt,
+      removedAt,
+    });
     if (!userResult.isSuccess()) throw new Error(userResult.error);
     return userResult.value;
   }
