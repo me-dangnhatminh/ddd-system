@@ -10,6 +10,11 @@ import {
   UserDeletedEvent,
 } from './events';
 import { Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  RoleValidationException,
+  ValidationRulesException,
+} from './exceptions/user-exception';
 
 // external dependencies
 export type TValidatesUserInput = {
@@ -23,10 +28,14 @@ export const ValidationRules = {
 };
 
 export const ErrorMessages = {
-  USER_REMOVED: 'User already removed',
+  USER_REMOVED: 'User already removed, please check isRemoved property',
   NAME_INVALID_FORMAT: 'Name must be between 1 and 30 characters',
   PASSWORD_INVALID: 'Invalid password',
   PASSWORD_INVALID_FORMAT: 'Password must be between 6 and 30 characters',
+  CANNOT_REMOVE_YOURSELF: 'You cannot remove yourself',
+  CANNOT_REMOVE_USER:
+    'You do not have permission to remove this user, only admins can remove users',
+  PERMISSION_DENIED: 'Permission denied',
 };
 
 export interface IUserProps {
@@ -90,7 +99,7 @@ export class User extends AggregateRoot {
     return Boolean(this.props.isAuthenticated);
   }
 
-  private constructor(private props: IUserProps) {
+  protected constructor(private props: IUserProps) {
     super();
     this.autoCommit = false;
   }
@@ -118,6 +127,38 @@ export class User extends AggregateRoot {
     return Result.success(user);
   }
 
+  /**
+   *
+   * @param user
+   * @throws {ValidationRulesException} if user is removed
+   * @throws {ConflictException} if user is removed, please check isRemoved property
+   * @throws {RoleValidationException} if user is not admin, please check isAdmin property
+   * @throws {ConflictException} if user is removed, please check isRemoved property
+   */
+  removeUser(user: User): void {
+    if (this.isRemoved)
+      throw new ValidationRulesException(ErrorMessages.USER_REMOVED);
+    if (user.id === this.id)
+      throw new ConflictException(ErrorMessages.CANNOT_REMOVE_YOURSELF);
+    else if (this.role !== UserRole.ADMIN)
+      throw new RoleValidationException(ErrorMessages.PERMISSION_DENIED);
+    else if (user.isRemoved)
+      throw new ConflictException(ErrorMessages.USER_REMOVED);
+
+    this.removeUserByAdmin(user);
+  }
+
+  removeUsers(users: User[]): void {
+    users.forEach((user) => this.removeUser(user));
+  }
+
+  // UserEmailVerifiedEvent
+  static verifyEmail(user: User): void {
+    if (user.isRemoved)
+      throw new Error('User already removed, please check isRemoved property');
+    user.props.isAuthenticated = true;
+  }
+
   update(poco: IUpdateUserPOCO): Result<undefined, string> {
     if (this.isRemoved)
       throw new Error('User already removed, please check isRemoved property');
@@ -143,11 +184,9 @@ export class User extends AggregateRoot {
     return new UserPermissions(false, false, false);
   }
 
-  remove(): void {
-    if (this.isRemoved)
-      throw new Error('User already removed, please check isRemoved property');
-    this.props.removedAt = new Date();
-    this.apply(new UserDeletedEvent(this.id));
+  private removeUserByAdmin(user: User): void {
+    user.props.removedAt = new Date();
+    user.apply(new UserDeletedEvent(user.id));
   }
 
   changePassword(oldPass: string, newPass: string): Result<undefined, string> {

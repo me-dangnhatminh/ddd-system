@@ -32,6 +32,7 @@ export class File extends AggregateRoot {
   }
 
   static create(props: IFileCreateProps): File {
+    // TODO: created file event
     return new File({
       id: props?.id ?? uuid(),
       name: props.name,
