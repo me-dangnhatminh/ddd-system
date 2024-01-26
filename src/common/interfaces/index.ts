@@ -1,2 +1,6 @@
+export * from './persistence';
+
 export * from './entity.interface';
-export * from './persistence/repository.interface';
+export * from './aggregate-root.interface';
+export * from './domain-event.interface';
+export * from './event-store.interface';

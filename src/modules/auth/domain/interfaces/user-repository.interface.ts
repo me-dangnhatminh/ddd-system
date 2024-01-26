@@ -1,4 +1,4 @@
-import { IRepository } from '@common/interfaces/persistence';
+import { IRepository } from '@common';
 import { IUserProps, ICreateUserPOCO, User } from '../user';
 
 export abstract class UserRepository implements IRepository {
