@@ -21,7 +21,7 @@
       "@common": ["src/common"],
       "@common/*": ["src/common/*"],
       "@modules/user": ["src/modules/user"],
-      "@modules/user/*": ["src/modules/user/*"],
+      "@modules/auth": ["src/modules/auth"],
     },
   },
 }
