@@ -1,9 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
-import { JWTClaims } from '@modules/user/domain/jwt';
 import { LoginUserQuery, LoginUserQueryResult } from '../login-user.query';
-import { UserRepository } from '@modules/user/domain/interfaces';
+import { UserRepository } from '../../../domain/interfaces';
+import { JWTClaims } from '../../../domain/jwt';
 
 @QueryHandler(LoginUserQuery)
 export class LoginUserHanlder

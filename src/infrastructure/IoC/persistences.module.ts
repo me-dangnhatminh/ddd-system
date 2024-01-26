@@ -1,5 +1,5 @@
+import { UserRepository } from '@modules/auth';
 import { PrismaService, PrismaUserRepository } from '../persistences/prisma';
-import { UserRepository } from '@modules/user/domain/interfaces';
 import { Global, Module, Provider, Scope } from '@nestjs/common';
 
 const PrismaProvider: Provider = {

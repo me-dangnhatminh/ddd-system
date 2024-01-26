@@ -1,4 +1,4 @@
-import { IUserProps, User, UserRole } from '@modules/user';
+import { IUserProps, User, UserRole } from '@modules/auth';
 import { User as PrismaUser } from '@prisma/client';
 
 export class UserMapper {

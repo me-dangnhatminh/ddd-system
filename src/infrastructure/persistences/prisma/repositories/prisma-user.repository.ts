@@ -1,11 +1,10 @@
-import * as UserModule from '@modules/user';
+import * as UserModule from '@modules/auth';
 import { PrismaService } from '../prisma.service';
 import { UserMapper } from '../mappers';
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '@modules/user/domain/interfaces';
 
 @Injectable()
-export class PrismaUserRepository implements UserRepository {
+export class PrismaUserRepository implements UserModule.UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
   async update(user: UserModule.User): Promise<void> {
     const data = UserMapper.toORM(user);

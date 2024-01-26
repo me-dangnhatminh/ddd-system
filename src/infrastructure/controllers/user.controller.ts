@@ -1,23 +1,22 @@
-import { GetUserReponseDTO } from '@modules/user/application/dtos';
-import { CreateUserCommand } from '@modules/user/application/commands';
-import {
-  GetUsersQuery,
-  LoginUserQuery,
-  LoginUserQueryResult,
-} from '@modules/user/application/queries';
+import { Body, Controller, Get, OnModuleInit, Post } from '@nestjs/common';
 
 import { CreateUserBody } from './models/create-user.model';
 import { LoginUserBody } from './models/login-user.model';
-
-import { Body, Controller, Get, OnModuleInit, Post } from '@nestjs/common';
 import {
-  CommandBus,
-  EventBus,
+  GetUsersQuery,
+  GetUserReponseDTO,
+  CreateUserCommand,
+  LoginUserQuery,
+  LoginUserQueryResult,
+} from '@modules/auth';
+import {
   EventsHandler,
   IEventHandler,
+  EventBus,
   QueryBus,
+  CommandBus,
 } from '@nestjs/cqrs';
-import { UserCreatedEvent } from '@modules/user/domain/events';
+import { UserCreatedEvent } from 'src/modules/auth/domain/events';
 
 @EventsHandler(UserCreatedEvent)
 export class UserCreatedHandler implements IEventHandler<UserCreatedEvent> {

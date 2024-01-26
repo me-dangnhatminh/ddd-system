@@ -1,21 +1,20 @@
 import {
   GetUsersQuery,
+  GetUserReponseDTO,
+  CreateUserCommand,
   LoginUserQuery,
   LoginUserQueryResult,
-} from '@modules/user/application/queries';
-import { CreateUserCommand } from '@modules/user/application/commands';
-import { GetUserReponseDTO } from '@modules/user/application/dtos';
+} from '@modules/auth';
 
 import { CreateUserBody } from './models/create-user.model';
 import { LoginUserBody } from './models/login-user.model';
 
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly eventBus: EventBus,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}

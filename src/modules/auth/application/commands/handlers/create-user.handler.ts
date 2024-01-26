@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { User } from '@modules/user';
+import { User } from '../../../domain';
+import { UserRepository } from '../../../domain/interfaces';
 import { CreateUserCommand } from '../create-user.command';
-import { UserRepository } from '@modules/user/domain/interfaces';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {

@@ -1,5 +1,5 @@
-import { User } from '@modules/user/domain';
-import { UserRepository } from '@modules/user/domain/interfaces';
+import { User } from '../../../domain';
+import { UserRepository } from '../../../domain/interfaces';
 import { GetUserQuery } from '../get-user.query';
 import { IQueryHandler, IQueryResult, QueryHandler } from '@nestjs/cqrs';
 

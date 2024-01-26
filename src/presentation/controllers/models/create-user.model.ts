@@ -1,4 +1,4 @@
-import * as UserModule from '@modules/user';
+import * as UserModule from '@modules/auth';
 import { IsEmail, IsEnum, IsString, Matches } from 'class-validator';
 
 const nameRules = {
