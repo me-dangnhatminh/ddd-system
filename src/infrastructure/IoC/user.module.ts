@@ -5,9 +5,10 @@ import {
   LoginUserHanlder,
 } from '@modules/user/application/queries';
 import { Module, Provider } from '@nestjs/common';
-import { UsersController } from '../controllers';
+import { UserCreatedHandler, UsersController } from '../controllers';
 
 const HandlersProvider: Provider[] = [
+  UserCreatedHandler,
   GetUserHandler,
   GetUsersHandler,
   CreateUserHandler,

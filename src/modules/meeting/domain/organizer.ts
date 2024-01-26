@@ -9,6 +9,11 @@ export class Organizer extends Participant {
     role: ParticipantRole;
     permissions: RoomPermisions;
   }) {
-    super(props);
+    super({
+      id: props.id,
+      name: props.name,
+      role: ParticipantRole.ORGANIZER,
+      permissions: props.permissions,
+    });
   }
 }
