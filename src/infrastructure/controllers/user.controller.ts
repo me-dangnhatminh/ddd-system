@@ -16,7 +16,7 @@ import {
   QueryBus,
   CommandBus,
 } from '@nestjs/cqrs';
-import { UserCreatedEvent } from 'src/modules/auth/domain/events';
+import { UserCreatedEvent } from '@modules/auth';
 
 @EventsHandler(UserCreatedEvent)
 export class UserCreatedHandler implements IEventHandler<UserCreatedEvent> {
