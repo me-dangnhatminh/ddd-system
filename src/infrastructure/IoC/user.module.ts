@@ -1,5 +1,5 @@
 import { Module, Provider } from '@nestjs/common';
-import { UserCreatedHandler, UsersController } from '../controllers';
+import { AuthController } from '../controllers';
 import {
   GetUserHandler,
   GetUsersHandler,
@@ -8,7 +8,6 @@ import {
 } from '@modules/auth';
 
 const HandlersProvider: Provider[] = [
-  UserCreatedHandler,
   GetUserHandler,
   GetUsersHandler,
   CreateUserHandler,
@@ -17,7 +16,7 @@ const HandlersProvider: Provider[] = [
 
 @Module({
   imports: [],
-  controllers: [UsersController],
+  controllers: [AuthController],
   providers: [...HandlersProvider],
 })
 export class UserModule {}

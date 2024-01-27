@@ -129,7 +129,7 @@ export class User extends AggregateRoot {
 
   /**
    *
-   * @param user
+   * @param {User} user - user to be removed
    * @throws {ValidationRulesException} if user is removed
    * @throws {ConflictException} if user is removed, please check isRemoved property
    * @throws {RoleValidationException} if user is not admin, please check isAdmin property
@@ -148,6 +148,11 @@ export class User extends AggregateRoot {
     this.removeUserByAdmin(user);
   }
 
+  /**
+   *
+   * @param {User[]} users - users to be removed
+   * @throws {Error} if user is removed
+   */
   removeUsers(users: User[]): void {
     users.forEach((user) => this.removeUser(user));
   }

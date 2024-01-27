@@ -1,4 +1,9 @@
-export class ApiResponse<TData, TError> {
+import { IErrorResponse } from './interfaces/error-response.interface';
+
+export class ApiResponse<
+  TData = undefined,
+  TError extends IErrorResponse = IErrorResponse,
+> {
   private constructor(
     public readonly isSuccess: boolean,
     public readonly data?: TData,
@@ -16,11 +21,19 @@ export class ApiResponse<TData, TError> {
     }
   }
 
-  static success<TData>(data: TData) {
+  static success(): ApiResponse<undefined, any>;
+  static success<TData>(data: TData): ApiResponse<TData, any>;
+  static success<TData>(data?: TData): ApiResponse<TData, any> {
     return new ApiResponse<TData, any>(true, data);
   }
 
-  static error<TError>(error: TError) {
+  static error(): ApiResponse<undefined, IErrorResponse>;
+  static error<TError extends IErrorResponse>(
+    error: TError,
+  ): ApiResponse<undefined, TError>;
+  static error<TError extends IErrorResponse>(
+    error?: TError,
+  ): ApiResponse<undefined, TError> {
     return new ApiResponse<any, TError>(false, undefined, error);
   }
 }
