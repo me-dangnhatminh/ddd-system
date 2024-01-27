@@ -3,7 +3,7 @@ import { User as PrismaUser } from '@prisma/client';
 
 export class UserMapper {
   static toDomain(orm: PrismaUser): User {
-    const { id, name, email, password } = orm;
+    const { id, email, password } = orm;
     const role = orm.role as UserRole;
     const createdAt = new Date();
     const updatedAt = null;
@@ -11,7 +11,6 @@ export class UserMapper {
 
     const userResult = User.create({
       id,
-      name,
       email,
       password,
       role,

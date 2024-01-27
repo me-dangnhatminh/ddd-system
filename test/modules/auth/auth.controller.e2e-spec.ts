@@ -1,53 +1,104 @@
-import { AuthController, RootModule } from '@infrastructure';
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import { RootModule } from '@infrastructure';
 
-describe('AuthController', () => {
-  let authController: AuthController;
+describe('AuthController (e2e)', () => {
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const module = await Test.createTestingModule({
       imports: [RootModule],
     }).compile();
 
-    const app = moduleFixture.createNestApplication();
+    app = module.createNestApplication();
     await app.init();
-    authController = app.get<AuthController>(AuthController);
   });
 
-  it('should be defined', () => {
-    expect(authController).toBeDefined();
-  });
+  it('should be defined', () => expect(app).toBeDefined());
 
-  describe('login', () => {
-    it("should return a error if user doesn't exist", async () => {
-      const dtos = [
-        { email: 'wrong@gmail.com', password: '123' }, // wrong email
-        { email: 'email_1@gmail.com', password: 'wrong' }, // wrong password
-      ];
+  describe('/auth/login (POST)', () => {
+    const login = (email, password) =>
+      request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email, password });
 
-      for (const dto of dtos) {
-        const result = await authController.login(dto).catch(() => null);
-        expect(result).toEqual({
-          isSuccess: false,
-          error: {
-            statusCode: 400,
-            message: 'Bad Request',
-          },
+    it('should be return success data', () => {
+      return login('email_1@gmail.com', '123')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toStrictEqual({
+            isSuccess: true,
+            data: { accessToken: expect.any(String) },
+          });
         });
-      }
     });
 
-    it('should return a JWT is accessToken', async () => {
-      const dto = { email: 'email_1@gmail.com', password: '123' };
-      const result = await authController.login(dto).catch(() => null);
-      expect(result).toEqual({
-        isSuccess: true,
-        data: { accessToken: expect.any(String) },
-      });
+    it('should be return error when email or password not provided', () => {
+      return login('', '')
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toStrictEqual({
+            isSuccess: false,
+            error: { code: 'ERR_VALIDATION', message: expect.any(String) },
+          });
+        });
+    });
+
+    it('should be return error when email or password not correct', () => {
+      return login('emailWrong@gmail.com', 'passwrong')
+        .expect(401)
+        .expect((res) => {
+          expect(res.body).toStrictEqual({
+            isSuccess: false,
+            error: {
+              code: 'ERR_AUTH_INVALID_CREDENTIALS',
+              message: 'Invalid credentials',
+            },
+          });
+        });
     });
   });
 
-  describe('register', () => {
-    it('should return a user', async () => {});
+  describe('/auth/register (POST)', () => {
+    it('should be return success data', () => {
+      return request(app.getHttpServer())
+        .post('/auth/register')
+        .send({ email: 'test1@gmail.com', password: 'test' })
+        .expect(201)
+        .expect((res) => {
+          expect(res.body).toStrictEqual({
+            isSuccess: true,
+            data: {
+              id: expect.any(Number),
+              firstName: expect.any(String),
+              lastName: expect.any(String),
+              email: expect.any(String),
+              avatarUrl: expect.any(String),
+              isVerified: expect.any(Boolean),
+            },
+          });
+        });
+    });
+
+    it('should be return error when email or password not provided', () => {
+      return request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+        })
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toStrictEqual({
+            isSuccess: false,
+            error: { code: 'ERR_VALIDATION', message: expect.any(String) },
+          });
+        });
+    });
   });
+
+  afterAll(async () => await app.close());
 });

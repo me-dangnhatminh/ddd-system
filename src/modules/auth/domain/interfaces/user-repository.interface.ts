@@ -1,9 +1,9 @@
 import { IRepository } from '@common';
-import { IUserProps, ICreateUserPOCO, User } from '../user';
+import { IUserProps, ICreateUserProps, User } from '../user';
 
 export abstract class UserRepository implements IRepository {
   abstract save(user: IUserProps): Promise<void>;
-  abstract create(poco: ICreateUserPOCO): Promise<User>;
+  abstract create(data: ICreateUserProps): Promise<User>;
   abstract exists(id: string): Promise<boolean>;
   abstract getAll(): Promise<User[]>;
   abstract getUserById(id: string): Promise<User | null>;

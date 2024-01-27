@@ -2,9 +2,8 @@ import { UserRole } from './user-role';
 
 export interface JWTClaims {
   userId: string;
-  isEmailVerified: boolean;
+  isVerified: boolean;
   email: string;
-  username: string;
   role: UserRole;
 }
 export type JWTToken = string;

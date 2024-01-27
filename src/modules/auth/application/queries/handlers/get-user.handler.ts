@@ -14,9 +14,7 @@ export class GetUserHandler
   async execute(query: GetUserQuery): Promise<User> {
     return this.userRepository.getUserById(query.id).then((u) => {
       if (!u) throw new Error('User not found');
-      const user = User.create(u);
-      if (!user.isSuccess()) throw new Error(user.error);
-      return user.value;
+      return u;
     });
   }
 }

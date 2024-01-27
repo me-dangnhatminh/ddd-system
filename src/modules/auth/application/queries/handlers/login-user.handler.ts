@@ -41,9 +41,8 @@ export class LoginUserHanlder
 
     const claims: JWTClaims = {
       userId: user.id,
-      isEmailVerified: false,
+      isVerified: false,
       email: user.email,
-      username: user.name,
       role: user.role,
     };
     const accessToken = await this.jwtService.sign(claims);

@@ -8,21 +8,12 @@ import { CreateUserCommand } from '../create-user.command';
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(private readonly userRepository: UserRepository) {}
   async execute(command: CreateUserCommand): Promise<User> {
-    const { name, email, password, role } = command;
-    const emailExists = await this.userRepository
-      .getUserByEmail(email)
-      .then((u) => Boolean(u));
-    if (emailExists) throw new Error('Email already exists');
-
-    const user = await this.userRepository
-      .create({ name, email, password, role })
-      .then((props) => {
-        const u = User.create(props);
-        if (!u.isSuccess()) throw new Error(u.error);
-        return u.value;
-      });
-
-    user.commit();
-    return user;
+    const { requester, data } = command;
+    const user = await this.userRepository.getUserByEmail(data.email);
+    if (user) throw new Error('User already exists');
+    const newUser = requester.createUser(data);
+    await this.userRepository.create(newUser);
+    newUser.commit();
+    return newUser;
   }
 }

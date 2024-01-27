@@ -6,42 +6,42 @@ export class ValidationRulesException extends Error {
   }
 }
 
-export class EmailValidationException extends Error {
-  static readonly message = 'Email is not valid';
+export class EmailInvalidException extends Error {
+  static readonly message = 'Email is invalid';
   constructor(message: string = ValidationRulesException.message) {
     super(message);
-    this.name = EmailValidationException.name;
+    this.name = EmailInvalidException.name;
   }
 }
 
-export class PasswordValidationException extends Error {
-  static readonly message = 'Password is not valid';
+export class PasswordInvalidException extends Error {
+  static readonly message = 'Password is invalid';
   constructor(message: string = ValidationRulesException.message) {
     super(message);
-    this.name = PasswordValidationException.name;
+    this.name = PasswordInvalidException.name;
   }
 }
 
-export class NameValidationException extends Error {
-  static readonly message = 'Name is not valid';
+export class NameInvalidException extends Error {
+  static readonly message = 'Name is invalid';
   constructor(message: string = ValidationRulesException.message) {
     super(message);
-    this.name = NameValidationException.name;
+    this.name = NameInvalidException.name;
   }
 }
 
-export class RoleValidationException extends Error {
-  static readonly message = 'Role is not valid';
-  constructor(message: string = ValidationRulesException.message) {
+export class UserNotFoundException extends Error {
+  static readonly message = 'User not found';
+  constructor(message: string = UserNotFoundException.message) {
     super(message);
-    this.name = RoleValidationException.name;
+    this.name = UserNotFoundException.name;
   }
 }
 
-export class ConflictException extends Error {
-  static readonly message = 'Conflict exception';
-  constructor(message: string = ConflictException.message) {
+export class PermissionDeniedException extends Error {
+  static readonly message = 'Permission denied';
+  constructor(message: string = PermissionDeniedException.message) {
     super(message);
-    this.name = ConflictException.name;
+    this.name = PermissionDeniedException.name;
   }
 }
