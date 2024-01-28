@@ -9,10 +9,11 @@ import {
   RegisterUserCommand,
   GetUsersQuery,
   GetUsersQueryResult,
+  UserRole,
 } from '@modules/auth';
 
 import { CreateUserBody, CreateUserResponse } from './models';
-import { HttpUser } from './decorators/HttpUser';
+import { HttpUserAuth, HttpUser } from './decorators';
 
 @Controller('users')
 export class UserController {
@@ -23,6 +24,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async getAll(): Promise<ApiResponse<GetUsersQueryResult>> {
     const query = new GetUsersQuery();
     return await this.queryBus
@@ -30,7 +32,8 @@ export class UserController {
       .then((result) => ApiResponse.success<GetUsersQueryResult>(result));
   }
 
-  @Post('')
+  @Post()
+  @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async createUser(
     @HttpUser() requester: User,
     @Body() body: CreateUserBody,

@@ -8,6 +8,7 @@ import {
   RegisterUserHandler,
   VerifyEmailHandler,
 } from '@modules/auth';
+import { UserController } from '../controllers/user.controller';
 
 const HandlersProvider: Provider[] = [
   GetUserHandler,
@@ -20,7 +21,7 @@ const HandlersProvider: Provider[] = [
 
 @Module({
   imports: [],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
   providers: [...HandlersProvider],
 })
 export class AuthModule {}

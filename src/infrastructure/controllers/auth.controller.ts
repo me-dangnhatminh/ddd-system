@@ -11,8 +11,8 @@ import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiResponse } from '@common';
 import { RegisterUserCommand } from 'src/modules/auth/application/commands/register-user.command';
 import { RegisterUserDTO } from './models';
-import { HttpUser } from './decorators/HttpUser';
-import { HttpUserAuth } from './decorators/HttpUserAuth';
+import { HttpUser } from './decorators/http-user.decorator';
+import { HttpUserAuth } from './decorators';
 
 export class LoggedInUserDTO {
   constructor(public readonly accessToken: string) {}

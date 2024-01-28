@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { LoginUserQuery, LoginUserQueryResult } from '../login-user.query';
 import { UserRepository } from '../../../domain/interfaces';
-import { JWTClaims } from '../../../domain/jwt';
+import { UserJWTClaims } from '../../../domain/user-jwt';
 import { IErrorResponse } from 'src/common/interfaces/error-response.interface';
 
 export class NotFoundException extends Error implements IErrorResponse {
@@ -39,7 +39,7 @@ export class LoginUserHanlder
     const passwordMatch = await user.comparePassword(password);
     if (!passwordMatch) throw new Error("Email or password doesn't match");
 
-    const claims: JWTClaims = {
+    const claims: UserJWTClaims = {
       userId: user.id,
       isVerified: false,
       email: user.email,

@@ -5,3 +5,4 @@ export * from './user';
 export * from './user-role';
 export * from './user-permissions';
 export * from './auth-provider';
+export * from './user-jwt';
