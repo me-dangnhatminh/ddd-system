@@ -147,6 +147,13 @@ export class User extends AggregateRoot implements IUser {
       return new UserPermissions(true, true, true);
     return new UserPermissions(false, false, false);
   }
+
+  verifyEmail(code: string): void {
+    code; //TODO: fake validate code
+    if (this.isVerified) throw new Error('User already verified');
+    this.apply(new EmailVerifiedEvent(this.id));
+  }
+
   //! ======================[ Protected methods ]====================== !//
 
   protected constructor(private props: IUserProps) {

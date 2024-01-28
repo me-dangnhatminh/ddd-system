@@ -6,6 +6,7 @@ import {
   CreateUserHandler,
   LoginUserHanlder,
   RegisterUserHandler,
+  VerifyEmailHandler,
 } from '@modules/auth';
 
 const HandlersProvider: Provider[] = [
@@ -14,6 +15,7 @@ const HandlersProvider: Provider[] = [
   CreateUserHandler,
   LoginUserHanlder,
   RegisterUserHandler,
+  VerifyEmailHandler,
 ];
 
 @Module({

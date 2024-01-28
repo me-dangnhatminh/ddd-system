@@ -1,11 +1,18 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Patch, Post, Query } from '@nestjs/common';
 
 import { LoginUserBody } from './models/login-user.model';
-import { LoginUserQuery, LoginUserQueryResult } from '@modules/auth';
+import {
+  LoginUserQuery,
+  LoginUserQueryResult,
+  User,
+  VerifyEmailCommand,
+} from '@modules/auth';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiResponse } from '@common';
 import { RegisterUserCommand } from 'src/modules/auth/application/commands/register-user.command';
 import { RegisterUserDTO } from './models';
+import { HttpUser } from './decorators/HttpUser';
+import { HttpUserAuth } from './decorators/HttpUserAuth';
 
 export class LoggedInUserDTO {
   constructor(public readonly accessToken: string) {}
@@ -39,6 +46,17 @@ export class AuthController {
       password,
     });
     await this.commandBus.execute<RegisterUserCommand>(command);
+    return ApiResponse.success();
+  }
+
+  @Patch('verify-email')
+  @HttpUserAuth()
+  async verifyEmail(
+    @HttpUser() requester: User,
+    @Query('code') code?: string,
+  ): Promise<ApiResponse> {
+    const command = new VerifyEmailCommand(requester, code);
+    await this.commandBus.execute<VerifyEmailCommand>(command);
     return ApiResponse.success();
   }
 }

@@ -30,7 +30,7 @@ const subscriptions: Provider[] = [UserCreatedSubscription];
 export class MailerModule implements OnApplicationBootstrap {
   constructor(private readonly mailerService: MailerService) {}
   async onApplicationBootstrap() {
-    await this.testConnection();
+    // await this.testConnection();
   }
 
   private async testConnection() {

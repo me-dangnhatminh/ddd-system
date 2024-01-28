@@ -6,6 +6,7 @@ import { PersistencesModule } from './persistences.module';
 import { JwtModule } from './jwt.module';
 import { EventStoreModule } from './esdb.module';
 import { MailerModule } from './mailer.module';
+import { CacheModule } from './cache.module';
 
 @Module({
   imports: [
@@ -13,8 +14,9 @@ import { MailerModule } from './mailer.module';
     JwtModule,
     CqrsModule,
     EventStoreModule,
-    AuthModule,
     MailerModule,
+    CacheModule,
+    AuthModule,
   ],
 })
 export class RootModule {}
