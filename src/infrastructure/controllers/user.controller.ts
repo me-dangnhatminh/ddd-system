@@ -44,7 +44,6 @@ export class UserController {
       role,
       avatarUrl,
     });
-    // use class transformer to transform the result
     return await this.commandBus
       .execute<RegisterUserCommand>(command)
       .then((result) =>
