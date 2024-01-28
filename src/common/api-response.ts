@@ -1,13 +1,13 @@
 import { IErrorResponse } from './interfaces/error-response.interface';
 
 export class ApiResponse<
-  TData = undefined,
-  TError extends IErrorResponse = IErrorResponse,
+  BaseData = undefined,
+  BaseError extends IErrorResponse = IErrorResponse,
 > {
   private constructor(
     public readonly isSuccess: boolean,
-    public readonly data?: TData,
-    public readonly error?: TError,
+    public readonly data?: BaseData,
+    public readonly error?: BaseError,
   ) {
     if (isSuccess && error) {
       throw new Error(
@@ -22,18 +22,14 @@ export class ApiResponse<
   }
 
   static success(): ApiResponse<undefined, any>;
-  static success<TData>(data: TData): ApiResponse<TData, any>;
-  static success<TData>(data?: TData): ApiResponse<TData, any> {
-    return new ApiResponse<TData, any>(true, data);
+  static success<T>(data: T): ApiResponse<T, any>;
+  static success<T>(data?: T): ApiResponse<T, any> {
+    return new ApiResponse<T, any>(true, data);
   }
 
   static error(): ApiResponse<undefined, IErrorResponse>;
-  static error<TError extends IErrorResponse>(
-    error: TError,
-  ): ApiResponse<undefined, TError>;
-  static error<TError extends IErrorResponse>(
-    error?: TError,
-  ): ApiResponse<undefined, TError> {
-    return new ApiResponse<any, TError>(false, undefined, error);
+  static error<E extends IErrorResponse>(error: E): ApiResponse<undefined, E>;
+  static error<E extends IErrorResponse>(error?: E): ApiResponse<undefined, E> {
+    return new ApiResponse<any, E>(false, undefined, error);
   }
 }

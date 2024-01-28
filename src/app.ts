@@ -24,6 +24,7 @@ export class ServerApplication {
   private buildValidatorPipe(): void {
     this.app.useGlobalPipes(
       new ValidationPipe({
+        transform: true,
         exceptionFactory(errors: ValidationError[]) {
           const message: { [key: string]: string } = {};
           errors.forEach((error) => {

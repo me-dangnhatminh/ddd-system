@@ -1,29 +1,72 @@
-import { IUserProps, User, UserRole } from '@modules/auth';
-import { User as PrismaUser } from '@prisma/client';
+import { AuthProvider, IUserProps, User, UserRole } from '@modules/auth';
+import {
+  User as PrismaUser,
+  AuthProvider as PrismaAuthProvider,
+  UserRole as PrismaUserRole,
+} from '@prisma/client';
 
 export class UserMapper {
   static toDomain(orm: PrismaUser): User {
-    const { id, email, password } = orm;
-    const role = orm.role as UserRole;
-    const createdAt = new Date();
-    const updatedAt = null;
-    const removedAt = null;
-
-    const userResult = User.create({
+    const {
       id,
+      firstName,
+      lastName,
       email,
       password,
+      authProvider,
       role,
+      isVerified,
+      avatarUrl,
+      createdAt,
+      updatedAt,
+      removedAt,
+    } = orm;
+
+    return User.new({
+      id,
+      firstName,
+      lastName,
+      email,
+      password,
+      authProvider: authProvider as AuthProvider,
+      role: role as UserRole,
+      isVerified,
+      avatarUrl,
       createdAt,
       updatedAt,
       removedAt,
     });
-    if (!userResult.isSuccess()) throw new Error(userResult.error);
-    return userResult.value;
   }
 
   static toORM(domain: IUserProps): PrismaUser {
-    const { id, name, email, password, role } = domain;
-    return { id, name, email, password, role };
+    const {
+      id,
+      firstName,
+      lastName,
+      email,
+      password,
+      authProvider,
+      role,
+      isVerified,
+      avatarUrl,
+      createdAt,
+      updatedAt,
+      removedAt,
+    } = domain;
+
+    return {
+      id,
+      firstName,
+      lastName,
+      email,
+      password,
+      authProvider: authProvider as PrismaAuthProvider,
+      role: role as PrismaUserRole,
+      isVerified,
+      avatarUrl,
+      createdAt,
+      updatedAt,
+      removedAt,
+    };
   }
 }

@@ -51,6 +51,7 @@ export interface IUserProps {
 
 export interface IUser {
   isRemoved: boolean;
+  isLogged: boolean;
   permissions: UserPermissions;
 }
 
@@ -136,6 +137,10 @@ export class User extends AggregateRoot implements IUser {
     return this.props.removedAt !== null;
   }
 
+  get isLogged(): boolean {
+    return this._isLogged;
+  }
+
   get permissions(): UserPermissions {
     if (this.role === UserRole.ADMIN)
       return new UserPermissions(true, true, true);
@@ -154,17 +159,18 @@ export class User extends AggregateRoot implements IUser {
 
   // --- Private methods ---
   private removeUserByAdmin(user: User): void {
+    user.validate({ ignoreLogin: true });
     user.props.removedAt = new Date();
     user.apply(new UserDeletedEvent(user.id));
   }
 
   private validate(
-    opts: { ignoreRemoved?: boolean; ignoreLogged?: boolean } = {
+    opts: { ignoreRemoved?: boolean; ignoreLogin?: boolean } = {
       ignoreRemoved: false,
-      ignoreLogged: false,
+      ignoreLogin: false,
     },
   ) {
-    if (!this._isLogged && !opts.ignoreLogged)
+    if (!this._isLogged && !opts.ignoreLogin)
       new PermissionDeniedException(MESSAGES.NOT_LOGGED);
     if (this.isRemoved && !opts.ignoreRemoved)
       throw new UserNotFoundException(MESSAGES.USER_REMOVED);
@@ -179,8 +185,20 @@ export class User extends AggregateRoot implements IUser {
   }
 
   // --- Static methods ---
+  /**
+   * Creates a new User instance.
+   * @param props - The properties to create a new user.
+   * @returns The newly created user.
+   */
+  static new = (props: IUserProps): User => new User(props);
+
+  /**
+   * Creates a new User instance.
+   * @param props - The properties to create a new user.
+   * @returns The newly created user.
+   */
   static create(props: ICreateUserProps): User {
-    const user = new User({
+    const user = User.new({
       id: props.id ?? uuid(),
       firstName: props.firstName,
       lastName: props.lastName,
@@ -194,7 +212,7 @@ export class User extends AggregateRoot implements IUser {
       updatedAt: props.updatedAt ?? null,
       removedAt: props.removedAt ?? null,
     });
-    user.validate();
+    user.validate({ ignoreRemoved: true, ignoreLogin: true });
     user.apply(new UserCreatedEvent(user));
     return user;
   }
@@ -213,6 +231,8 @@ export class User extends AggregateRoot implements IUser {
 
   // --- Public methods ---
   removeUser(user: User): void {
+    if (this.role !== UserRole.ADMIN)
+      throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
     this.removeUserByAdmin(user);
   }
 
@@ -226,6 +246,12 @@ export class User extends AggregateRoot implements IUser {
     return User.create(props);
   }
 
+  /**
+   * Updates the properties of a user. Only an admin can update a user.
+   * @param data - The properties to update the user with.
+   * @throws {PermissionDeniedException} If the requester is not an admin.
+   * @returns The updated user.
+   */
   updateUser(user: User, data: IUpdateUserProps): void {
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
@@ -254,7 +280,7 @@ export class User extends AggregateRoot implements IUser {
     if (!this.comparePassword(oldPass))
       throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
     this.props.password = newPass;
-    this.validate({ ignoreLogged: true });
+    this.validate({ ignoreLogin: true });
     this.apply(new PasswordChangedEvent(this.id));
   }
 
