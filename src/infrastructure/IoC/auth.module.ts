@@ -5,6 +5,7 @@ import {
   GetUsersHandler,
   CreateUserHandler,
   LoginUserHanlder,
+  RegisterUserHandler,
 } from '@modules/auth';
 
 const HandlersProvider: Provider[] = [
@@ -12,6 +13,7 @@ const HandlersProvider: Provider[] = [
   GetUsersHandler,
   CreateUserHandler,
   LoginUserHanlder,
+  RegisterUserHandler,
 ];
 
 @Module({
@@ -19,4 +21,4 @@ const HandlersProvider: Provider[] = [
   controllers: [AuthController],
   providers: [...HandlersProvider],
 })
-export class UserModule {}
+export class AuthModule {}

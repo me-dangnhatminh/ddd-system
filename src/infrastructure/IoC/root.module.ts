@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 
-import { UserModule } from './user.module';
+import { AuthModule } from './auth.module';
 import { CqrsModule } from './cqrs.module';
 import { PersistencesModule } from './persistences.module';
 import { JwtModule } from './jwt.module';
 import { EventStoreModule } from './esdb.module';
+import { MailerModule } from './mailer.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { EventStoreModule } from './esdb.module';
     JwtModule,
     CqrsModule,
     EventStoreModule,
-    UserModule,
+    AuthModule,
+    MailerModule,
   ],
 })
 export class RootModule {}

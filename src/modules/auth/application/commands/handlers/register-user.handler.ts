@@ -1,10 +1,13 @@
 import { AuthProvider, User, UserRepository, UserRole } from '../../../domain';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../register-user.command';
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler implements ICommandHandler {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly publisher: EventPublisher,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async execute(command) {
     const { data } = command;
@@ -17,6 +20,8 @@ export class RegisterUserHandler implements ICommandHandler {
       role: UserRole.USER,
     });
     await this.userRepository.create(newUser);
+
+    this.publisher.mergeObjectContext(newUser);
     newUser.commit();
     return newUser;
   }

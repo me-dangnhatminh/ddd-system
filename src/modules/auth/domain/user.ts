@@ -17,11 +17,13 @@ import {
 } from './exceptions/user-exception';
 import { AuthProvider } from './auth-provider';
 import { UserUpdatedEvent } from './events/user-updated.event';
+import { LoggedInEvent } from './events/logged-in.event';
+import { EmailVerifiedEvent } from './events/email-verified.event';
 
 export const ValidationRules = {
-  NAME_VALIDATION_REGEXP: /^[a-zA-Z0-9]{1,30}$/,
+  NAME_VALIDATION_REGEXP: /^.{1,30}$/,
   PASSWORD_VALIDATION_REGEXP: /^[a-zA-Z0-9]{6,30}$/,
-  EMAIL_VALIDATION_REGEXP: /^[a-zA-Z0-9]{1,30}$/,
+  EMAIL_VALIDATION_REGEXP: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
 };
 
 export const MESSAGES = {
@@ -51,8 +53,7 @@ export interface IUserProps {
 
 export interface IUser {
   isRemoved: boolean;
-  isLogged: boolean;
-  permissions: UserPermissions;
+  isLoggedIn: boolean;
 }
 
 export interface ICreateUserProps {
@@ -79,7 +80,7 @@ export interface IUpdateUserProps {
 }
 
 export class User extends AggregateRoot implements IUser {
-  private _isLogged: boolean;
+  private _isLoggedIn: boolean;
 
   get id(): string {
     return this.props.id;
@@ -137,8 +138,8 @@ export class User extends AggregateRoot implements IUser {
     return this.props.removedAt !== null;
   }
 
-  get isLogged(): boolean {
-    return this._isLogged;
+  get isLoggedIn(): boolean {
+    return this._isLoggedIn;
   }
 
   get permissions(): UserPermissions {
@@ -151,10 +152,6 @@ export class User extends AggregateRoot implements IUser {
   protected constructor(private props: IUserProps) {
     super();
     this.autoCommit = false;
-  }
-
-  protected onUserCreatedEvent(event: UserCreatedEvent) {
-    console.log(`User Create with name: ${event.user.fullname}`);
   }
 
   //! ======================[ Private methods ]====================== !//
@@ -186,7 +183,7 @@ export class User extends AggregateRoot implements IUser {
       ignoreLogin: false,
     },
   ) {
-    if (!this._isLogged && !opts.ignoreLogin)
+    if (!this._isLoggedIn && !opts.ignoreLogin)
       new PermissionDeniedException(MESSAGES.NOT_LOGGED);
     if (this.isRemoved && !opts.ignoreRemoved)
       throw new UserNotFoundException(MESSAGES.USER_REMOVED);
@@ -315,9 +312,7 @@ export class User extends AggregateRoot implements IUser {
   changePassword(oldPass: string, newPass: string): void {
     if (!this.comparePassword(oldPass))
       throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
-    this.props.password = newPass;
-    this.validate({ ignoreLogin: true });
-    this.apply(new PasswordChangedEvent(this.id));
+    this.apply(new PasswordChangedEvent(this.id, newPass));
   }
 
   comparePassword(pass: string): boolean {
@@ -327,21 +322,49 @@ export class User extends AggregateRoot implements IUser {
   loggin(pass: string): void {
     if (!this.comparePassword(pass))
       throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
-    this._isLogged = true;
   }
 
   //! ======================[ Event methods ]====================== !//
-  onUserDeletedEvent() {
+  protected onUserCreatedEvent(event: UserCreatedEvent) {
+    const { data } = event;
+    this.props.id = data.id;
+    this.props.firstName = data.firstName;
+    this.props.lastName = data.lastName;
+    this.props.email = data.email;
+    this.props.password = data.password;
+    this.props.authProvider = data.authProvider;
+    this.props.role = data.role;
+    this.props.isVerified = data.isVerified;
+    this.props.avatarUrl = data.avatarUrl;
+    this.props.createdAt = data.createdAt;
+    this.props.updatedAt = data.updatedAt;
+    this.props.removedAt = data.removedAt;
+  }
+
+  protected onUserDeletedEvent(event: UserDeletedEvent) {
+    event; // fake usage to avoid eslint error
     this.props.removedAt = new Date();
   }
 
-  onUserLoggedEvent() {
-    this._isLogged = true;
+  protected onLoggedInEvent(event: LoggedInEvent) {
+    event; // fake usage to avoid eslint error
+    this._isLoggedIn = true;
   }
 
-  onPasswordChangedEvent() {}
+  protected onPasswordChangedEvent(event: PasswordChangedEvent) {
+    this.props.password = event.password;
+  }
 
-  onUserUpdatedEvent() {
+  protected onUserUpdatedEvent(event: UserUpdatedEvent) {
+    const { data } = event;
+    this.props.firstName = data?.firstName ?? this.props.firstName;
+    this.props.lastName = data?.lastName ?? this.props.lastName;
+    this.props.avatarUrl = data?.avatarUrl ?? this.props.avatarUrl;
     this.props.updatedAt = new Date();
+  }
+
+  protected onEmailVerifiedEvent(event: EmailVerifiedEvent) {
+    event; // fake usage to avoid eslint error
+    this.props.isVerified = true;
   }
 }

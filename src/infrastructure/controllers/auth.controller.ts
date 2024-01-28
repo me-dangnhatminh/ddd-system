@@ -1,11 +1,11 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 
-import { CreateUserBody } from './models/create-user.model';
 import { LoginUserBody } from './models/login-user.model';
 import { LoginUserQuery, LoginUserQueryResult } from '@modules/auth';
-import { EventBus, QueryBus, CommandBus } from '@nestjs/cqrs';
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { ApiResponse } from '@common';
 import { RegisterUserCommand } from 'src/modules/auth/application/commands/register-user.command';
+import { RegisterUserDTO } from './models';
 
 export class LoggedInUserDTO {
   constructor(public readonly accessToken: string) {}
@@ -13,7 +13,6 @@ export class LoggedInUserDTO {
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly eventBus: EventBus,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
   ) {}
@@ -31,7 +30,7 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() body: CreateUserBody): Promise<ApiResponse> {
+  async register(@Body() body: RegisterUserDTO): Promise<ApiResponse> {
     const { firstName, lastName, email, password } = body;
     const command = new RegisterUserCommand({
       firstName,
