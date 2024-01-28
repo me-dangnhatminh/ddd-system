@@ -146,8 +146,8 @@ export class User extends AggregateRoot implements IUser {
       return new UserPermissions(true, true, true);
     return new UserPermissions(false, false, false);
   }
+  //! ======================[ Protected methods ]====================== !//
 
-  // --- Protected methods ---
   protected constructor(private props: IUserProps) {
     super();
     this.autoCommit = false;
@@ -157,13 +157,29 @@ export class User extends AggregateRoot implements IUser {
     console.log(`User Create with name: ${event.user.fullname}`);
   }
 
-  // --- Private methods ---
+  //! ======================[ Private methods ]====================== !//
+
   private removeUserByAdmin(user: User): void {
     user.validate({ ignoreLogin: true });
     user.props.removedAt = new Date();
     user.apply(new UserDeletedEvent(user.id));
   }
 
+  /**
+   * The `validate` function checks various conditions related to user authentication and data validity,
+   * throwing exceptions if any of the conditions are not met.
+   * @param opts - The `opts` parameter is an object that contains two optional properties:
+   * @param opts.ignoreRemoved - The `ignoreRemoved` property is a boolean value that indicates whether
+   * the function should ignore the "removed" status of the user.
+   * @param opts.ignoreLogin - The `ignoreLogin` property is a boolean value that indicates whether the
+   * function should ignore the "logged" status of the user.
+   * @throws {PermissionDeniedException} If the user is not logged in.
+   * @throws {UserNotFoundException} If the user is removed.
+   * @throws {NameInvalidException} If the user's first or last name is invalid.
+   * @throws {EmailInvalidException} If the user's email is invalid.
+   * @throws {PasswordInvalidException} If the user's password is invalid.
+   * @returns void - The `validate` function does not return anything.
+   */
   private validate(
     opts: { ignoreRemoved?: boolean; ignoreLogin?: boolean } = {
       ignoreRemoved: false,
@@ -184,7 +200,8 @@ export class User extends AggregateRoot implements IUser {
       throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
   }
 
-  // --- Static methods ---
+  //! ======================[ Static methods ]====================== !//
+
   /**
    * Creates a new User instance.
    * @param props - The properties to create a new user.
@@ -193,9 +210,10 @@ export class User extends AggregateRoot implements IUser {
   static new = (props: IUserProps): User => new User(props);
 
   /**
-   * Creates a new User instance.
-   * @param props - The properties to create a new user.
-   * @returns The newly created user.
+   * The function creates a new User object with the provided properties and returns it.
+   * @param {ICreateUserProps} props - The `props` parameter is an object that contains the following
+   * properties:
+   * @returns The `create` method returns an instance of the `User` class.
    */
   static create(props: ICreateUserProps): User {
     const user = User.new({
@@ -217,19 +235,37 @@ export class User extends AggregateRoot implements IUser {
     return user;
   }
 
+  /**
+   * The function "validateEmail" checks if a given email string matches a regular expression for email
+   * validation.
+   * @param {string} email - The email parameter is a string that represents an email address.
+   * @returns a boolean value.
+   */
   static validateEmail(email: string): boolean {
     return ValidationRules.EMAIL_VALIDATION_REGEXP.test(email);
   }
 
+  /**
+   * The function "validateName" checks if a given name matches a specific regular expression pattern.
+   * @param {string} name - The parameter "name" is a string that represents a name.
+   * @returns a boolean value.
+   */
   static validateName(name: string): boolean {
     return ValidationRules.NAME_VALIDATION_REGEXP.test(name);
   }
-
+  /**
+   * The function "validatePassword" checks if a given password matches a specific regular expression
+   * pattern.
+   * @param {string} password - The `password` parameter is a string that represents the password that
+   * needs to be validated.
+   * @returns a boolean value.
+   */
   static validatePassword(password: string): boolean {
     return ValidationRules.PASSWORD_VALIDATION_REGEXP.test(password);
   }
 
-  // --- Public methods ---
+  //! ======================[ Public methods ]====================== !//
+
   removeUser(user: User): void {
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
@@ -292,5 +328,20 @@ export class User extends AggregateRoot implements IUser {
     if (!this.comparePassword(pass))
       throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
     this._isLogged = true;
+  }
+
+  //! ======================[ Event methods ]====================== !//
+  onUserDeletedEvent() {
+    this.props.removedAt = new Date();
+  }
+
+  onUserLoggedEvent() {
+    this._isLogged = true;
+  }
+
+  onPasswordChangedEvent() {}
+
+  onUserUpdatedEvent() {
+    this.props.updatedAt = new Date();
   }
 }
