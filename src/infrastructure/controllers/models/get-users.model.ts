@@ -8,7 +8,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class UserQueryParamsDTO {
+export class GetUsersQueryParamsDTO {
   @IsOptional()
   @Transform(({ value }) => parseInt(value))
   @IsNumber()

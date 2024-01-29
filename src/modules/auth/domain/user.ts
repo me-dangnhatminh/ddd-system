@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuid } from 'uuid';
 
@@ -271,6 +272,7 @@ export class User extends AggregateRoot implements IUser {
   //! ======================[ Public methods ]====================== !//
 
   removeUser(user: User): void {
+    if (user.id === this.id) throw new Error('You cannot remove yourself');
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
     this.removeUserByAdmin(user);
@@ -284,6 +286,10 @@ export class User extends AggregateRoot implements IUser {
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
     return User.create(props);
+  }
+
+  createUsers(props: ICreateUserProps[]): User[] {
+    return props.map((user) => this.createUser(user));
   }
 
   /**
@@ -349,12 +355,10 @@ export class User extends AggregateRoot implements IUser {
   }
 
   protected onUserDeletedEvent(event: UserDeletedEvent) {
-    event; // fake usage to avoid eslint error
     this.props.removedAt = new Date();
   }
 
   protected onLoggedInEvent(event: LoggedInEvent) {
-    event; // fake usage to avoid eslint error
     this._isLoggedIn = true;
   }
 
@@ -371,7 +375,6 @@ export class User extends AggregateRoot implements IUser {
   }
 
   protected onEmailVerifiedEvent(event: EmailVerifiedEvent) {
-    event; // fake usage to avoid eslint error
     this.props.isVerified = true;
   }
 }

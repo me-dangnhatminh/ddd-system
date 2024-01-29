@@ -18,12 +18,14 @@ import {
   GetUsersQuery,
   GetUsersQueryResult,
   UserRole,
+  DeleteUserCommand,
 } from '@modules/auth';
 
 import {
   CreateUserBody,
   CreateUserResponse,
-  UserQueryParamsDTO,
+  DeleteUsersQueryParamsDTO,
+  GetUsersQueryParamsDTO,
 } from './models';
 import { HttpUserAuth, HttpUser } from './decorators';
 import { CreateMultipleUsersBody } from './models/create-multiple-users.model';
@@ -38,7 +40,7 @@ export class UserController {
   @Get()
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async getAllByAdmin(
-    @Query() queryParams: UserQueryParamsDTO,
+    @Query() queryParams: GetUsersQueryParamsDTO,
   ): Promise<ApiResponse<GetUsersQueryResult>> {
     const query = new GetUsersQuery(queryParams);
     return await this.queryBus
@@ -75,17 +77,23 @@ export class UserController {
     return ApiResponse.success();
   }
 
-  @Delete(':userId')
+  @Delete(':id')
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async deleteUser(@Param('userId') userId: string) {
-    throw new Error('Not implemented'); // TODO: Implement this
+  async deleteUsers(@HttpUser() requester: User, @Param('id') id: string) {
+    const command = new DeleteUserCommand(requester, [id]);
+    await this.commandBus.execute<DeleteUserCommand>(command);
+    return ApiResponse.success();
   }
 
   @Delete('delete-multiple')
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
-  async deleteMultipleUsersByAdmin(@Query('userIds') userIds: string[]) {
-    throw new Error('Not implemented'); // TODO: Implement this
+  async deleteMultipleUsersByAdmin(
+    @HttpUser() requester: User,
+    @Query() queryParams: DeleteUsersQueryParamsDTO,
+  ): Promise<ApiResponse> {
+    const command = new DeleteUserCommand(requester, queryParams.ids);
+    await this.commandBus.execute<DeleteUserCommand>(command);
+    return ApiResponse.success();
   }
 
   @Get('me')
