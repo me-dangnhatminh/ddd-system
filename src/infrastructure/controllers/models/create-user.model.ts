@@ -33,10 +33,7 @@ export class CreateUserBody {
   @Matches(passwordRules.reg, { message: passwordRules.mes })
   password: string;
 
-  @IsString()
-  @IsEnum(UserModule.UserRole)
-  role: UserModule.UserRole;
-
+  @IsString() @IsEnum(UserModule.UserRole) role: UserModule.UserRole;
   @IsString() @IsUrl() @IsOptional() avatarUrl?: string;
 }
 
@@ -46,5 +43,10 @@ export class CreateUserResponse {
     public readonly firstName: string,
     public readonly lastName: string,
     public readonly email: string,
+    public readonly avatarUrl: string,
+    public readonly role: string,
+    public readonly isVerified: boolean,
+    public readonly createdAt: Date | null,
+    public readonly updatedAt: Date | null,
   ) {}
 }

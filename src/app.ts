@@ -8,6 +8,7 @@ import {
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 
 export class ServerApplication {
   private constructor(public readonly app: NestExpressApplication) {}
@@ -18,6 +19,8 @@ export class ServerApplication {
 
   public async run() {
     this.buildValidatorPipe();
+    this.app.use(bodyParser.json({ limit: '100mb' }));
+    this.app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
     await this.app.listen(3000);
   }
 

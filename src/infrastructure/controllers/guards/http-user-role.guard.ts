@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AUTHENTICATED_USER_KEY, USER_ROLES_METADATA } from '../constants';
 import { User, UserRole } from '@modules/auth';
@@ -22,6 +27,10 @@ export class HttpUserRoleGuard implements CanActivate {
         'User does not exist in the request, please check the HttpUser decorator',
       );
 
-    return roles.includes(request.user.role);
+    if (!roles.includes(request.user.role))
+      throw new ForbiddenException(
+        "You don't have permission to access this resource",
+      );
+    return true;
   }
 }

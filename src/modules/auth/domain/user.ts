@@ -148,8 +148,8 @@ export class User extends AggregateRoot implements IUser {
     return new UserPermissions(false, false, false);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   verifyEmail(code: string): void {
-    code; //TODO: fake validate code
     if (this.isVerified) throw new Error('User already verified');
     this.apply(new EmailVerifiedEvent(this.id));
   }

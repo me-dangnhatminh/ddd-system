@@ -20,14 +20,13 @@ import {
   UserRole,
 } from '@modules/auth';
 
-import { CreateUserBody, CreateUserResponse } from './models';
+import {
+  CreateUserBody,
+  CreateUserResponse,
+  UserQueryParamsDTO,
+} from './models';
 import { HttpUserAuth, HttpUser } from './decorators';
-
-interface GetUsersOptions {
-  page: number;
-  limit: number;
-  search: string;
-}
+import { CreateMultipleUsersBody } from './models/create-multiple-users.model';
 
 @Controller('users')
 export class UserController {
@@ -36,11 +35,12 @@ export class UserController {
     private readonly commandBus: CommandBus,
   ) {}
 
-  // TODO: add pagination
   @Get()
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
-  async getAllByAdmin(): Promise<ApiResponse<GetUsersQueryResult>> {
-    const query = new GetUsersQuery();
+  async getAllByAdmin(
+    @Query() queryParams: UserQueryParamsDTO,
+  ): Promise<ApiResponse<GetUsersQueryResult>> {
+    const query = new GetUsersQuery(queryParams);
     return await this.queryBus
       .execute<GetUsersQuery, GetUsersQueryResult>(query)
       .then((result) => ApiResponse.success<GetUsersQueryResult>(result));
@@ -62,12 +62,22 @@ export class UserController {
 
   @Post('create-multiple')
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
-  async createMultipleUsersByAdmin(): Promise<ApiResponse<unknown>> {
-    throw new Error('Not implemented'); // TODO: Implement this
+  async createMultipleUsersByAdmin(
+    @HttpUser() requester: User,
+    @Body() body: CreateMultipleUsersBody,
+  ): Promise<ApiResponse<unknown>> {
+    const process: Promise<any>[] = [];
+    for (const item of body.items) {
+      const command = new CreateUserCommand(requester, item);
+      process.push(this.commandBus.execute<RegisterUserCommand>(command));
+    }
+    await Promise.all(process);
+    return ApiResponse.success();
   }
 
   @Delete(':userId')
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async deleteUser(@Param('userId') userId: string) {
     throw new Error('Not implemented'); // TODO: Implement this
   }
