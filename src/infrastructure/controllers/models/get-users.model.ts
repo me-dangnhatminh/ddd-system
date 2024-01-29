@@ -1,3 +1,4 @@
+import { TUserFindField } from '@modules/auth';
 import { Transform } from 'class-transformer';
 import {
   IsIn,
@@ -28,8 +29,8 @@ export class GetUsersQueryParamsDTO {
 
   @IsString()
   @IsOptional()
-  @IsIn(['createdAt', 'updatedAt', 'fullname', 'email', 'role'])
-  sortBy?: string;
+  @IsIn(['createdAt', 'updatedAt', 'firstName', 'lastName', 'email', 'id'])
+  sortBy?: TUserFindField;
 
   @IsIn(['asc', 'desc'])
   @IsOptional()

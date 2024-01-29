@@ -12,9 +12,8 @@ export class GetUserHandler
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(query: GetUserQuery): Promise<User> {
-    return this.userRepository.getUserById(query.id).then((u) => {
-      if (!u) throw new Error('User not found');
-      return u;
-    });
+    const user = await this.userRepository.getOneById(query.id);
+    if (!user) throw new Error('User not found');
+    return user;
   }
 }

@@ -11,9 +11,10 @@ export class RegisterUserHandler implements ICommandHandler {
 
   async execute(command) {
     const { data } = command;
-    await this.userRepository.getUserByEmail(data.email).then((user) => {
-      if (user) throw new Error('User already exists');
-    });
+
+    const u = await this.userRepository.getOneByEmail(data.email);
+    if (u) throw new Error('User already exists');
+
     const newUser = User.create({
       ...data,
       authProvider: AuthProvider.LOCAL,

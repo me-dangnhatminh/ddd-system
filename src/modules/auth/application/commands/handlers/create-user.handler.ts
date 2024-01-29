@@ -9,9 +9,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(private readonly userRepository: UserRepository) {}
   async execute(command: CreateUserCommand): Promise<User> {
     const { requester, data } = command;
-    await this.userRepository.getUserByEmail(data.email).then((user) => {
-      if (user) throw new Error('User already exists');
-    });
+
+    const u = await this.userRepository.getOneByEmail(data.email);
+    if (u) throw new Error('User already exists');
 
     const newUser = requester.createUser(data);
     await this.userRepository.create(newUser);

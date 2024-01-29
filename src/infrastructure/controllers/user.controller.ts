@@ -19,6 +19,7 @@ import {
   GetUsersQueryResult,
   UserRole,
   DeleteUserCommand,
+  CreateUsersCommand,
 } from '@modules/auth';
 
 import {
@@ -42,7 +43,13 @@ export class UserController {
   async getAllByAdmin(
     @Query() queryParams: GetUsersQueryParamsDTO,
   ): Promise<ApiResponse<GetUsersQueryResult>> {
-    const query = new GetUsersQuery(queryParams);
+    const query = new GetUsersQuery({
+      page: queryParams.page,
+      limit: queryParams.limit,
+      search: queryParams.search,
+      sortBy: queryParams.sortBy,
+      sort: queryParams.sort,
+    });
     return await this.queryBus
       .execute<GetUsersQuery, GetUsersQueryResult>(query)
       .then((result) => ApiResponse.success<GetUsersQueryResult>(result));
@@ -68,12 +75,8 @@ export class UserController {
     @HttpUser() requester: User,
     @Body() body: CreateMultipleUsersBody,
   ): Promise<ApiResponse<unknown>> {
-    const process: Promise<any>[] = [];
-    for (const item of body.items) {
-      const command = new CreateUserCommand(requester, item);
-      process.push(this.commandBus.execute<RegisterUserCommand>(command));
-    }
-    await Promise.all(process);
+    const command = new CreateUsersCommand(requester, body.items);
+    await this.commandBus.execute<CreateUsersCommand>(command);
     return ApiResponse.success();
   }
 

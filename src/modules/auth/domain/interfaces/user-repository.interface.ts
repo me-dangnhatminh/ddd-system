@@ -1,20 +1,36 @@
-import { IFindOptions, IRepository } from '@common';
-import { IUserProps, ICreateUserProps, User } from '../user';
+import { IOptions } from '@common';
+import { IUserProps, ICreateUserData, User, IUpdateUserData } from '../user';
 
-export abstract class UserRepository implements IRepository {
-  abstract save(user: IUserProps): Promise<void>;
+export type TUserFindField =
+  | 'id'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'createdAt'
+  | 'updatedAt';
+
+export interface IUserOptions extends IOptions {
+  orderBy?: TUserFindField;
+}
+
+export abstract class UserRepository {
+  abstract save(data: IUserProps): Promise<void>;
   abstract saveMany(data: IUserProps[]): Promise<void>;
-  abstract create(data: ICreateUserProps): Promise<User>;
-  abstract createMany(data: ICreateUserProps[]): Promise<void>;
-  abstract delete(id: string): Promise<void>;
-  abstract deleteMany(ids: string[]): Promise<void>;
-  abstract exists(id: string): Promise<boolean>;
-  abstract getAll(): Promise<User[]>;
-  abstract getUserById(id: string): Promise<User | null>;
-  abstract getUserByEmail(email: string): Promise<User | null>;
-  abstract update(user: User): Promise<void>;
+  abstract create(data: ICreateUserData): Promise<User>;
+  abstract createMany(data: ICreateUserData[]): Promise<void>;
+  abstract getOneById(id: string): Promise<User | null>;
+  abstract getOneByEmail(email: string): Promise<User | null>;
+  abstract getManyByIEmail(email: string): Promise<User[]>;
   abstract findMany(
-    query: Partial<IUserProps>,
-    options?: IFindOptions,
+    field: TUserFindField,
+    options?: IUserOptions,
   ): Promise<User[]>;
+  abstract updateById(id: string, data: IUpdateUserData): Promise<void>;
+  abstract update(data: User): Promise<void>;
+  abstract updateMany(data: User[]): Promise<void>;
+  abstract deleteByIds(ids: string[]): Promise<void>;
+  abstract countWith(
+    field: TUserFindField,
+    options?: IUserOptions,
+  ): Promise<number>;
 }

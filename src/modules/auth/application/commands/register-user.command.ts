@@ -1,6 +1,6 @@
 import { ICommand } from '@nestjs/cqrs/dist';
-import { ICreateUserProps } from '../../domain';
+import { ICreateUserData } from '../../domain';
 
 export class RegisterUserCommand implements ICommand {
-  constructor(public readonly data: ICreateUserProps) {}
+  constructor(public readonly data: ICreateUserData) {}
 }

@@ -1,9 +1,10 @@
 import { Module, Provider } from '@nestjs/common';
 import { AuthController } from '../controllers';
 import {
+  CreateUserHandler,
+  CreateUsersHandler,
   GetUserHandler,
   GetUsersHandler,
-  CreateUserHandler,
   LoginUserHanlder,
   RegisterUserHandler,
   VerifyEmailHandler,
@@ -14,6 +15,7 @@ const HandlersProvider: Provider[] = [
   GetUserHandler,
   GetUsersHandler,
   CreateUserHandler,
+  CreateUsersHandler,
   LoginUserHanlder,
   RegisterUserHandler,
   VerifyEmailHandler,

@@ -10,23 +10,15 @@ export class GetUsersHandler
   constructor(private readonly userRepository: UserRepository) {}
   async execute(query: GetUsersQuery): Promise<GetUsersQueryResult> {
     const { page, search, sortBy, sort, limit } = query;
-
-    const users = await this.userRepository.getAll();
-    const totalPage = Math.ceil(users.length / limit);
-
-    const itemsSorted = users.sort((a, b) => {
-      if (a[sortBy] < b[sortBy]) return sort === 'asc' ? -1 : 1;
-      if (a[sortBy] > b[sortBy]) return sort === 'asc' ? 1 : -1;
-      return 0;
+    const count = await this.userRepository.countWith('id');
+    const totalPage = Math.ceil(count / limit);
+    const items = await this.userRepository.findMany('firstName', {
+      limit,
+      offset: (page - 1) * limit,
+      orderBy: sortBy,
+      order: sort,
+      search,
     });
-    const itemsLimited = itemsSorted.slice((page - 1) * limit, page * limit);
-
-    const items =
-      search.length <= 0
-        ? itemsLimited
-        : itemsLimited.filter((user) => {
-            user.fullname.toLowerCase().includes(search.toLowerCase());
-          });
     return new GetUsersQueryResult(page, totalPage, limit, items);
   }
 }

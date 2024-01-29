@@ -27,7 +27,7 @@ export class HttpUserLocalAuthGuard implements CanActivate {
     if (!Boolean(userJWT.userId))
       throw new Error('Logic Error: userJWT is not UserJWTClaims');
 
-    const user = await this.userRepository.getUserById(userJWT.userId);
+    const user = await this.userRepository.getOneById(userJWT.userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
 
     request[AUTHENTICATED_USER_KEY] = user;

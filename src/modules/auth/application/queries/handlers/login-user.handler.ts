@@ -34,7 +34,7 @@ export class LoginUserHanlder
    */
   async execute(query: LoginUserQuery): Promise<LoginUserQueryResult> {
     const { email, password } = query;
-    const user = await this.userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getOneByEmail(email);
     if (!user) throw new NotFoundException("Email or password doesn't match");
     const passwordMatch = await user.comparePassword(password);
     if (!passwordMatch) throw new Error("Email or password doesn't match");

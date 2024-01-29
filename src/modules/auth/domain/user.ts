@@ -23,14 +23,14 @@ import { EmailVerifiedEvent } from './events/email-verified.event';
 
 export const ValidationRules = {
   NAME_VALIDATION_REGEXP: /^.{1,30}$/,
-  PASSWORD_VALIDATION_REGEXP: /^[a-zA-Z0-9]{6,30}$/,
-  EMAIL_VALIDATION_REGEXP: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+  PASSWORD_VALIDATION_REGEXP: /^.{3,30}$/,
+  EMAIL_VALIDATION_REGEXP: /^.{1,130}$/,
 };
 
 export const MESSAGES = {
   NAME_INVALID: 'Name must be between 1 and 30 character',
-  EMAIL_INVALID: 'Email must be between 1 and 30 characters',
-  PASSWORD_INVALID: 'Password must be between 6 and 30 characters',
+  EMAIL_INVALID: 'Email must be between 5 and 30 characters',
+  PASSWORD_INVALID: 'Password must be between 3 and 30 characters',
   USER_NOT_FOUND: 'User not found',
   USER_REMOVED: 'User already removed',
   NOT_LOGGED: 'User not logged',
@@ -57,7 +57,7 @@ export interface IUser {
   isLoggedIn: boolean;
 }
 
-export interface ICreateUserProps {
+export interface ICreateUserData {
   id?: string;
   firstName: string;
   lastName: string;
@@ -72,7 +72,7 @@ export interface ICreateUserProps {
   removedAt?: Date | null;
 }
 
-export interface IUpdateUserProps {
+export interface IUpdateUserData {
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -220,20 +220,20 @@ export class User extends AggregateRoot implements IUser {
    * properties:
    * @returns The `create` method returns an instance of the `User` class.
    */
-  static create(props: ICreateUserProps): User {
+  static create(data: ICreateUserData): User {
     const user = User.new({
-      id: props.id ?? uuid(),
-      firstName: props.firstName,
-      lastName: props.lastName,
-      email: props.email,
-      password: props.password,
-      authProvider: props.authProvider ?? AuthProvider.LOCAL,
-      role: props.role ?? UserRole.USER,
-      isVerified: props.isVerified ?? false,
-      avatarUrl: props.avatarUrl ?? '',
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? null,
-      removedAt: props.removedAt ?? null,
+      id: data.id ?? uuid(),
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      password: data.password,
+      authProvider: data.authProvider ?? AuthProvider.LOCAL,
+      role: data.role ?? UserRole.USER,
+      isVerified: data.isVerified ?? false,
+      avatarUrl: data.avatarUrl ?? '',
+      createdAt: data.createdAt ?? new Date(),
+      updatedAt: data.updatedAt ?? null,
+      removedAt: data.removedAt ?? null,
     });
     user.validate({ ignoreRemoved: true, ignoreLogin: true });
     user.apply(new UserCreatedEvent(user));
@@ -282,13 +282,13 @@ export class User extends AggregateRoot implements IUser {
     users.forEach((user) => this.removeUser(user));
   }
 
-  createUser(props: ICreateUserProps): User {
+  createUser(props: ICreateUserData): User {
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
     return User.create(props);
   }
 
-  createUsers(props: ICreateUserProps[]): User[] {
+  createUsers(props: ICreateUserData[]): User[] {
     return props.map((user) => this.createUser(user));
   }
 
@@ -298,18 +298,18 @@ export class User extends AggregateRoot implements IUser {
    * @throws {PermissionDeniedException} If the requester is not an admin.
    * @returns The updated user.
    */
-  updateUser(user: User, data: IUpdateUserProps): void {
+  updateUser(user: User, data: IUpdateUserData): void {
     if (this.role !== UserRole.ADMIN)
       throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
     user.updateMe(data);
   }
 
-  updateMe(props: IUpdateUserProps): void {
-    this.props.firstName = props.firstName ?? this.props.firstName;
-    this.props.lastName = props.lastName ?? this.props.lastName;
-    this.props.email = props.email ?? this.props.email;
-    this.props.role = props.role ?? this.props.role;
-    this.props.avatarUrl = props.avatarUrl ?? this.props.avatarUrl;
+  updateMe(data: IUpdateUserData): void {
+    this.props.firstName = data.firstName ?? this.props.firstName;
+    this.props.lastName = data.lastName ?? this.props.lastName;
+    this.props.email = data.email ?? this.props.email;
+    this.props.role = data.role ?? this.props.role;
+    this.props.avatarUrl = data.avatarUrl ?? this.props.avatarUrl;
     this.props.updatedAt = new Date();
     this.validate({ ignoreRemoved: true });
     this.apply(new UserUpdatedEvent(this.id));
