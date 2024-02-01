@@ -8,6 +8,14 @@ import { EventStoreModule } from './esdb.module';
 import { MailerModule } from './mailer.module';
 import { CacheModule } from './cache.module';
 
+import { ExceptionFilter } from '../controllers/Interceptors';
+
+// TODO: categorize this provider
+const ExceptionFilterProvider = {
+  provide: 'APP_FILTER',
+  useClass: ExceptionFilter,
+};
+
 @Module({
   imports: [
     PersistencesModule,
@@ -18,5 +26,6 @@ import { CacheModule } from './cache.module';
     CacheModule,
     AuthModule,
   ],
+  providers: [ExceptionFilterProvider],
 })
 export class RootModule {}

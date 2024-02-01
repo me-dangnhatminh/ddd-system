@@ -4,12 +4,13 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginUserQuery, LoginUserQueryResult } from '../login-user.query';
 import { UserRepository } from '../../../domain/interfaces';
 import { UserJWTClaims } from '../../../domain/user-jwt';
-import { IErrorResponse } from 'src/common/interfaces/error-response.interface';
+import { ErrorType, IErrorResponse } from '@common';
 
 export class NotFoundException extends Error implements IErrorResponse {
   constructor(
-    public readonly message: string = 'Not found',
+    public readonly type: string = ErrorType.NotFound,
     public readonly code: number = 404,
+    public readonly message: string = 'Not found',
   ) {
     super(message);
   }

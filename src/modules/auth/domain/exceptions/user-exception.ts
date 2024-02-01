@@ -1,3 +1,9 @@
+export class BussinessException extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export class ValidationRulesException extends Error {
   static readonly message = 'Validation rules exception';
   constructor(message: string = ValidationRulesException.message) {

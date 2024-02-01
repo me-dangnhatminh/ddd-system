@@ -29,11 +29,9 @@ export class ServerApplication {
       new ValidationPipe({
         transform: true,
         exceptionFactory(errors: ValidationError[]) {
-          const message: { [key: string]: string } = {};
-          errors.forEach((error) => {
-            const prop = error.property;
-            message[prop] = Object.values(error.constraints ?? {}).join(', ');
-          });
+          const message = errors
+            .map((error) => Object.values(error.constraints ?? {}).join(', '))
+            .join(', ');
           return new HttpException(message, HttpStatus.BAD_REQUEST);
         },
       }),

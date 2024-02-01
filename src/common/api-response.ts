@@ -9,14 +9,9 @@ export class ApiResponse<
     public readonly data?: BaseData,
     public readonly error?: BaseError,
   ) {
-    if (isSuccess && error) {
+    if (isSuccess && Boolean(error)) {
       throw new Error(
         'InvalidOperation: A successful response cannot contain an error.',
-      );
-    }
-    if (!isSuccess && !error) {
-      throw new Error(
-        'InvalidOperation: An unsuccessful response must contain an error.',
       );
     }
   }
@@ -31,5 +26,13 @@ export class ApiResponse<
   static error<E extends IErrorResponse>(error: E): ApiResponse<undefined, E>;
   static error<E extends IErrorResponse>(error?: E): ApiResponse<undefined, E> {
     return new ApiResponse<any, E>(false, undefined, error);
+  }
+
+  getErrorDisplay(): string {
+    if (!this.error)
+      throw new Error(
+        'InvalidOperation: No error to display, please check the error property.',
+      );
+    return `[#${this.error.code}] ${this.error.type}: ${this.error.message}`;
   }
 }
