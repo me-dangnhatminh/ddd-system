@@ -9,14 +9,14 @@ import {
 
 @Injectable()
 export class ExceptionFilter implements NestExceptionFilter {
-  catch(error: any, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
     let errorRes: ApiResponse<undefined, any> = ApiResponse.error();
-    errorRes = this.handleNestException(error, errorRes);
-    errorRes = this.handleCoreException(error, errorRes);
+    errorRes = this.handleNestException(exception, errorRes);
+    errorRes = this.handleCoreException(exception, errorRes);
 
     const API_LOG_ENABLE = true;
     if (API_LOG_ENABLE) {
@@ -28,22 +28,28 @@ export class ExceptionFilter implements NestExceptionFilter {
     return response.json(errorRes);
   }
 
-  private handleNestException(error: any, res: ApiResponse<undefined, any>) {
-    if (!(error instanceof HttpException)) return res;
+  private handleNestException(
+    exception: any,
+    apiRes: ApiResponse<undefined, any>,
+  ) {
+    if (!(exception instanceof HttpException)) return apiRes;
     return ApiResponse.error({
-      code: error.getStatus(),
+      code: exception.getStatus(),
       type: ErrorTypes.INTERNAL, // TODO: classification of error
-      message: error.message,
+      message: exception.message,
     });
   }
 
-  private handleCoreException(error: any, res: ApiResponse<undefined, any>) {
-    if (!(error instanceof ApiResponse)) return res;
-    if (!error.error) throw new Error('ApiResponse error is not defined');
+  private handleCoreException(
+    exception: any,
+    apiRes: ApiResponse<undefined, any>,
+  ) {
+    if (!(exception instanceof ApiResponse)) return apiRes;
+    if (!exception.error) throw new Error('ApiResponse error is not defined');
     return ApiResponse.error({
-      code: 'INTERNAL_SERVER_ERROR',
+      code: exception.error.code,
       type: ErrorTypes.INTERNAL,
-      message: error.error.message,
+      message: exception.error.message,
     });
   }
 }

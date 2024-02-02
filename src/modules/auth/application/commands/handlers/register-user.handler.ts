@@ -1,6 +1,8 @@
 import { AuthProvider, User, UserRepository, UserRole } from '../../../domain';
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../register-user.command';
+import { IErrorDetail, Result } from '@common';
+import { UserErrors } from '../../common/user-errors';
 
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler implements ICommandHandler {
@@ -9,21 +11,21 @@ export class RegisterUserHandler implements ICommandHandler {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async execute(command) {
+  async execute(command): Promise<Result<User, IErrorDetail>> {
     const { data } = command;
 
     const u = await this.userRepository.getOneByEmail(data.email);
-    if (u) throw new Error('User already exists');
+    if (u) return Result.failure(UserErrors.USER_ALREADY_EXISTS);
 
     const newUser = User.create({
       ...data,
       authProvider: AuthProvider.LOCAL,
       role: UserRole.USER,
     });
+
     await this.userRepository.create(newUser);
 
-    this.publisher.mergeObjectContext(newUser);
     newUser.commit();
-    return newUser;
+    return Result.success(newUser);
   }
 }

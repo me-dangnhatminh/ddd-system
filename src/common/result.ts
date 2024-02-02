@@ -6,6 +6,7 @@ interface IResult<S, F> {
   isFailure(): this is Failure<F>;
   map<U>(func: (r: S | F) => U): Result<U, F> | Result<S, U>;
   endThen<T, U>(func: (r: S | F) => Result<T, U>): Result<T, U>;
+  throwIfFailure(): void;
 }
 
 class Success<S> implements IResult<S, never> {
@@ -17,6 +18,7 @@ class Success<S> implements IResult<S, never> {
   }
 
   constructor(public readonly value: S) {}
+  throwIfFailure(): void {}
   map<U>(func: (r: S) => U): Success<U> {
     return new Success(func(this.value));
   }
@@ -33,6 +35,9 @@ class Failure<F> implements IResult<never, F> {
     return true;
   }
   constructor(public readonly error: F) {}
+  throwIfFailure(): void {
+    throw this.error;
+  }
 
   map<U>(func: (r: F) => U): Failure<U> {
     return new Failure(func(this.error));

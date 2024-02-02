@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -39,6 +41,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async getAllByAdmin(
     @Query() queryParams: GetUsersQueryParamsDTO,
@@ -56,6 +59,7 @@ export class UserController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async createUserByAdmin(
     @HttpUser() requester: User,
@@ -70,6 +74,7 @@ export class UserController {
   }
 
   @Post('create-multiple')
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async createMultipleUsersByAdmin(
     @HttpUser() requester: User,
@@ -81,6 +86,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async deleteUsers(@HttpUser() requester: User, @Param('id') id: string) {
     const command = new DeleteUserCommand(requester, [id]);
@@ -89,6 +95,7 @@ export class UserController {
   }
 
   @Delete('delete-multiple')
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth({ roles: [UserRole.ADMIN] })
   async deleteMultipleUsersByAdmin(
     @HttpUser() requester: User,
@@ -100,6 +107,7 @@ export class UserController {
   }
 
   @Get('me')
+  @HttpCode(HttpStatus.OK)
   @HttpUserAuth()
   async getMe(@HttpUser() user: User): Promise<ApiResponse<User>> {
     return ApiResponse.success(user);

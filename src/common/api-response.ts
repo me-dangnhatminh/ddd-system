@@ -1,5 +1,12 @@
 import { IErrorResponse } from './interfaces/error-response.interface';
 
+export interface IApiResponse {
+  isSuccess: boolean;
+  context: string;
+  data?: any;
+  error?: IErrorResponse;
+}
+
 export class ApiResponse<
   BaseData = undefined,
   BaseError extends IErrorResponse = IErrorResponse,

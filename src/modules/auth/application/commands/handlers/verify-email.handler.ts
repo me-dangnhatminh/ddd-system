@@ -4,6 +4,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { UserRepository } from 'src/modules/auth/domain';
+import { IErrorDetail, Result } from '@common';
+import { UserErrors } from '../../common/user-errors';
 
 /**
  *
@@ -21,9 +23,12 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
     @Inject('CACHE_MANAGER') private readonly cacheService: Cache,
   ) {}
 
-  async execute(command: VerifyEmailCommand): Promise<void> {
+  async execute(
+    command: VerifyEmailCommand,
+  ): Promise<Result<undefined, IErrorDetail>> {
     const { requester, code } = command;
     const isVerified = command.requester.isVerified;
+    if (isVerified) return Result.failure(UserErrors.USER_ALREADY_VERIFIED);
     if (isVerified) throw new Error('User already verified');
 
     const CODE_CACHE_KEY = `verify-email:${command.requester.email}`;
@@ -31,11 +36,13 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
     // If code is provided, verify code and update user
     if (code !== undefined && code !== null) {
       const _code = await this.cacheService.get(CODE_CACHE_KEY);
-      if (`${_code}` !== code) throw new Error('Invalid code');
+      if (`${_code}` !== code) return Result.failure(UserErrors.INVALID_TOKEN);
+
       requester.verifyEmail(code);
       await this.userRepository.update(requester);
       requester.commit();
-      return;
+
+      return Result.success();
     }
 
     // generate code, save to cache and send email
@@ -55,5 +62,6 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
         <p>Use this code to verify your email: ${1234}</p>`,
       context: { code: 1234 },
     });
+    return Result.success();
   }
 }
