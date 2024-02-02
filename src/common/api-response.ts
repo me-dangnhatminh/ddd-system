@@ -4,7 +4,7 @@ export class ApiResponse<
   BaseData = undefined,
   BaseError extends IErrorResponse = IErrorResponse,
 > {
-  private constructor(
+  protected constructor(
     public readonly isSuccess: boolean,
     public readonly data?: BaseData,
     public readonly error?: BaseError,
@@ -14,6 +14,8 @@ export class ApiResponse<
         'InvalidOperation: A successful response cannot contain an error.',
       );
     }
+    if (isSuccess) this.error = undefined;
+    if (!isSuccess) this.data = undefined;
   }
 
   static success(): ApiResponse<undefined, any>;
@@ -29,10 +31,15 @@ export class ApiResponse<
   }
 
   getErrorDisplay(): string {
+    if (this.isSuccess)
+      throw new Error(
+        'InvalidOperation: A successful response cannot contain an error.',
+      );
     if (!this.error)
       throw new Error(
-        'InvalidOperation: No error to display, please check the error property.',
+        'InvalidOperation: An error response must contain an error.',
       );
+
     return `[#${this.error.code}] ${this.error.type}: ${this.error.message}`;
   }
 }

@@ -1,5 +1,5 @@
 export interface IErrorResponse {
-  type: string;
   code: string | number;
+  type: string;
   message: string;
 }

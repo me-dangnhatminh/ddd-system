@@ -1,4 +1,8 @@
-export class BussinessException extends Error {
+import { IErrorResponse } from '@common';
+
+export class BussinessException extends Error implements IErrorResponse {
+  public readonly code: number = 400;
+  public readonly type: string = 'BussinessException';
   constructor(message: string) {
     super(message);
   }
