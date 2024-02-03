@@ -6,7 +6,7 @@ import { ValidationError, ValidationPipe } from '@nestjs/common';
 import { ErrorTypes } from './common/constants';
 
 import * as bodyParser from 'body-parser';
-import { AppException } from '@common';
+import { Exception } from './common/exception';
 
 export class ServerApplication {
   private constructor(public readonly app: NestExpressApplication) {}
@@ -27,7 +27,7 @@ export class ServerApplication {
       new ValidationPipe({
         transform: true,
         exceptionFactory(errors: ValidationError[]) {
-          return new AppException(
+          return new Exception(
             ErrorTypes.INVALID_PARAMETER,
             errors
               .map((error) => Object.values(error.constraints ?? {}).join(', '))

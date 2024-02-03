@@ -10,12 +10,12 @@ import {
 
 const nameRules = {
   reg: UserModule.ValidationRules.NAME_VALIDATION_REGEXP,
-  mes: UserModule.MESSAGES.NAME_INVALID,
+  mes: UserModule.ErrorMessages.INVALID_NAME,
 };
 
 const passwordRules = {
   reg: UserModule.ValidationRules.PASSWORD_VALIDATION_REGEXP,
-  mes: UserModule.MESSAGES.PASSWORD_INVALID,
+  mes: UserModule.ErrorMessages.INVALID_PASSWORD,
 };
 
 export class CreateUserBody {

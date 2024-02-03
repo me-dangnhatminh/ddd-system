@@ -1,4 +1,4 @@
-import { ApiResponse, AppException, ErrorTypes } from '@common';
+import { ApiResponse, ErrorTypes, Exception } from '@common';
 import {
   ArgumentsHost,
   Injectable,
@@ -55,7 +55,7 @@ export class ExceptionFilter implements NestExceptionFilter {
     exception: any,
     apiRes: ApiResponse<undefined, any>,
   ) {
-    if (!(exception instanceof AppException)) return apiRes;
+    if (!(exception instanceof Exception)) return apiRes;
     const code = ErrorTypesMapToHttpStatus[exception.type] ?? 500;
     const message = exception.message;
     return ApiResponse.error({ code, message });

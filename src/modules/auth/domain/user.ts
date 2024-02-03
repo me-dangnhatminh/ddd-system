@@ -9,32 +9,17 @@ import {
   UserCreatedEvent,
   UserDeletedEvent,
 } from './events';
-import {
-  EmailInvalidException,
-  NameInvalidException,
-  PasswordInvalidException,
-  PermissionDeniedException,
-  UserNotFoundException,
-} from './exceptions/user-exception';
+
 import { AuthProvider } from './auth-provider';
 import { UserUpdatedEvent } from './events/user-updated.event';
 import { LoggedInEvent } from './events/logged-in.event';
 import { EmailVerifiedEvent } from './events/email-verified.event';
+import { ErrorMessages } from './error-messages';
 
 export const ValidationRules = {
   NAME_VALIDATION_REGEXP: /^.{1,30}$/,
   PASSWORD_VALIDATION_REGEXP: /^.{3,30}$/,
   EMAIL_VALIDATION_REGEXP: /^.{1,130}$/,
-};
-
-export const MESSAGES = {
-  NAME_INVALID: 'Name must be between 1 and 30 character',
-  EMAIL_INVALID: 'Email must be between 5 and 30 characters',
-  PASSWORD_INVALID: 'Password must be between 3 and 30 characters',
-  USER_NOT_FOUND: 'User not found',
-  USER_REMOVED: 'User already removed',
-  NOT_LOGGED: 'User not logged',
-  PERMISSION_DENIED: 'Permission denied',
 };
 
 export interface IUserProps {
@@ -192,17 +177,17 @@ export class User extends AggregateRoot implements IUser {
     },
   ) {
     if (!this._isLoggedIn && !opts.ignoreLogin)
-      new PermissionDeniedException(MESSAGES.NOT_LOGGED);
+      throw new Error(ErrorMessages.USER_NOT_LOGGED_IN);
     if (this.isRemoved && !opts.ignoreRemoved)
-      throw new UserNotFoundException(MESSAGES.USER_REMOVED);
+      throw new Error(ErrorMessages.USER_REMOVED);
     if (!User.validateName(this.firstName))
-      throw new NameInvalidException(MESSAGES.NAME_INVALID);
+      throw new Error(ErrorMessages.INVALID_NAME);
     if (!User.validateName(this.lastName))
-      throw new NameInvalidException(MESSAGES.NAME_INVALID);
+      throw new Error(ErrorMessages.INVALID_NAME);
     if (!User.validateEmail(this.email))
-      throw new EmailInvalidException(MESSAGES.EMAIL_INVALID);
+      throw new Error(ErrorMessages.INVALID_EMAIL);
     if (!User.validatePassword(this.password))
-      throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
+      throw new Error(ErrorMessages.INVALID_PASSWORD);
   }
 
   //! ======================[ Static methods ]====================== !//
@@ -274,7 +259,7 @@ export class User extends AggregateRoot implements IUser {
   removeUser(user: User): void {
     if (user.id === this.id) throw new Error('You cannot remove yourself');
     if (this.role !== UserRole.ADMIN)
-      throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
+      throw new Error('You do not have permission to remove a user');
     this.removeUserByAdmin(user);
   }
 
@@ -284,7 +269,7 @@ export class User extends AggregateRoot implements IUser {
 
   createUser(props: ICreateUserData): User {
     if (this.role !== UserRole.ADMIN)
-      throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
+      throw new Error(ErrorMessages.USER_CREATE_PERMISSION);
     return User.create(props);
   }
 
@@ -300,7 +285,7 @@ export class User extends AggregateRoot implements IUser {
    */
   updateUser(user: User, data: IUpdateUserData): void {
     if (this.role !== UserRole.ADMIN)
-      throw new PermissionDeniedException(MESSAGES.PERMISSION_DENIED);
+      throw new Error(ErrorMessages.USER_UPDATE_PERMISSION);
     user.updateMe(data);
   }
 
@@ -324,7 +309,7 @@ export class User extends AggregateRoot implements IUser {
 
   changePassword(oldPass: string, newPass: string): void {
     if (!this.comparePassword(oldPass))
-      throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
+      throw new Error(ErrorMessages.INVALID_PASSWORD);
     this.apply(new PasswordChangedEvent(this.id, newPass));
   }
 
@@ -334,7 +319,7 @@ export class User extends AggregateRoot implements IUser {
 
   loggin(pass: string): void {
     if (!this.comparePassword(pass))
-      throw new PasswordInvalidException(MESSAGES.PASSWORD_INVALID);
+      throw new Error(ErrorMessages.INVALID_PASSWORD);
   }
 
   //! ======================[ Event methods ]====================== !//
