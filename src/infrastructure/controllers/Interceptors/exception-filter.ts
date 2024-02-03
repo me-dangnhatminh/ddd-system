@@ -1,4 +1,4 @@
-import { ApiResponse, ErrorTypes } from '@common';
+import { ApiResponse, AppException, ErrorTypes } from '@common';
 import {
   ArgumentsHost,
   Injectable,
@@ -6,6 +6,16 @@ import {
   ExceptionFilter as NestExceptionFilter,
   HttpException,
 } from '@nestjs/common';
+
+const ErrorTypesMapToHttpStatus = {
+  [ErrorTypes.INTERNAL]: 500,
+  [ErrorTypes.INVALID_PARAMETER]: 400,
+  [ErrorTypes.UNAUTHORIZED]: 401,
+  [ErrorTypes.FORBIDDEN]: 403,
+  [ErrorTypes.NOT_FOUND]: 404,
+  [ErrorTypes.CONFLICT]: 409,
+  [ErrorTypes.UNPROCESSABLE_ENTITY]: 422,
+};
 
 @Injectable()
 export class ExceptionFilter implements NestExceptionFilter {
@@ -33,9 +43,10 @@ export class ExceptionFilter implements NestExceptionFilter {
     apiRes: ApiResponse<undefined, any>,
   ) {
     if (!(exception instanceof HttpException)) return apiRes;
+
     return ApiResponse.error({
       code: exception.getStatus(),
-      type: ErrorTypes.INTERNAL, // TODO: classification of error
+      type: ErrorTypes.INTERNAL,
       message: exception.message,
     });
   }
@@ -44,12 +55,9 @@ export class ExceptionFilter implements NestExceptionFilter {
     exception: any,
     apiRes: ApiResponse<undefined, any>,
   ) {
-    if (!(exception instanceof ApiResponse)) return apiRes;
-    if (!exception.error) throw new Error('ApiResponse error is not defined');
-    return ApiResponse.error({
-      code: exception.error.code,
-      type: ErrorTypes.INTERNAL,
-      message: exception.error.message,
-    });
+    if (!(exception instanceof AppException)) return apiRes;
+    const code = ErrorTypesMapToHttpStatus[exception.type] ?? 500;
+    const message = exception.message;
+    return ApiResponse.error({ code, message });
   }
 }

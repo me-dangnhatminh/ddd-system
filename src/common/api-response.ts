@@ -1,12 +1,5 @@
 import { IErrorResponse } from './interfaces/error-response.interface';
 
-export interface IApiResponse {
-  isSuccess: boolean;
-  context: string;
-  data?: any;
-  error?: IErrorResponse;
-}
-
 export class ApiResponse<
   BaseData = undefined,
   BaseError extends IErrorResponse = IErrorResponse,
@@ -47,6 +40,9 @@ export class ApiResponse<
         'InvalidOperation: An error response must contain an error.',
       );
 
-    return `[#${this.error.code}] ${this.error.type}: ${this.error.message}`;
+    const errors = this.error.errors?.map(
+      (error) => `[${error.type}] ${error.message}`,
+    );
+    return errors?.join('\n') || this.error.message;
   }
 }

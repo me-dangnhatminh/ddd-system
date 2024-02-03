@@ -2,13 +2,11 @@ import { RootModule } from './infrastructure/IoC/root.module';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';
-import {
-  HttpException,
-  HttpStatus,
-  ValidationError,
-  ValidationPipe,
-} from '@nestjs/common';
+import { ValidationError, ValidationPipe } from '@nestjs/common';
+import { ErrorTypes } from './common/constants';
+
 import * as bodyParser from 'body-parser';
+import { AppException } from '@common';
 
 export class ServerApplication {
   private constructor(public readonly app: NestExpressApplication) {}
@@ -29,10 +27,12 @@ export class ServerApplication {
       new ValidationPipe({
         transform: true,
         exceptionFactory(errors: ValidationError[]) {
-          const message = errors
-            .map((error) => Object.values(error.constraints ?? {}).join(', '))
-            .join(', ');
-          return new HttpException(message, HttpStatus.BAD_REQUEST);
+          return new AppException(
+            ErrorTypes.INVALID_PARAMETER,
+            errors
+              .map((error) => Object.values(error.constraints ?? {}).join(', '))
+              .join(', '),
+          );
         },
       }),
     );

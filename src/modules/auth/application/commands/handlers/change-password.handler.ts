@@ -17,8 +17,8 @@ export class ChangePasswordHandler
     const isVerified = command.requester.isVerified;
     if (!isVerified) return Result.failure(UserErrors.USER_NOT_VERIFIED);
 
-    const isPasswordCorrect = await requester.comparePassword(currentPassword);
-    if (!isPasswordCorrect) return Result.failure(UserErrors.INVALID_PASSWORD);
+    const passValid = requester.comparePassword(currentPassword);
+    if (!passValid) return Result.failure(UserErrors.INVALID_PASSWORD);
 
     requester.changePassword(currentPassword, newPassword);
     await this.userRepository.update(requester);

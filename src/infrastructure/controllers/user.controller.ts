@@ -66,11 +66,8 @@ export class UserController {
     @Body() body: CreateUserBody,
   ): Promise<ApiResponse<CreateUserResponse>> {
     const command = new CreateUserCommand(requester, body);
-    return await this.commandBus
-      .execute<RegisterUserCommand>(command)
-      .then((result) =>
-        ApiResponse.success(plainToInstance(CreateUserResponse, result)),
-      );
+    const result = await this.commandBus.execute<RegisterUserCommand>(command);
+    return ApiResponse.success(plainToInstance(CreateUserResponse, result));
   }
 
   @Post('create-multiple')
