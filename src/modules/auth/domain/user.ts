@@ -52,9 +52,6 @@ export interface ICreateUserData {
   role?: UserRole;
   isVerified?: boolean;
   avatarUrl?: string;
-  createdAt?: Date;
-  updatedAt?: Date | null;
-  removedAt?: Date | null;
 }
 
 export interface IUpdateUserData {
@@ -216,9 +213,9 @@ export class User extends AggregateRoot implements IUser {
       role: data.role ?? UserRole.USER,
       isVerified: data.isVerified ?? false,
       avatarUrl: data.avatarUrl ?? '',
-      createdAt: data.createdAt ?? new Date(),
-      updatedAt: data.updatedAt ?? null,
-      removedAt: data.removedAt ?? null,
+      createdAt: new Date(),
+      updatedAt: null,
+      removedAt: null,
     });
     user.validate({ ignoreRemoved: true, ignoreLogin: true });
     user.apply(new UserCreatedEvent(user));

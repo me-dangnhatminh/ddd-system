@@ -1,21 +1,10 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
-import { ErrorTypes, IErrorResponse } from '@common';
-
 import { LoginUserQuery, LoginUserQueryResult } from '../login-user.query';
 import { UserRepository } from '../../../domain/interfaces';
 import { UserJWTClaims } from '../../../domain/user-jwt';
-
-export class NotFoundException extends Error implements IErrorResponse {
-  constructor(
-    public readonly message: string = 'Not found',
-    public readonly code: number = 404,
-    public readonly type: string = ErrorTypes.NOT_FOUND,
-  ) {
-    super(message);
-  }
-}
+import { UnauthorizedException } from '@common';
 
 @QueryHandler(LoginUserQuery)
 export class LoginUserHanlder
@@ -37,9 +26,11 @@ export class LoginUserHanlder
   async execute(query: LoginUserQuery): Promise<LoginUserQueryResult> {
     const { email, password } = query;
     const user = await this.userRepository.getOneByEmail(email);
-    if (!user) throw new NotFoundException("Email or password doesn't match");
+    if (!user)
+      throw new UnauthorizedException('Email or password does not match');
     const passwordMatch = await user.comparePassword(password);
-    if (!passwordMatch) throw new Error("Email or password doesn't match");
+    if (!passwordMatch)
+      throw new UnauthorizedException('Email or password does not match');
 
     const claims: UserJWTClaims = {
       userId: user.id,
@@ -47,6 +38,9 @@ export class LoginUserHanlder
       email: user.email,
       role: user.role,
     };
+
+    // TODO: add time to live for token
+
     const accessToken = await this.jwtService.sign(claims);
     return { accessToken };
   }

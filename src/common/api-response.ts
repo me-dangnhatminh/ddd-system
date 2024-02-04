@@ -35,11 +35,8 @@ export class ApiResponse<
       throw new Error(
         'InvalidOperation: A successful response cannot contain an error.',
       );
-    if (!this.error)
-      throw new Error(
-        'InvalidOperation: An error response must contain an error.',
-      );
 
+    if (!this.error) return '';
     const errors = this.error.errors?.map(
       (error) => `[${error.type}] ${error.message}`,
     );

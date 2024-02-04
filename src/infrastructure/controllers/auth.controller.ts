@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 
 import { LoginUserBody } from './models/login-user.model';
 import {
@@ -8,15 +16,15 @@ import {
   VerifyEmailCommand,
 } from '@modules/auth';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiResponse } from '@common';
-import { RegisterUserCommand } from 'src/modules/auth/application/commands/register-user.command';
-import { RegisterUserDTO } from './models';
+import { ApiResponse, Result } from '@common';
+import {
+  RegisterUserCommand,
+  RegisterUserCommandResult,
+} from 'src/modules/auth/application/commands/register-user.command';
+import { RegisterUserBody } from './models';
 import { HttpUser } from './decorators/http-user.decorator';
 import { HttpUserAuth } from './decorators';
 
-export class LoggedInUserDTO {
-  constructor(public readonly accessToken: string) {}
-}
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -28,16 +36,17 @@ export class AuthController {
   @HttpCode(200)
   async login(
     @Body() body: LoginUserBody,
-  ): Promise<ApiResponse<LoggedInUserDTO>> {
+  ): Promise<ApiResponse<{ accessToken: string }>> {
     const { email, password } = body;
     const query = new LoginUserQuery(email, password);
     return await this.queryBus
       .execute<LoginUserQuery, LoginUserQueryResult>(query)
-      .then((result) => ApiResponse.success(result));
+      .then((res) => ApiResponse.success(res));
   }
 
   @Post('register')
-  async register(@Body() body: RegisterUserDTO): Promise<ApiResponse> {
+  @HttpCode(HttpStatus.OK)
+  async register(@Body() body: RegisterUserBody): Promise<ApiResponse> {
     const { firstName, lastName, email, password } = body;
     const command = new RegisterUserCommand({
       firstName,
@@ -45,7 +54,9 @@ export class AuthController {
       email,
       password,
     });
-    await this.commandBus.execute<RegisterUserCommand>(command);
+    const result: RegisterUserCommandResult =
+      await this.commandBus.execute<RegisterUserCommand>(command);
+    if (result.isFailure()) return ApiResponse.error(result.error);
     return ApiResponse.success();
   }
 

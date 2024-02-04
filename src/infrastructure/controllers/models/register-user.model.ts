@@ -11,7 +11,7 @@ const passwordRules = {
   mes: UserModule.ErrorMessages.INVALID_PASSWORD,
 };
 
-export class RegisterUserDTO {
+export class RegisterUserBody {
   @IsString()
   @Matches(nameRules.reg, { message: nameRules.mes })
   firstName: string;
