@@ -16,7 +16,7 @@ import {
   VerifyEmailCommand,
 } from '@modules/auth';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
-import { ApiResponse, Result } from '@common';
+import { ApiResponse } from '@common';
 import {
   RegisterUserCommand,
   RegisterUserCommandResult,
@@ -56,7 +56,8 @@ export class AuthController {
     });
     const result: RegisterUserCommandResult =
       await this.commandBus.execute<RegisterUserCommand>(command);
-    if (result.isFailure()) return ApiResponse.error(result.error);
+    if (result.isFailure()) console.log(result.error);
+
     return ApiResponse.success();
   }
 

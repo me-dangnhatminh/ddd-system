@@ -1,5 +1,4 @@
-type IValueObjectProps = { [value: string]: unknown };
-export abstract class ValueObject<T extends IValueObjectProps> {
+export abstract class ValueObject<T> {
   protected props: T;
 
   constructor(props: T) {
