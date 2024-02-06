@@ -2,7 +2,7 @@ import { Result, ValueObject } from '@common';
 
 export interface UserPasswordProps {
   password: string;
-  // isHashed?: boolean;
+  isHashed?: boolean;
 }
 
 export class UserPassword extends ValueObject<UserPasswordProps> {
@@ -14,8 +14,16 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return this.props.password;
   }
 
+  get isHashed(): boolean {
+    return this.props.isHashed ?? false;
+  }
+
   private constructor(password: string) {
     super({ password });
+  }
+
+  public comparePassword(plainTextPassword: string): boolean {
+    return plainTextPassword === this.props.password;
   }
 
   public static create(password: string): Result<UserPassword, string> {
