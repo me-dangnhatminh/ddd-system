@@ -16,7 +16,7 @@ export class UserEmail extends ValueObject<IUserEmailProps> {
     super({ email });
   }
 
-  create(email: string): Result<UserEmail, string> {
+  static create(email: string): Result<UserEmail, string> {
     if (!UserEmail.EMAIL_REGEX.test(email))
       return Result.failure<string>(UserEmail.INVALID_EMAIL_MESSAGE);
     return Result.success<UserEmail>(new UserEmail(email));

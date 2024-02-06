@@ -27,10 +27,7 @@ export class UserName extends ValueObject<IUserNameProps> {
     super(props);
   }
 
-  public static create(
-    firstName: string,
-    lastName: string,
-  ): Result<UserName, string> {
+  static create(firstName: string, lastName: string): Result<UserName, string> {
     if (firstName.length > 0 && firstName.length <= 8)
       return Result.failure<string>(UserName.INVALID_FIRST_NAME);
     if (firstName.length > 0 && firstName.length <= 8)
