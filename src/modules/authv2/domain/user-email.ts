@@ -1,6 +1,6 @@
 import { IErrorDetail, ValueObject } from '@common';
 import { Either, left, right } from 'fp-ts/Either';
-import { INVALID_EMAIL } from './user-errors.constant';
+import { INVALID_EMAIL } from './user-errors';
 
 export interface IUserEmailProps {
   email: string;
