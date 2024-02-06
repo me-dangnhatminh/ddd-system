@@ -1,4 +1,6 @@
-import { Result, ValueObject } from '@common';
+import { IErrorDetail, ValueObject } from '@common';
+import { Either, left, right } from 'fp-ts/Either';
+import { INVALID_PASSWORD } from './user-errors.constant';
 
 export interface UserPasswordProps {
   password: string;
@@ -8,7 +10,6 @@ export interface UserPasswordProps {
 export class UserPassword extends ValueObject<UserPasswordProps> {
   static readonly PASSWORD_REGEX =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-  static readonly INVALID_PASSWORD_MESSAGE = `Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number`;
 
   get value(): string {
     return this.props.password;
@@ -18,7 +19,7 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return this.props.isHashed ?? false;
   }
 
-  private constructor(password: string) {
+  protected constructor(password: string) {
     super({ password });
   }
 
@@ -26,9 +27,9 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return plainTextPassword === this.props.password;
   }
 
-  public static create(password: string): Result<UserPassword, string> {
+  public static create(password: string): Either<IErrorDetail, UserPassword> {
     if (!UserPassword.PASSWORD_REGEX.test(password))
-      return Result.failure<string>(UserPassword.INVALID_PASSWORD_MESSAGE);
-    return Result.success<UserPassword>(new UserPassword(password));
+      return left(INVALID_PASSWORD);
+    return right(new UserPassword(password));
   }
 }
