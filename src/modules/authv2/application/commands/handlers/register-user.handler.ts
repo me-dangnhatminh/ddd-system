@@ -22,7 +22,7 @@ export class RegisterUserHandler
     const existingUser = await this.userRepository.getByEmail(command.email);
     if (existingUser) return left(CONFLICT_EMAIL);
 
-    const result = User.create(command);
+    const result = User.register(command);
     if (result._tag === 'Left') return left(result.left);
     const user = result.right;
 

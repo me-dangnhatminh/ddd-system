@@ -33,7 +33,7 @@ export class LoginUserHandler
     const tokenClaims: UserJWTClaims = {
       userId: user.id,
       email: user.email,
-      roles: user.roles,
+      role: user.role,
       isVerified: user.isVerified,
     };
     const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' });

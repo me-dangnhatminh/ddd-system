@@ -8,17 +8,17 @@ export class RegisterUserCommand implements ICommand {
   public readonly password: string;
   public readonly roles: UserRole[];
 
-  constructor(
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    roles?: UserRole[],
-  ) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.password = password;
-    this.roles = roles || [];
+  constructor(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    roles?: UserRole[];
+  }) {
+    this.firstName = data.firstName;
+    this.lastName = data.lastName;
+    this.email = data.email;
+    this.password = data.password;
+    this.roles = data.roles || [];
   }
 }

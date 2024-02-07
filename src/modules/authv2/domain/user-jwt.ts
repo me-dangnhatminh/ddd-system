@@ -4,5 +4,5 @@ export interface UserJWTClaims {
   userId: string;
   isVerified: boolean;
   email: string;
-  roles: UserRole[];
+  role: UserRole;
 }

@@ -1,20 +1,11 @@
-import { ErrorTypes, IErrorDetail, ValueObject } from '@common';
+import { IErrorDetail, ValueObject } from '@common';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { INVALID_FIRST_NAME, INVALID_LAST_NAME } from './user-errors';
 
 export interface IUserNameProps {
   firstName: string;
   lastName: string;
 }
-
-export const INVALID_FIRST_NAME: IErrorDetail = {
-  type: ErrorTypes.INVALID_PARAMETER,
-  message: 'First name must be greater than 0 and less than 8 characters',
-};
-
-export const INVALID_LAST_NAME: IErrorDetail = {
-  type: ErrorTypes.INVALID_PARAMETER,
-  message: 'Last name must be greater than 0 and less than 8 characters',
-};
 
 export class UserName extends ValueObject<IUserNameProps> {
   get firstName(): string {

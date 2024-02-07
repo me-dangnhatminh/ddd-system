@@ -11,9 +11,14 @@ export const INVALID_PASSWORD: IErrorDetail = {
     'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number',
 };
 
-export const INVALID_ROLES: IErrorDetail = {
+export const INVALID_FIRST_NAME: IErrorDetail = {
   type: ErrorTypes.INVALID_PARAMETER,
-  message: 'Roles is required and must be an array of at least one role',
+  message: 'First name must be greater than 0 and less than 8 characters',
+};
+
+export const INVALID_LAST_NAME: IErrorDetail = {
+  type: ErrorTypes.INVALID_PARAMETER,
+  message: 'Last name must be greater than 0 and less than 8 characters',
 };
 
 export const USER_NOT_LOGGED: IErrorDetail = {
