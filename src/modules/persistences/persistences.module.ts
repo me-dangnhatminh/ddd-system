@@ -1,11 +1,21 @@
 import { UserRepository } from '@modules/auth';
 import { Global, Module, Provider, Scope } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { PrismaUserRepository } from './prisma/repositories';
+import {
+  PrismaReadRepository,
+  PrismaUserRepository,
+} from './prisma/repositories';
+import { ReadRepository } from '@common';
 
 const PrismaProvider: Provider = {
   provide: PrismaService,
   useClass: PrismaService,
+  scope: Scope.DEFAULT,
+};
+
+const ReadRepositoryProvider: Provider = {
+  provide: ReadRepository,
+  useClass: PrismaReadRepository,
   scope: Scope.DEFAULT,
 };
 
@@ -15,7 +25,11 @@ const UserRepositoryProvider: Provider = {
   scope: Scope.DEFAULT,
 };
 
-const providers: Provider[] = [PrismaProvider, UserRepositoryProvider];
+const providers: Provider[] = [
+  PrismaProvider,
+  ReadRepositoryProvider,
+  UserRepositoryProvider,
+];
 
 @Global()
 @Module({ providers, exports: providers })
