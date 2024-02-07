@@ -1,5 +1,4 @@
 export * from './handlers';
 
-export * from './get-user.query';
-export * from './get-users.query';
+export * from './get-list-user.query';
 export * from './login-user.query';

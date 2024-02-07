@@ -1,4 +1,4 @@
-import { RootModule } from './infrastructure/IoC/root.module';
+import { RootModule } from './modules/root.module';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { NestFactory } from '@nestjs/core';

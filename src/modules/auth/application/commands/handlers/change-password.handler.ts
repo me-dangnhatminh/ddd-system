@@ -1,18 +1,25 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ChangePasswordCommand } from '../change-passwrod.command';
-import { UserRepository } from 'src/modules/auth/domain';
+import { Either, left, right } from 'fp-ts/Either';
+
+import { IErrorDetail } from '@common';
+
+import { ChangePasswordCommand } from '../change-password.command';
+import { PASSWORD_NOT_MATCH } from '../../../domain';
 
 @CommandHandler(ChangePasswordCommand)
 export class ChangePasswordHandler
   implements ICommandHandler<ChangePasswordCommand>
 {
-  constructor(private readonly userRepository: UserRepository) {}
+  async execute(
+    command: ChangePasswordCommand,
+  ): Promise<Either<IErrorDetail, void>> {
+    const { requester } = command;
+    if (!requester.comparePassword(command.oldPassword))
+      return left(PASSWORD_NOT_MATCH);
+    const result = requester.changePassword(command.newPassword);
+    if (result._tag === 'Left') return left(result.left);
 
-  async execute(command: ChangePasswordCommand): Promise<void> {
-    const { requester, currentPassword, newPassword } = command;
-
-    requester.changePassword(currentPassword, newPassword);
-    await this.userRepository.update(requester);
     requester.commit();
+    return right(undefined);
   }
 }

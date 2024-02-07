@@ -1,4 +1,1 @@
-/**
- * asignt impliemnt for infrastructure folder
- */
-export default {};
+export * from './controllers';

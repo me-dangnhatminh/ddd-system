@@ -1,35 +1,33 @@
-import { AuthProvider, User, UserRepository, UserRole } from '../../../domain';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  RegisterUserCommand,
-  RegisterUserCommandResult,
-} from '../register-user.command';
-import { Result } from '@common';
-import { UserErrors } from '../../common/user-errors';
+import { Either, left, right } from 'fp-ts/Either';
+import { ErrorTypes, IErrorDetail } from '@common';
+
+import { RegisterUserCommand } from '../register-user.command';
+import { User, UserRepository } from '../../../domain';
+
+const CONFLICT_EMAIL: IErrorDetail = {
+  type: ErrorTypes.CONFLICT,
+  message: 'Email already exists',
+};
 
 @CommandHandler(RegisterUserCommand)
-export class RegisterUserHandler implements ICommandHandler {
+export class RegisterUserHandler
+  implements ICommandHandler<RegisterUserCommand>
+{
   constructor(private readonly userRepository: UserRepository) {}
 
   async execute(
     command: RegisterUserCommand,
-  ): Promise<RegisterUserCommandResult> {
-    const { data } = command;
+  ): Promise<Either<IErrorDetail, void>> {
+    const existingUser = await this.userRepository.getByEmail(command.email);
+    if (existingUser) return left(CONFLICT_EMAIL);
 
-    const u = await this.userRepository.getOneByEmail(data.email);
-    if (u) return Result.failure(UserErrors.USER_ALREADY_EXISTS);
+    const result = User.register(command);
+    if (result._tag === 'Left') return left(result.left);
+    const user = result.right;
 
-    const newUser = await this.userRepository
-      .create({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-        role: UserRole.USER,
-        authProvider: AuthProvider.LOCAL,
-      })
-      .then((data) => User.create(data)); // to add create user event
-    newUser.commit();
-    return Result.success(newUser);
+    await this.userRepository.save(user);
+    user.commit();
+    return right(undefined);
   }
 }

@@ -1,8 +1,0 @@
-import { LoginUserQuery, LoginUserQueryResult } from '@modules/auth';
-import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
-
-export class LoginUserBody implements LoginUserQuery {
-  @IsString() @IsEmail() email: string;
-  @IsString() @IsNotEmpty() password: string;
-}
-export class LoginUserResponse extends LoginUserQueryResult {}

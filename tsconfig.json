@@ -20,8 +20,6 @@
     "paths": {
       "@common": ["src/common"],
       "@modules/auth": ["src/modules/auth"],
-      "@infrastructure": ["src/infrastructure"],
-      "@modules/mailer": ["src/modules/mailer"],
     },
   },
 }

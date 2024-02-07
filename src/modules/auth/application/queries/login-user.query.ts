@@ -1,4 +1,4 @@
-import { IQuery } from '@nestjs/cqrs';
+import { IQuery, IQueryResult } from '@nestjs/cqrs';
 
 export class LoginUserQuery implements IQuery {
   constructor(
@@ -7,6 +7,6 @@ export class LoginUserQuery implements IQuery {
   ) {}
 }
 
-export class LoginUserQueryResult {
-  constructor(public readonly accessToken: string) {}
+export class LoginUserQueryResult implements IQueryResult {
+  constructor(public readonly assessToken: string) {}
 }

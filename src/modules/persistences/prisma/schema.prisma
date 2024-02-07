@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+model User {
+  id           String       @id @default(uuid()) @map("id")
+  firstName    String       @map("first_name")
+  lastName     String       @map("last_name")
+  email        String       @unique @map("email")
+  password     String       @map("password")
+  authProvider AuthProvider @default(LOCAL) @map("auth_provider")
+  role         UserRole     @default(USER) @map("role")
+  isVerified   Boolean      @default(false) @map("is_verified")
+  avatarUrl    String       @default("") @map("avatar_url")
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt    DateTime?    @updatedAt @map("updated_at") @db.Timestamp()
+  removedAt    DateTime?    @map("removed_at") @db.Timestamp()
+
+  @@map("users")
+}

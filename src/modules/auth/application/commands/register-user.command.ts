@@ -1,9 +1,24 @@
-import { ICommand } from '@nestjs/cqrs/dist';
-import { ICreateUserData, User } from '../../domain';
-import { IErrorDetail, Result } from '@common';
+import { ICommand } from '@nestjs/cqrs';
+import { UserRole } from '../../domain';
 
 export class RegisterUserCommand implements ICommand {
-  constructor(public readonly data: ICreateUserData) {}
-}
+  public readonly firstName: string;
+  public readonly lastName: string;
+  public readonly email: string;
+  public readonly password: string;
+  public readonly roles: UserRole[];
 
-export type RegisterUserCommandResult = Result<User, IErrorDetail>;
+  constructor(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    roles?: UserRole[];
+  }) {
+    this.firstName = data.firstName;
+    this.lastName = data.lastName;
+    this.email = data.email;
+    this.password = data.password;
+    this.roles = data.roles || [];
+  }
+}
