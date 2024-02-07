@@ -1,4 +1,4 @@
-import { IQueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ReadRepository, nameof } from '@common';
 import {
   GetListUsersQuery,
@@ -6,6 +6,7 @@ import {
 } from '../get-list-user.query';
 import { User } from '../../../domain';
 
+@QueryHandler(GetListUsersQuery)
 export class GetListUsersHandler implements IQueryHandler<GetListUsersQuery> {
   constructor(public readonly readRepository: ReadRepository) {}
   async execute(query: GetListUsersQuery): Promise<GetListUsersQueryResult> {
