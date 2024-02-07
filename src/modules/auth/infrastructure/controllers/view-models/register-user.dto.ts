@@ -1,15 +1,21 @@
-import { IsEmail, IsString, Matches, Max, Min } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { INVALID_PASSWORD, UserName, UserPassword } from '../../../domain';
 
 export class RegisterUserBody {
   @IsString()
-  @Min(UserName.MIN_LENGTH)
-  @Max(UserName.MAX_LENGTH)
+  @MinLength(UserName.MIN_LENGTH)
+  @MaxLength(UserName.MAX_LENGTH)
   firstName: string;
 
   @IsString()
-  @Min(UserName.MIN_LENGTH)
-  @Max(UserName.MAX_LENGTH)
+  @MinLength(UserName.MIN_LENGTH)
+  @MaxLength(UserName.MAX_LENGTH)
   lastName: string;
 
   @IsString() @IsEmail() email: string;

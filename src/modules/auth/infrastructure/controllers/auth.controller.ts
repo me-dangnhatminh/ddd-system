@@ -42,13 +42,18 @@ export class AuthController {
     const query = new LoginUserQuery(dto.email, dto.password);
     const result: Either<IErrorDetail, LoginUserQueryResult> =
       await this.queryBus.execute(query);
-    return fold<IErrorDetail, LoginUserQueryResult, ApiResponse>(
+
+    return fold<
+      IErrorDetail,
+      LoginUserQueryResult,
+      ApiResponse<LoginUserQueryResult> | ApiResponse
+    >(
       (err) =>
         ApiResponse.error({
           code: HttpStatusUtil.mapErrorTypeToHttpCode(err.type as ErrorTypes),
           message: err.message,
         }),
-      () => ApiResponse.success(),
+      (res) => ApiResponse.success(res),
     )(result);
   }
 }

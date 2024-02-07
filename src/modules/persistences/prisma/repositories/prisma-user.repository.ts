@@ -10,7 +10,7 @@ export class PrismaUserRepository implements UserModule.UserRepository {
   getAll(): Promise<UserModule.User[]> {
     return this.prismaService.user
       .findMany()
-      .then((users) => users.map(UserMapper.toDomain));
+      .then((users) => users.map((u) => UserMapper.toDomain(u)));
   }
   getById(id: string): Promise<UserModule.User | null> {
     return this.prismaService.user
