@@ -6,6 +6,13 @@ import {
   LoginUserHandler,
   RegisterUserHandler,
 } from './application';
+import { ExceptionFilter } from './infrastructure/common/Interceptors';
+import { APP_FILTER } from '@nestjs/core';
+
+const ExceptionFilterProvider: Provider = {
+  provide: APP_FILTER,
+  useClass: ExceptionFilter,
+};
 
 const HandlersProvider: Provider[] = [
   GetListUsersHandler,
@@ -17,6 +24,6 @@ const HandlersProvider: Provider[] = [
 @Module({
   imports: [],
   controllers: [AuthController],
-  providers: [...HandlersProvider],
+  providers: [ExceptionFilterProvider, ...HandlersProvider],
 })
 export class AuthModule {}

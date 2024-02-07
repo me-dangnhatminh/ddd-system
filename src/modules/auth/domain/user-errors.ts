@@ -8,7 +8,7 @@ export const INVALID_EMAIL: IErrorDetail = {
 export const INVALID_PASSWORD: IErrorDetail = {
   type: ErrorTypes.INVALID_PARAMETER,
   message:
-    'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number',
+    'Password must be greater than 8 characters, at least one uppercase letter',
 };
 
 export const INVALID_FIRST_NAME: IErrorDetail = {

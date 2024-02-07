@@ -8,6 +8,9 @@ export interface IUserNameProps {
 }
 
 export class UserName extends ValueObject<IUserNameProps> {
+  static readonly MIN_LENGTH = 1;
+  static readonly MAX_LENGTH = 20;
+
   get firstName(): string {
     return this.props.firstName;
   }
@@ -28,10 +31,18 @@ export class UserName extends ValueObject<IUserNameProps> {
     firstName: string,
     lastName: string,
   ): Either<IErrorDetail, UserName> {
-    if (firstName.length < 1 || firstName.length > 8)
+    if (
+      firstName.length < UserName.MIN_LENGTH ||
+      firstName.length > UserName.MAX_LENGTH
+    )
       return left(INVALID_FIRST_NAME);
-    if (lastName.length < 1 || lastName.length > 8)
+
+    if (
+      lastName.length < UserName.MIN_LENGTH ||
+      lastName.length > UserName.MAX_LENGTH
+    )
       return left(INVALID_LAST_NAME);
+
     return right(new UserName({ firstName, lastName }));
   }
 }

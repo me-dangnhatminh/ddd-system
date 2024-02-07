@@ -8,9 +8,7 @@ export interface UserPasswordProps {
 }
 
 export class UserPassword extends ValueObject<UserPasswordProps> {
-  static readonly PASSWORD_REGEX =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-
+  static readonly PASSWORD_REGEX = /^[A-Za-z\d]{8,}$/;
   get value(): string {
     return this.props.password;
   }
