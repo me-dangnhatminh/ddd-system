@@ -14,10 +14,13 @@ export class ExceptionFilter implements NestExceptionFilter {
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
-    let errorRes: ApiResponse<undefined, any> = ApiResponse.error();
+    let errorRes: ApiResponse<undefined, any> = ApiResponse.error({
+      code: 500,
+      message: 'Internal server error',
+    });
     errorRes = this.handleNestException(exception, errorRes);
 
-    const API_LOG_ENABLE = false;
+    const API_LOG_ENABLE = true;
     if (API_LOG_ENABLE) {
       const message: string =
         `\nMethod: ${request.method}, ${request.path}` +

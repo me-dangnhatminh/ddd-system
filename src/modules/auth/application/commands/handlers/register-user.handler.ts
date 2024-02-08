@@ -24,9 +24,10 @@ export class RegisterUserHandler
 
     const result = User.register(command);
     if (result._tag === 'Left') return left(result.left);
-    const user = result.right;
 
+    const user = result.right;
     await this.userRepository.save(user);
+
     user.commit();
     return right(undefined);
   }

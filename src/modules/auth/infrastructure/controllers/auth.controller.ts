@@ -70,5 +70,5 @@ export class AuthController {
   @Get('email-confirmation')
   @HttpCode(HttpStatus.OK)
   @HttpUserAuth()
-  async confirmEmail(@Query('token') token: string, @HttpUser() user: User) {}
+  async confirmEmail(@Query('token') token: string, @HttpUser() user: User) {} //TODO: implement
 }
