@@ -9,9 +9,15 @@ import {
   OnApplicationBootstrap,
   Provider,
 } from '@nestjs/common';
-import { RegisteredUserSubscription } from './application';
+import {
+  CodeGeneratedVerifyEmailSubscription,
+  RegisteredUserSubscription,
+} from './application';
 
-const subscriptions: Provider[] = [RegisteredUserSubscription];
+const subscriptions: Provider[] = [
+  CodeGeneratedVerifyEmailSubscription,
+  RegisteredUserSubscription,
+];
 
 @Global()
 @Module({
