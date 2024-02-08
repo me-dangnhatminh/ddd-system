@@ -9,11 +9,11 @@ import { PersistencesModule } from './persistences/persistences.module';
 @Module({
   imports: [
     PersistencesModule,
-    AuthModule,
     MailerModule,
     JwtModule,
     CqrsModule,
     CacheModule,
+    AuthModule,
   ],
   providers: [],
 })

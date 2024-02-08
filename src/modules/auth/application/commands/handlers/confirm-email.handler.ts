@@ -9,6 +9,6 @@ export class ConfirmEmailHandler
   constructor(private readonly jwtService: JwtService) {}
 
   async execute(command: ConfirmEmailCommand) {
-    const { token } = command;
+    const { token } = command; // TODO: Implement this
   }
 }
