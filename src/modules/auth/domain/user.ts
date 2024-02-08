@@ -242,4 +242,12 @@ export class User extends AggregateRoot implements IUser {
     this.apply(new ProfileEditedEvent(this));
     return right(undefined);
   }
+
+  public verifyEmail(): void {
+    if (this.props.isVerified)
+      throw new Error(
+        'Email already verified, please check @isVerified property',
+      );
+    this.props.isVerified = true;
+  }
 }

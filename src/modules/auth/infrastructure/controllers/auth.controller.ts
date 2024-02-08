@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, fold } from 'fp-ts/lib/Either';
 
@@ -9,8 +17,10 @@ import {
   LoginUserQueryResult,
   RegisterUserCommand,
 } from '../../application';
-import { HttpStatusUtil } from '../common/utils';
+import { mapErrorTypeToHttpCode } from '../common/utils';
 import { LoginUserBody } from './view-models/login-user.dto';
+import { HttpUser, HttpUserAuth } from '../common/decorators';
+import { User } from '../../domain';
 
 @Controller('auth')
 export class AuthController {
@@ -29,7 +39,7 @@ export class AuthController {
     return fold<IErrorDetail, void, ApiResponse>(
       (err) =>
         ApiResponse.error({
-          code: HttpStatusUtil.mapErrorTypeToHttpCode(err.type as ErrorTypes),
+          code: mapErrorTypeToHttpCode(err.type as ErrorTypes),
           message: err.message,
         }),
       () => ApiResponse.success(),
@@ -50,10 +60,15 @@ export class AuthController {
     >(
       (err) =>
         ApiResponse.error({
-          code: HttpStatusUtil.mapErrorTypeToHttpCode(err.type as ErrorTypes),
+          code: mapErrorTypeToHttpCode(err.type as ErrorTypes),
           message: err.message,
         }),
       (res) => ApiResponse.success(res),
     )(result);
   }
+
+  @Get('email-confirmation')
+  @HttpCode(HttpStatus.OK)
+  @HttpUserAuth()
+  async confirmEmail(@Query('token') token: string, @HttpUser() user: User) {}
 }

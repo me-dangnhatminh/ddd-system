@@ -34,4 +34,8 @@ export class PrismaUserRepository implements UserModule.UserRepository {
   count(): Promise<number> {
     return this.prismaService.user.count();
   }
+  update(user: UserModule.User): Promise<void> {
+    const { id, ...data } = UserMapper.toOrm(user);
+    return this.prismaService.user.update({ where: { id }, data }).then();
+  }
 }

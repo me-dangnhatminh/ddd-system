@@ -36,6 +36,16 @@ export const USER_ALREADY_EXISTS: IErrorDetail = {
   message: 'User already exists',
 };
 
+export const EMAIL_NOT_VERIFIED: IErrorDetail = {
+  type: ErrorTypes.UNAUTHORIZED,
+  message: 'Email not verified',
+};
+
+export const EMAIL_VERIFIED: IErrorDetail = {
+  type: ErrorTypes.CONFLICT,
+  message: 'Email is verified',
+};
+
 export const PASSWORD_NOT_MATCH: IErrorDetail = {
   type: ErrorTypes.UNAUTHORIZED,
   message: 'Password not match',

@@ -13,11 +13,10 @@ const ErrorTypeMapToHttpCode = {
   [ErrorTypes.SERVICE_UNAVAILABLE]: HttpStatus.SERVICE_UNAVAILABLE,
   [ErrorTypes.GATEWAY_TIMEOUT]: HttpStatus.GATEWAY_TIMEOUT,
   [ErrorTypes.INVALID_PARAMETER]: HttpStatus.BAD_REQUEST,
+  [ErrorTypes.INVALID_OPERATION]: HttpStatus.BAD_REQUEST,
 };
 
-export class HttpStatusUtil {
-  static mapErrorTypeToHttpCode(errorType) {
-    const httpCode = ErrorTypeMapToHttpCode[errorType];
-    return httpCode ?? ErrorTypeMapToHttpCode['INTERNAL'];
-  }
+export function mapErrorTypeToHttpCode(errorType) {
+  const httpCode = ErrorTypeMapToHttpCode[errorType];
+  return httpCode ?? ErrorTypeMapToHttpCode['INTERNAL'];
 }
