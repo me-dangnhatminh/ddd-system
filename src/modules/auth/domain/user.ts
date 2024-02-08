@@ -139,7 +139,6 @@ export class User extends AggregateRoot implements IUser {
       authProvider: AuthProvider.LOCAL,
     });
 
-    this.apply(new RegisteredUserEvent(user));
     return right(user);
   }
   /**

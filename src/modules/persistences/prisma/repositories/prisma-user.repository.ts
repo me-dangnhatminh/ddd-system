@@ -23,7 +23,7 @@ export class PrismaUserRepository implements UserModule.UserRepository {
       .then((user) => (user ? UserMapper.toDomain(user) : null));
   }
   save(user: UserModule.User): Promise<void> {
-    const { id, ...data } = UserMapper.toOrm(user);
+    const data = UserMapper.toOrm(user);
     return this.prismaService.user.create({ data }).then();
   }
   deleteByIds(ids: string[]): Promise<void> {
