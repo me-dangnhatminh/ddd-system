@@ -10,13 +10,13 @@ export class RegisteredUserSubscription
   constructor(private readonly mailer: MailerService) {}
   async handle(event: RegisteredUserEvent) {
     const { email, firstName, lastName } = event;
-    const fullName = `${firstName} ${lastName}`;
+    console.log('Sending email to:', email);
     await this.mailer
       .sendMail({
         to: email,
         subject: 'Welcome to the app',
         template: 'welcome',
-        context: { name: fullName },
+        context: { name: `${firstName} ${lastName}` },
       })
       .catch((error) =>
         Logger.error(

@@ -1,5 +1,5 @@
 import { Global } from '@nestjs/common';
-import { CqrsModule as NestCqrsModule } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
 
 @Global()
-export class CqrsModule extends NestCqrsModule {}
+export class CqrsModule extends NestCQRS.CqrsModule {}

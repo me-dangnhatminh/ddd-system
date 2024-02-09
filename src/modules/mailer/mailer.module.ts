@@ -1,28 +1,13 @@
-import {
-  MailerService,
-  MailerModule as NestMailerModule,
-} from '@nestjs-modules/mailer';
-import {
-  Global,
-  Logger,
-  Module,
-  OnApplicationBootstrap,
-  Provider,
-} from '@nestjs/common';
-import {
-  CodeGeneratedVerifyEmailSubscription,
-  RegisteredUserSubscription,
-} from './application';
+import * as NestMailer from '@nestjs-modules/mailer';
+import * as NestCommon from '@nestjs/common';
+import { RegisteredUserSubscription } from './application';
 
-const subscriptions: Provider[] = [
-  CodeGeneratedVerifyEmailSubscription,
-  RegisteredUserSubscription,
-];
+const subscriptions: NestCommon.Provider[] = [RegisteredUserSubscription];
 
-@Global()
-@Module({
+@NestCommon.Global()
+@NestCommon.Module({
   imports: [
-    NestMailerModule.forRoot({
+    NestMailer.MailerModule.forRoot({
       transport: {
         host: 'smtp.ethereal.email',
         port: 587,
@@ -33,8 +18,8 @@ const subscriptions: Provider[] = [
   providers: [...subscriptions],
   exports: [],
 })
-export class MailerModule implements OnApplicationBootstrap {
-  constructor(private readonly mailerService: MailerService) {}
+export class MailerModule implements NestCommon.OnApplicationBootstrap {
+  constructor(private readonly mailerService: NestMailer.MailerService) {}
   async onApplicationBootstrap() {
     // await this.testConnection();
   }
@@ -48,7 +33,7 @@ export class MailerModule implements OnApplicationBootstrap {
         text: 'This is a test email.',
       })
       .then(() => {
-        Logger.log('Mailer service connected!', MailerModule.name);
+        NestCommon.Logger.log('Mailer service connected!', MailerModule.name);
       })
       .catch((error) => {
         throw new Error(`Email failed to send: ${error}`);

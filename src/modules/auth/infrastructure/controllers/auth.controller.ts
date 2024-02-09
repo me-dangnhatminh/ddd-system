@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Query,
-} from '@nestjs/common';
+import * as NestjsCommon from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, fold } from 'fp-ts/lib/Either';
 
@@ -19,19 +11,19 @@ import {
 } from '../../application';
 import { mapErrorTypeToHttpCode } from '../common/utils';
 import { LoginUserBody } from './view-models/login-user.dto';
-import { HttpUser, HttpUserAuth } from '../common/decorators';
-import { User } from '../../domain';
 
-@Controller('auth')
+@NestjsCommon.Controller('auth')
 export class AuthController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Post('register')
-  @HttpCode(HttpStatus.OK)
-  async register(@Body() dto: RegisterUserBody): Promise<ApiResponse<void>> {
+  @NestjsCommon.Post('register')
+  @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
+  async register(
+    @NestjsCommon.Body() dto: RegisterUserBody,
+  ): Promise<ApiResponse<void>> {
     const command = new RegisterUserCommand(dto);
     const result: Either<IErrorDetail, void> =
       await this.commandBus.execute(command);
@@ -46,9 +38,9 @@ export class AuthController {
     )(result);
   }
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginUserBody) {
+  @NestjsCommon.Post('login')
+  @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
+  async login(@NestjsCommon.Body() dto: LoginUserBody) {
     const query = new LoginUserQuery(dto.email, dto.password);
     const result: Either<IErrorDetail, LoginUserQueryResult> =
       await this.queryBus.execute(query);
@@ -67,8 +59,11 @@ export class AuthController {
     )(result);
   }
 
-  @Get('email-confirmation')
-  @HttpCode(HttpStatus.OK)
-  @HttpUserAuth()
-  async confirmEmail(@Query('token') token: string, @HttpUser() user: User) {} //TODO: implement
+  // @NestjsCommon.Get('email-confirmation')
+  // @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
+  // @HttpUserAuth()
+  // async confirmEmail(
+  //   @NestjsCommon.Query('token') token: string,
+  //   @HttpUser() user: User,
+  // ) {} //TODO: implement
 }

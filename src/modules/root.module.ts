@@ -8,11 +8,11 @@ import { PersistencesModule } from './persistences/persistences.module';
 
 @Module({
   imports: [
+    CqrsModule,
+    JwtModule,
+    CacheModule,
     PersistencesModule,
     MailerModule,
-    JwtModule,
-    CqrsModule,
-    CacheModule,
     AuthModule,
   ],
   providers: [],
