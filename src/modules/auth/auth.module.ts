@@ -1,5 +1,9 @@
 import { Module, Provider } from '@nestjs/common';
-import { AuthController } from './infrastructure';
+import {
+  AuthController,
+  DemoCreatedHandler,
+  UserController,
+} from './infrastructure';
 import {
   ChangePasswordHandler,
   GetListUsersHandler,
@@ -19,11 +23,12 @@ const HandlersProvider: Provider[] = [
   LoginUserHandler,
   ChangePasswordHandler,
   RegisterUserHandler,
+  DemoCreatedHandler,
 ];
 
 @Module({
   imports: [],
-  controllers: [AuthController],
+  controllers: [UserController, AuthController],
   providers: [ExceptionFilterProvider, ...HandlersProvider],
 })
 export class AuthModule {}
