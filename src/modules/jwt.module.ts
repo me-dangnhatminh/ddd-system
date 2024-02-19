@@ -1,14 +1,14 @@
-import { JwtModule as NestJwtModule } from '@nestjs/jwt';
+import * as NestJWT from '@nestjs/jwt';
 import { Global, Module } from '@nestjs/common';
 
 @Global()
 @Module({
   imports: [
-    NestJwtModule.register({
+    NestJWT.JwtModule.register({
       secret: 'secretKey', //TODO: Change secret key
       signOptions: { expiresIn: '10 days' },
     }),
   ],
-  exports: [NestJwtModule],
+  exports: [NestJWT.JwtModule],
 })
 export class JwtModule {}

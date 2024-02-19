@@ -1,4 +1,5 @@
-import { Module, Provider } from '@nestjs/common';
+import * as NestCommon from '@nestjs/common';
+import * as NestCore from '@nestjs/core';
 import {
   AuthController,
   DemoCreatedHandler,
@@ -11,14 +12,13 @@ import {
   RegisterUserHandler,
 } from './application';
 import { ExceptionFilter } from './infrastructure/common/Interceptors';
-import { APP_FILTER } from '@nestjs/core';
 
-const ExceptionFilterProvider: Provider = {
-  provide: APP_FILTER,
+const ExceptionFilterProvider: NestCommon.Provider = {
+  provide: NestCore.APP_FILTER,
   useClass: ExceptionFilter,
 };
 
-const HandlersProvider: Provider[] = [
+const HandlersProvider: NestCommon.Provider[] = [
   GetListUsersHandler,
   LoginUserHandler,
   ChangePasswordHandler,
@@ -26,7 +26,7 @@ const HandlersProvider: Provider[] = [
   DemoCreatedHandler,
 ];
 
-@Module({
+@NestCommon.Module({
   imports: [],
   controllers: [UserController, AuthController],
   providers: [ExceptionFilterProvider, ...HandlersProvider],
