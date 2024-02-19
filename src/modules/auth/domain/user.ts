@@ -12,9 +12,9 @@ import {
   PasswordChangedEvent,
   ProfileEditedEvent,
   RegisteredUserEvent,
+  UnregisteredUserEvent,
 } from './events';
 import { AuthProvider } from './auth-provider';
-import { UnregisteredUserEvent } from './events/unregistered-user.event';
 
 interface IUserProps {
   id: string;
@@ -165,7 +165,7 @@ export class User extends AggregateRoot implements IUser {
       authProvider: AuthProvider.LOCAL,
     });
 
-    user.apply(new RegisteredUserEvent(user));
+    user.apply(new RegisteredUserEvent(user)); //TODO: Why user aggregate is not auto published?
     return right(user);
   }
 

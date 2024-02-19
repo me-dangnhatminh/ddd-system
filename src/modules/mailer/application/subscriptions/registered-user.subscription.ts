@@ -11,7 +11,7 @@ export class RegisteredUserSubscription
   constructor(private readonly mailer: NestMailer.MailerService) {}
   async handle(event: AuthModule.RegisteredUserEvent) {
     const { email, firstName, lastName } = event;
-    console.log('Sending email to:', email);
+    NestCommon.Logger.log(`Sending welcome email to ${email}...`);
     return; // TODO: Implement email sending
     await this.mailer
       .sendMail({

@@ -1,7 +1,7 @@
-import { IEvent } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
 import { UserRole } from '../user-role';
 
-export class RegisteredUserEvent implements IEvent {
+export class RegisteredUserEvent implements NestCQRS.IEvent {
   public readonly id: string;
   public readonly email: string;
   public readonly firstName: string;

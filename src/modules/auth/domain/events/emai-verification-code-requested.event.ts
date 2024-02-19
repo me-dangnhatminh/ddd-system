@@ -1,16 +1,16 @@
-import { IEvent } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
 
-type TDataCodeGeneratedVerifyEmailEvent = {
+type TData = {
   email: string;
   code: number;
   expiredAt: number;
 };
 
-export class CodeGeneratedVerifyEmailEvent implements IEvent {
+export class EmailVerificationCodeRequestedEvent implements NestCQRS.IEvent {
   public readonly email: string;
   public readonly code: number;
   public readonly expiredAt: number;
-  constructor(public readonly data: TDataCodeGeneratedVerifyEmailEvent) {
+  constructor(public readonly data: TData) {
     this.email = data.email;
     this.code = data.code;
     this.expiredAt = data.expiredAt;

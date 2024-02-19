@@ -1,8 +1,12 @@
 import * as NestMailer from '@nestjs-modules/mailer';
 import * as NestCommon from '@nestjs/common';
-import { RegisteredUserSubscription } from './application';
 
-const subscriptions: NestCommon.Provider[] = [RegisteredUserSubscription];
+import * as App from './application';
+
+const subscriptions: NestCommon.Provider[] = [
+  App.VerifyEmailCodeGeneratedSubscription,
+  App.RegisteredUserSubscription,
+];
 
 @NestCommon.Global()
 @NestCommon.Module({

@@ -1,7 +1,6 @@
 export type Result<S, F = never> = Success<S> | Failure<F>;
 export const Result = Object.freeze({ success, failure });
 
-// TODO: apply combine function
 /**
  * Result pattern is serialization that is used to represent the result of an operation.
  * It is a way to handle errors and exceptions in a functional way.

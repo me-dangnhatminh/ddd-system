@@ -3,10 +3,15 @@ import { Inject } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
-import { IErrorDetail } from '@common';
-import { CodeGeneratedVerifyEmailEvent } from '../../../domain';
-import { EMAIL_VERIFIED } from '../../../domain/user-errors';
+import * as Common from '@common';
+import * as Domain from '../../../domain';
+
 import { SendVerifyEmailCommand } from '../send-verify-email.command';
+
+const EMAIL_VERIFIED: Common.IErrorDetail = {
+  type: 'EmailVerified',
+  message: 'Email is already verified',
+};
 
 @CommandHandler(SendVerifyEmailCommand)
 export class SendVerifyEmailHandler
@@ -16,7 +21,7 @@ export class SendVerifyEmailHandler
 
   async execute(
     command: SendVerifyEmailCommand,
-  ): Promise<Either<IErrorDetail, void>> {
+  ): Promise<Either<Common.IErrorDetail, void>> {
     const { requester } = command;
     const isVerified = requester.isVerified;
     if (isVerified) return left(EMAIL_VERIFIED);
@@ -33,8 +38,13 @@ export class SendVerifyEmailHandler
       codeTTLMs, // in v5 ttl is miliseconds
     );
 
-    const event = new CodeGeneratedVerifyEmailEvent({ email, code, expiredAt });
+    const event = new Domain.EmailVerificationCodeRequestedEvent({
+      email,
+      code,
+      expiredAt,
+    });
     requester.apply(event);
+
     return right(undefined);
   }
 
