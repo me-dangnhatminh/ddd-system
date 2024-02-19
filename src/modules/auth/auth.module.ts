@@ -1,34 +1,24 @@
 import * as NestCommon from '@nestjs/common';
 import * as NestCore from '@nestjs/core';
-import {
-  AuthController,
-  DemoCreatedHandler,
-  UserController,
-} from './infrastructure';
-import {
-  ChangePasswordHandler,
-  GetListUsersHandler,
-  LoginUserHandler,
-  RegisterUserHandler,
-} from './application';
-import { ExceptionFilter } from './infrastructure/common/Interceptors';
+import * as Infra from './infrastructure';
+import * as App from './application';
 
 const ExceptionFilterProvider: NestCommon.Provider = {
   provide: NestCore.APP_FILTER,
-  useClass: ExceptionFilter,
+  useClass: Infra.ExceptionFilter,
 };
 
 const HandlersProvider: NestCommon.Provider[] = [
-  GetListUsersHandler,
-  LoginUserHandler,
-  ChangePasswordHandler,
-  RegisterUserHandler,
-  DemoCreatedHandler,
+  App.GetListUsersHandler,
+  App.LoginUserHandler,
+  App.ChangePasswordHandler,
+  App.RegisterUserHandler,
+  Infra.DemoCreatedHandler,
 ];
 
 @NestCommon.Module({
   imports: [],
-  controllers: [UserController, AuthController],
+  controllers: [Infra.UserController, Infra.AuthController],
   providers: [ExceptionFilterProvider, ...HandlersProvider],
 })
 export class AuthModule {}

@@ -1,16 +1,18 @@
-import { RegisteredUserEvent } from '@modules/auth';
-import { MailerService } from '@nestjs-modules/mailer';
-import { Logger } from '@nestjs/common';
-import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import * as NestMailer from '@nestjs-modules/mailer';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as NestCommon from '@nestjs/common';
 
-@EventsHandler(RegisteredUserEvent)
+import * as AuthModule from '@modules/auth';
+
+@NestCQRS.EventsHandler(AuthModule.RegisteredUserEvent)
 export class RegisteredUserSubscription
-  implements IEventHandler<RegisteredUserEvent>
+  implements NestCQRS.IEventHandler<AuthModule.RegisteredUserEvent>
 {
-  constructor(private readonly mailer: MailerService) {}
-  async handle(event: RegisteredUserEvent) {
+  constructor(private readonly mailer: NestMailer.MailerService) {}
+  async handle(event: AuthModule.RegisteredUserEvent) {
     const { email, firstName, lastName } = event;
     console.log('Sending email to:', email);
+    return; // TODO: Implement email sending
     await this.mailer
       .sendMail({
         to: email,
@@ -19,7 +21,7 @@ export class RegisteredUserSubscription
         context: { name: `${firstName} ${lastName}` },
       })
       .catch((error) =>
-        Logger.error(
+        NestCommon.Logger.error(
           `Error sending email: ${error}`,
           RegisteredUserSubscription.name,
         ),

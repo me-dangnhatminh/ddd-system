@@ -1,5 +1,6 @@
 import * as NestCQRS from '@nestjs/cqrs';
 import * as Either from 'fp-ts/Either';
+
 import { ErrorTypes, IErrorDetail } from '@common';
 
 import { RegisterUserCommand } from '../register-user.command';
@@ -14,10 +15,7 @@ const CONFLICT_EMAIL: IErrorDetail = {
 export class RegisterUserHandler
   implements NestCQRS.ICommandHandler<RegisterUserCommand>
 {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly eventBus: NestCQRS.EventBus,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async execute(
     command: RegisterUserCommand,
@@ -29,7 +27,7 @@ export class RegisterUserHandler
     if (result._tag === 'Left') return Either.left(result.left);
 
     const user = result.right;
-    await this.userRepository.save(user);
+    // await this.userRepository.save(user);
 
     user.commit();
     return Either.right(undefined);
