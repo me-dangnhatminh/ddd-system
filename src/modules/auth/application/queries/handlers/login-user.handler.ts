@@ -1,42 +1,42 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { JwtService } from '@nestjs/jwt';
-import { Either, left, right } from 'fp-ts/Either';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as NestJWT from '@nestjs/jwt';
+import * as Either from 'fp-ts/Either';
+
+import * as Shared from '@common';
+import * as Common from '../../../common';
+import * as Domain from '../../../domain';
 
 import { LoginUserQuery, LoginUserQueryResult } from '../login-user.query';
-import { UserRepository, UserJWTClaims } from '../../../domain';
-import { ErrorTypes, IErrorDetail } from '@common';
 
-const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
-  type: ErrorTypes.UNAUTHORIZED,
-  message: 'Invalid email or password',
-};
-
-@QueryHandler(LoginUserQuery)
+@NestCQRS.QueryHandler(LoginUserQuery)
 export class LoginUserHandler
   implements
-    IQueryHandler<LoginUserQuery, Either<IErrorDetail, LoginUserQueryResult>>
+    NestCQRS.IQueryHandler<
+      LoginUserQuery,
+      Either.Either<Shared.IErrorDetail, LoginUserQueryResult>
+    >
 {
   constructor(
-    private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: NestJWT.JwtService,
+    private readonly userRepository: Domain.UserRepository,
   ) {}
 
   async execute(
     query: LoginUserQuery,
-  ): Promise<Either<IErrorDetail, LoginUserQueryResult>> {
+  ): Promise<Either.Either<Shared.IErrorDetail, LoginUserQueryResult>> {
     const user = await this.userRepository.getByEmail(query.email);
 
-    if (!user) return left(INVALID_EMAIL_OR_PASSWORD);
+    if (!user) return Either.left(Common.INVALID_EMAIL_OR_PASSWORD);
     const isPasswordValid = user.comparePassword(query.password);
-    if (!isPasswordValid) return left(INVALID_EMAIL_OR_PASSWORD);
+    if (!isPasswordValid) return Either.left(Common.INVALID_EMAIL_OR_PASSWORD);
 
-    const tokenClaims: UserJWTClaims = {
+    const tokenClaims: Domain.UserJWTClaims = {
       userId: user.id,
       email: user.email,
       role: user.role,
       isVerified: user.isVerified,
     };
-    const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' });
-    return right(new LoginUserQueryResult(token));
+    const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' }); //TODO: config expiresIn in env
+    return Either.right(new LoginUserQueryResult(token));
   }
 }

@@ -1,6 +1,6 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
-import { Cache } from '@nestjs/cache-manager';
+import * as NestCache from '@nestjs/cache-manager';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 import * as Common from '@common';
@@ -13,11 +13,15 @@ const EMAIL_VERIFIED: Common.IErrorDetail = {
   message: 'Email is already verified',
 };
 
-@CommandHandler(SendVerifyEmailCommand)
+@NestCQRS.CommandHandler(SendVerifyEmailCommand)
 export class SendVerifyEmailHandler
-  implements ICommandHandler<SendVerifyEmailCommand>
+  implements NestCQRS.ICommandHandler<SendVerifyEmailCommand>
 {
-  constructor(@Inject('CACHE_MANAGER') private readonly cacheService: Cache) {}
+  constructor(
+    @Inject(NestCache.CACHE_MANAGER)
+    private readonly cacheService: NestCache.Cache,
+    private readonly publisher: NestCQRS.EventPublisher,
+  ) {}
 
   async execute(
     command: SendVerifyEmailCommand,
@@ -27,8 +31,8 @@ export class SendVerifyEmailHandler
     if (isVerified) return left(EMAIL_VERIFIED);
 
     const email = requester.email;
-    const code = this.generateCode();
 
+    const code = this.generateCode();
     const codeTTL = 5; // 5 minutes
     const codeTTLMs = codeTTL * 60 * 1000;
     const expiredAt = Date.now() + codeTTLMs; // 5 minutes // TODO: add to config
@@ -44,6 +48,7 @@ export class SendVerifyEmailHandler
       expiredAt,
     });
     requester.apply(event);
+    this.publisher.mergeObjectContext(requester).commit();
 
     return right(undefined);
   }
@@ -52,6 +57,4 @@ export class SendVerifyEmailHandler
   private generateCode(): number {
     return Math.floor(1000 + Math.random() * 9000);
   }
-
-  private saveCode(): void {}
 }

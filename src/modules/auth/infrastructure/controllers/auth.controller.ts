@@ -1,69 +1,56 @@
-import * as NestjsCommon from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, fold } from 'fp-ts/lib/Either';
+import * as NestCommon from '@nestjs/common';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as Either from 'fp-ts/lib/Either';
 
-import { ApiResponse, ErrorTypes, IErrorDetail } from '@common';
+import { ApiResponse, IErrorDetail } from '@common';
+
+import * as App from '../../application';
+import * as Domain from '../../domain';
+import * as Common from '../../common';
+
 import { RegisterUserBody } from './view-models/register-user.dto';
-import {
-  LoginUserQuery,
-  LoginUserQueryResult,
-  RegisterUserCommand,
-} from '../../application';
-import { mapErrorTypeToHttpCode } from '../common/utils';
 import { LoginUserBody } from './view-models/login-user.dto';
 
-@NestjsCommon.Controller('auth')
+@NestCommon.Controller('auth')
 export class AuthController {
   constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    private readonly commandBus: NestCQRS.CommandBus,
+    private readonly queryBus: NestCQRS.QueryBus,
   ) {}
 
-  @NestjsCommon.Post('register')
-  @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
+  @NestCommon.Post('register')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async register(
-    @NestjsCommon.Body() dto: RegisterUserBody,
+    @NestCommon.Body() dto: RegisterUserBody,
   ): Promise<ApiResponse<void>> {
-    const command = new RegisterUserCommand(dto);
-    const result: Either<IErrorDetail, void> =
+    const command = new App.RegisterUserCommand(dto);
+    const result: Either.Either<IErrorDetail, void> =
       await this.commandBus.execute(command);
 
-    return fold<IErrorDetail, void, ApiResponse>(
-      (err) =>
-        ApiResponse.error({
-          code: mapErrorTypeToHttpCode(err.type as ErrorTypes),
-          message: err.message,
-        }),
-      () => ApiResponse.success(),
-    )(result);
+    return Common.EitherToApiResponse.fold(result);
   }
 
-  @NestjsCommon.Post('login')
-  @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
-  async login(@NestjsCommon.Body() dto: LoginUserBody) {
-    const query = new LoginUserQuery(dto.email, dto.password);
-    const result: Either<IErrorDetail, LoginUserQueryResult> =
+  @NestCommon.Post('login')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async login(@NestCommon.Body() dto: LoginUserBody) {
+    const query = new App.LoginUserQuery(dto.email, dto.password);
+    const result: Either.Either<IErrorDetail, App.LoginUserQueryResult> =
       await this.queryBus.execute(query);
 
-    return fold<
-      IErrorDetail,
-      LoginUserQueryResult,
-      ApiResponse<LoginUserQueryResult> | ApiResponse
-    >(
-      (err) =>
-        ApiResponse.error({
-          code: mapErrorTypeToHttpCode(err.type as ErrorTypes),
-          message: err.message,
-        }),
-      (res) => ApiResponse.success(res),
-    )(result);
+    return Common.EitherToApiResponse.fold(result);
   }
 
-  // @NestjsCommon.Get('email-confirmation')
-  // @NestjsCommon.HttpCode(NestjsCommon.HttpStatus.OK)
-  // @HttpUserAuth()
-  // async confirmEmail(
-  //   @NestjsCommon.Query('token') token: string,
-  //   @HttpUser() user: User,
-  // ) {} //TODO: implement
+  @NestCommon.Get('email-confirmation')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth()
+  async confirmEmail(
+    @NestCommon.Query('code') code: number,
+    @Common.HttpUser() user: Domain.User,
+  ) {
+    const command = new App.ConfirmEmailCommand(user, code);
+    const result: Either.Either<IErrorDetail, void> =
+      await this.commandBus.execute(command);
+
+    return Common.EitherToApiResponse.fold(result);
+  }
 }

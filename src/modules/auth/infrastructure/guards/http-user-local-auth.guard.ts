@@ -8,7 +8,7 @@ import { UserJWTClaims, UserRepository } from '@modules/auth';
 import {
   AUTHENTICATED_USER_KEY,
   AUTHENTICATED_USER_TOKEN_KEY,
-} from '../constants';
+} from '../../common/constants';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
