@@ -11,6 +11,6 @@ export const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
 };
 
 export const INVALID_EMAIL_VERIFICATION_CODE: IErrorDetail = {
-  type: ErrorTypes.BAD_REQUEST,
-  message: 'Invalid email verification code',
+  type: ErrorTypes.FORBIDDEN,
+  message: 'Confirmation code has expired or is invalid',
 };

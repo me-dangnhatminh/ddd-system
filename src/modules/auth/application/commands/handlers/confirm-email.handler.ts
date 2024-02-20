@@ -23,10 +23,45 @@ export class ConfirmEmailHandler
   async execute(
     command: ConfirmEmailCommand,
   ): Promise<Either.Either<Shared.IErrorDetail, void>> {
-    const { code, requester } = command;
+    const { requester, userId, code } = command;
+    if (requester.id !== userId) return Either.left(Shared.FORBIDDEN);
+
+    if (!code) return this.genAndSendVerifyCode(requester);
+    return this.verifyCode(requester, code);
+  }
+
+  private async genAndSendVerifyCode(requester: Domain.User) {
+    const isVerified = requester.isVerified;
+    if (isVerified) return Either.left(Shared.CONFLICT);
+
     const email = requester.email;
 
-    // get the code from cache
+    const code = this.generateCode();
+    const codeTTL = 5; // 5 minutes
+    const codeTTLMs = codeTTL * 60 * 1000;
+    const expiredAt = Date.now() + codeTTLMs; // 5 minutes // TODO: add to config
+    await this.cacheService.set(
+      `verify-email:${requester.email}`,
+      code,
+      codeTTLMs, // in v5 ttl is miliseconds
+    );
+
+    const event = new Domain.EmailVerificationCodeRequestedEvent({
+      email,
+      code,
+      expiredAt,
+    });
+    requester.apply(event);
+    this.publisher.mergeObjectContext(requester).commit();
+
+    return Either.right(undefined);
+  }
+
+  private async verifyCode(requester: Domain.User, code: number) {
+    const isVerified = requester.isVerified;
+    if (isVerified) return Either.left(Shared.CONFLICT);
+
+    const { email } = requester;
     const codeKey = `verify-email:${email}`;
     const cachedCode = await this.cacheService.get(codeKey);
 
@@ -34,11 +69,18 @@ export class ConfirmEmailHandler
     if (cachedCode !== code)
       return Either.left(Common.INVALID_EMAIL_VERIFICATION_CODE);
     requester.verifyEmail(); // TODO: Add event to the user entity
-    await this.cacheService.del(codeKey);
-    await this.userRepository.save(requester);
+    // await this.cacheService.del(codeKey);
+    await this.userRepository.update(requester);
 
     // publish the event
     this.publisher.mergeObjectContext(requester).commit();
     return Either.right(undefined);
+  }
+
+  /**
+   * Generate a 4 digit code
+   */
+  private generateCode(): number {
+    return Math.floor(1000 + Math.random() * 9000);
   }
 }

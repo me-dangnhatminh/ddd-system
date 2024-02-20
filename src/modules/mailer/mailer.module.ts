@@ -5,6 +5,7 @@ import * as App from './application';
 
 const subscriptions: NestCommon.Provider[] = [
   App.VerifyEmailCodeGeneratedSubscription,
+  App.EmailVerifiedSubscription,
   App.RegisteredUserSubscription,
 ];
 

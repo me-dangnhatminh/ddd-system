@@ -9,6 +9,7 @@ import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
 import {
+  EmailVerifiedEvent,
   PasswordChangedEvent,
   ProfileEditedEvent,
   RegisteredUserEvent,
@@ -244,5 +245,6 @@ export class User extends AggregateRoot implements IUser {
         'Conflic: Email already verified, please check @isVerified property',
       );
     this.props.isVerified = true;
+    this.apply(new EmailVerifiedEvent(this));
   }
 }

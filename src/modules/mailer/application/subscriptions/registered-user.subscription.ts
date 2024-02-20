@@ -17,6 +17,7 @@ export class RegisteredUserSubscription
         subject: 'Welcome to the app',
         template: 'welcome',
         context: { name: `${firstName} ${lastName}` },
+        html: `<h1>Welcome to the app, ${firstName} ${lastName}!</h1>`,
       })
       .catch((error) =>
         NestCommon.Logger.error(

@@ -8,5 +8,5 @@ export class LoginUserQuery implements IQuery {
 }
 
 export class LoginUserQueryResult implements IQueryResult {
-  constructor(public readonly assessToken: string) {}
+  constructor(public readonly accessToken: string) {}
 }

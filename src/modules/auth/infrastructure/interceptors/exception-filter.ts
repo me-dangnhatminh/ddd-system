@@ -23,8 +23,8 @@ export class ExceptionFilter implements NestExceptionFilter {
     const API_LOG_ENABLE = true;
     if (API_LOG_ENABLE) {
       const message: string =
-        `\nMethod: ${request.method}, ${request.path}` +
-        `\n${errorRes.getErrorDisplay()}`;
+        `Method: ${request.method}, ${request.path}, ` +
+        `${errorRes.getErrorDisplay()}`;
       Logger.error(message);
     }
     return response.json(errorRes);

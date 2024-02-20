@@ -13,6 +13,7 @@ export class VerifyEmailCodeGeneratedSubscription {
       subject: 'Verify your email',
       template: 'verify-email',
       context: { code },
+      html: `<h1>Your verification code is: ${code}</h1>`,
     });
   }
 }
