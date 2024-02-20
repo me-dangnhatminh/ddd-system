@@ -5,7 +5,4 @@ import * as NestCQRS from '@nestjs/cqrs';
 export class UserController implements NestCommon.OnModuleInit {
   constructor(private readonly eventBus: NestCQRS.EventBus) {}
   onModuleInit() {}
-
-  @NestCommon.Get('create-demo')
-  async createDemo() {}
 }

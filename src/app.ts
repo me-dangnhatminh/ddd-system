@@ -1,35 +1,39 @@
+import * as NestExpress from '@nestjs/platform-express';
+import * as NestCore from '@nestjs/core';
+import * as NestCommon from '@nestjs/common';
+import * as BodyParser from 'body-parser';
+import * as NestSwagger from '@nestjs/swagger';
+
 import { RootModule } from './modules/root.module';
 
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { NestFactory } from '@nestjs/core';
-import {
-  BadRequestException,
-  ValidationError,
-  ValidationPipe,
-} from '@nestjs/common';
-
-import * as bodyParser from 'body-parser';
-
 export class ServerApplication {
-  private constructor(public readonly app: NestExpressApplication) {}
+  private constructor(
+    public readonly app: NestExpress.NestExpressApplication,
+  ) {}
   static async create(): Promise<ServerApplication> {
-    const app = await NestFactory.create<NestExpressApplication>(RootModule);
+    const app =
+      await NestCore.NestFactory.create<NestExpress.NestExpressApplication>(
+        RootModule,
+      );
     return new ServerApplication(app);
   }
 
   public async run() {
     this.buildValidatorPipe();
-    this.app.use(bodyParser.json({ limit: '100mb' }));
-    this.app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
+    this.app.use(BodyParser.json({ limit: '100mb' }));
+    this.app.use(BodyParser.urlencoded({ limit: '100mb', extended: true }));
+
+    this.buildAPIDocumentation();
+
     await this.app.listen(3000);
   }
 
   private buildValidatorPipe(): void {
     this.app.useGlobalPipes(
-      new ValidationPipe({
+      new NestCommon.ValidationPipe({
         transform: true,
-        exceptionFactory(errors: ValidationError[]) {
-          return new BadRequestException(
+        exceptionFactory(errors: NestCommon.ValidationError[]) {
+          return new NestCommon.BadRequestException(
             errors
               .map((error) => Object.values(error.constraints ?? {}).join(', '))
               .join(', '),
@@ -37,5 +41,23 @@ export class ServerApplication {
         },
       }),
     );
+  }
+
+  private buildAPIDocumentation(): void {
+    const title = 'IPoster';
+    const description = 'IPoster API documentation';
+    const version = '1.0.0';
+
+    const options: Omit<NestSwagger.OpenAPIObject, 'paths'> =
+      new NestSwagger.DocumentBuilder()
+        .setTitle(title)
+        .setDescription(description)
+        .setVersion(version)
+        .addBearerAuth({ type: 'apiKey', in: 'header', name: 'x-access-token' })
+        .build();
+
+    const document: NestSwagger.OpenAPIObject =
+      NestSwagger.SwaggerModule.createDocument(this.app, options);
+    NestSwagger.SwaggerModule.setup('docs', this.app, document);
   }
 }
