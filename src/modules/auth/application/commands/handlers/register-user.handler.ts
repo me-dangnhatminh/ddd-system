@@ -4,7 +4,7 @@ import * as Either from 'fp-ts/Either';
 import { IErrorDetail } from '@common';
 
 import { RegisterUserCommand } from '../register-user.command';
-import { RegisteredUserEvent, User, UserRepository } from '../../../domain';
+import { User, UserRepository } from '../../../domain';
 import { CONFLICT_EMAIL } from '../../common';
 
 @NestCQRS.CommandHandler(RegisterUserCommand)
@@ -13,7 +13,7 @@ export class RegisterUserHandler
 {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly eventBus: NestCQRS.EventBus,
+    private readonly publisher: NestCQRS.EventPublisher,
   ) {}
 
   async execute(
@@ -26,11 +26,9 @@ export class RegisterUserHandler
     if (result._tag === 'Left') return Either.left(result.left);
 
     const user = result.right;
-    // await this.userRepository.save(user); //TODO open this line
+    await this.userRepository.save(user);
 
-    user.commit();
-    this.eventBus.publish(new RegisteredUserEvent(user)); //TODO: Why user aggregate is not auto published?
-
+    this.publisher.mergeObjectContext(user).commit();
     return Either.right(undefined);
   }
 }
