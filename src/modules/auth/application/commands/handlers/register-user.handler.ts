@@ -1,15 +1,11 @@
 import * as NestCQRS from '@nestjs/cqrs';
 import * as Either from 'fp-ts/Either';
 
-import { ErrorTypes, IErrorDetail } from '@common';
+import { IErrorDetail } from '@common';
 
 import { RegisterUserCommand } from '../register-user.command';
 import { RegisteredUserEvent, User, UserRepository } from '../../../domain';
-
-const CONFLICT_EMAIL: IErrorDetail = {
-  type: ErrorTypes.CONFLICT,
-  message: 'Email already exists',
-};
+import { CONFLICT_EMAIL } from '../../common';
 
 @NestCQRS.CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler

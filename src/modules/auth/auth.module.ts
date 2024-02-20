@@ -13,7 +13,6 @@ const HandlersProvider: NestCommon.Provider[] = [
   App.LoginUserHandler,
   App.ChangePasswordHandler,
   App.RegisterUserHandler,
-  Infra.DemoCreatedHandler,
 ];
 
 @NestCommon.Module({

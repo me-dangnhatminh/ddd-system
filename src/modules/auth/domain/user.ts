@@ -116,32 +116,6 @@ export class User extends AggregateRoot implements IUser {
 
   public static new = (props: IUserProps): User => new User(props);
 
-  public static create = (data: IDataRegisterUser): User => {
-    const nameResult = UserName.create(data.firstName, data.lastName);
-    const emailResult = UserEmail.create(data.email);
-    const passwordResult = UserPassword.create(data.password);
-    if (nameResult._tag === 'Left') throw new Error(nameResult.left.message);
-    if (emailResult._tag === 'Left') throw new Error(emailResult.left.message);
-    if (passwordResult._tag === 'Left')
-      throw new Error(passwordResult.left.message);
-
-    const user = new User({
-      id: uuid(),
-      name: nameResult.right,
-      email: emailResult.right,
-      password: passwordResult.right,
-      role: UserRole.USER,
-      isVerified: data.isVerified ?? false,
-      createdAt: new Date(),
-      avatarUrl: data.avatarUrl ?? '',
-      removedAt: null,
-      updatedAt: null,
-      authProvider: AuthProvider.LOCAL,
-    });
-    user.apply(new RegisteredUserEvent(user));
-    return user;
-  };
-
   public static register(data: IDataRegisterUser): Either<IErrorDetail, User> {
     const nameResult = UserName.create(data.firstName, data.lastName);
     const emailResult = UserEmail.create(data.email);
