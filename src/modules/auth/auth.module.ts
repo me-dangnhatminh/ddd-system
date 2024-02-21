@@ -9,7 +9,7 @@ const ExceptionFilterProvider: NestCommon.Provider = {
 };
 
 const HandlersProvider: NestCommon.Provider[] = [
-  App.GetListUsersHandler,
+  App.GetProfileHandler,
   App.LoginUserHandler,
   App.ChangePasswordHandler,
   App.RegisterUserHandler,
@@ -21,4 +21,9 @@ const HandlersProvider: NestCommon.Provider[] = [
   controllers: [Infra.UserController, Infra.AuthController],
   providers: [ExceptionFilterProvider, ...HandlersProvider],
 })
-export class AuthModule {}
+export class AuthModule {
+  constructor() {}
+  configure(consumer: NestCommon.MiddlewareConsumer) {
+    consumer.apply(Infra.FormatApiResponseMiddleware).forRoutes('*');
+  }
+}

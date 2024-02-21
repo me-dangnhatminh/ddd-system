@@ -9,11 +9,43 @@ import * as Domain from '../../domain';
 import * as Common from '../../common';
 import { EmailConfirmationBody, UserParams } from './view-models';
 
+const VIEW_PROFILE_ERROR: Shared.IErrorDetail = {
+  type: Shared.ErrorTypes.FORBIDDEN,
+  message: 'You are not allowed to view this profile',
+};
+
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
-export class UserController implements NestCommon.OnModuleInit {
-  constructor(private readonly commandBus: NestCQRS.CommandBus) {}
+export class UserController
+  extends Common.BaseController
+  implements NestCommon.OnModuleInit
+{
+  constructor(
+    private readonly commandBus: NestCQRS.CommandBus,
+    private readonly queryBus: NestCQRS.QueryBus,
+  ) {
+    super();
+  }
   onModuleInit() {}
+
+  @NestCommon.Get(':userId')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth()
+  async getProfile(
+    @NestCommon.Param() params: UserParams,
+    @Common.HttpUser() requester: Domain.User,
+  ) {
+    if (requester.id !== params.userId) return Either.left(VIEW_PROFILE_ERROR);
+    const canview = requester.canViewProfile(requester);
+    if (!canview) return Either.left(VIEW_PROFILE_ERROR);
+
+    const { userId } = params;
+    const query = new App.GetProfileQuery(userId);
+    const result: Either.Either<Shared.IErrorDetail, Domain.User> =
+      await this.queryBus.execute(query);
+
+    return result;
+  }
 
   @NestCommon.Post(':userId/email/confirmation')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
@@ -30,6 +62,6 @@ export class UserController implements NestCommon.OnModuleInit {
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
 
-    return Common.EitherToApiResponse.fold(result);
+    return this.formatFromEither(result);
   }
 }

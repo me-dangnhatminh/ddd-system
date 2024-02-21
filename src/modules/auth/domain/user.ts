@@ -247,4 +247,13 @@ export class User extends AggregateRoot implements IUser {
     this.props.isVerified = true;
     this.apply(new EmailVerifiedEvent(this));
   }
+
+  /**
+   * Check if the requester can view the profile, if the requester is the owner of the profile or the requester is an admin, then the requester can view the profile
+   * @param requester
+   * @returns boolean
+   */
+  public canViewProfile(requester: User): boolean {
+    return requester.id === this.id || requester.role === UserRole.ADMIN;
+  }
 }

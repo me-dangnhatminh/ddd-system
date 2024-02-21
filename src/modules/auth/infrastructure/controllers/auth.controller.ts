@@ -11,11 +11,13 @@ import { RegisterUserBody, LoginUserBody } from './view-models';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
-export class AuthController {
+export class AuthController extends Common.BaseController {
   constructor(
     private readonly commandBus: NestCQRS.CommandBus,
     private readonly queryBus: NestCQRS.QueryBus,
-  ) {}
+  ) {
+    super();
+  }
 
   @NestCommon.Post('register')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
@@ -26,7 +28,7 @@ export class AuthController {
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
 
-    return Common.EitherToApiResponse.fold(result);
+    return this.formatFromEither(result);
   }
 
   @NestCommon.Post('login')
@@ -36,6 +38,6 @@ export class AuthController {
     const result: Either.Either<Shared.IErrorDetail, App.LoginUserQueryResult> =
       await this.queryBus.execute(query);
 
-    return Common.EitherToApiResponse.fold(result);
+    return this.formatFromEither(result);
   }
 }

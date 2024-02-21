@@ -1,2 +1,2 @@
-export * from './get-list-user.handler';
+export * from './get-profile.handler';
 export * from './login-user.handler';

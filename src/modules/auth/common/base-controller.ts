@@ -1,11 +1,13 @@
 import * as Either from 'fp-ts/lib/Either';
 import { ApiResponse, ErrorTypes, IErrorDetail } from '@common';
-import { mapErrorTypeToHttpCode } from './http-status.util';
+import { mapErrorTypeToHttpCode } from './utils';
 
-export class EitherToApiResponse {
-  static async fold<T>(
+export class BaseController {
+  constructor() {}
+
+  formatFromEither<T>(
     either: Either.Either<IErrorDetail, T>,
-  ): Promise<ApiResponse<T | void>> {
+  ): ApiResponse<T | void> {
     return Either.fold<IErrorDetail, any, ApiResponse>(
       (err) =>
         ApiResponse.error({

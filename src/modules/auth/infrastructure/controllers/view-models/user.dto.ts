@@ -1,5 +1,5 @@
-import { IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class UserParams {
-  @IsUUID() userId: string;
+  @IsNotEmpty() @IsUUID() userId: string;
 }
