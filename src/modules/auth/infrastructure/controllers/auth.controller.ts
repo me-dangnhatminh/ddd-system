@@ -5,30 +5,25 @@ import * as NestSwagger from '@nestjs/swagger';
 
 import * as Shared from '@common';
 import * as App from '../../application';
-import * as Common from '../../common';
 
 import { RegisterUserBody, LoginUserBody } from './view-models';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
-export class AuthController extends Common.BaseController {
+export class AuthController {
   constructor(
     private readonly commandBus: NestCQRS.CommandBus,
     private readonly queryBus: NestCQRS.QueryBus,
-  ) {
-    super();
-  }
+  ) {}
 
   @NestCommon.Post('register')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  async register(
-    @NestCommon.Body() dto: RegisterUserBody,
-  ): Promise<Shared.ApiResponse<void>> {
+  async register(@NestCommon.Body() dto: RegisterUserBody) {
     const command = new App.RegisterUserCommand(dto);
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
 
-    return this.formatFromEither(result);
+    return result;
   }
 
   @NestCommon.Post('login')
@@ -37,7 +32,6 @@ export class AuthController extends Common.BaseController {
     const query = new App.LoginUserQuery(dto.email, dto.password);
     const result: Either.Either<Shared.IErrorDetail, App.LoginUserQueryResult> =
       await this.queryBus.execute(query);
-
-    return this.formatFromEither(result);
+    return result;
   }
 }

@@ -16,17 +16,11 @@ const VIEW_PROFILE_ERROR: Shared.IErrorDetail = {
 
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
-export class UserController
-  extends Common.BaseController
-  implements NestCommon.OnModuleInit
-{
+export class UserController {
   constructor(
     private readonly commandBus: NestCQRS.CommandBus,
     private readonly queryBus: NestCQRS.QueryBus,
-  ) {
-    super();
-  }
-  onModuleInit() {}
+  ) {}
 
   @NestCommon.Get(':userId')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
@@ -54,7 +48,7 @@ export class UserController
     @NestCommon.Body() body: EmailConfirmationBody,
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
-  ): Promise<Shared.ApiResponse<void>> {
+  ) {
     const { code } = body;
     const { userId } = params;
 
@@ -62,6 +56,6 @@ export class UserController
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
 
-    return this.formatFromEither(result);
+    return result;
   }
 }
