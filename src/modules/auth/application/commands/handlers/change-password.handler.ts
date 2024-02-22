@@ -1,25 +1,25 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Either, left, right } from 'fp-ts/Either';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as Either from 'fp-ts/lib/Either';
 
-import { IErrorDetail } from '@common';
+import * as Shared from '@common';
+import * as Domain from '../../../domain';
 
 import { ChangePasswordCommand } from '../change-password.command';
-import { PASSWORD_NOT_MATCH } from '../../../domain';
 
-@CommandHandler(ChangePasswordCommand)
+@NestCQRS.CommandHandler(ChangePasswordCommand)
 export class ChangePasswordHandler
-  implements ICommandHandler<ChangePasswordCommand>
+  implements NestCQRS.ICommandHandler<ChangePasswordCommand>
 {
   async execute(
     command: ChangePasswordCommand,
-  ): Promise<Either<IErrorDetail, void>> {
+  ): Promise<Either.Either<Shared.IErrorDetail, void>> {
     const { requester } = command;
     if (!requester.comparePassword(command.oldPassword))
-      return left(PASSWORD_NOT_MATCH);
+      return Either.left(Domain.PASSWORD_NOT_MATCH);
     const result = requester.changePassword(command.newPassword);
-    if (result._tag === 'Left') return left(result.left);
+    if (result._tag === 'Left') return Either.left(result.left);
 
     requester.commit();
-    return right(undefined);
+    return Either.right(undefined);
   }
 }
