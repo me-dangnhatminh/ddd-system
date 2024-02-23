@@ -10,6 +10,7 @@ const ExceptionFilterProvider: NestCommon.Provider = {
 
 const HandlersProvider: NestCommon.Provider[] = [
   // -- Queries
+  App.GetAllAsAdminHandler,
   App.GetProfileAsAdminHandler,
   App.GetProfileHandler,
   App.LoginUserHandler,

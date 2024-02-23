@@ -6,10 +6,14 @@ import { Injectable } from '@nestjs/common';
 export class PrismaReadRepository implements ReadRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async $query<T = any>(
+  async $query<T = unknown>(
     query: TemplateStringsArray,
-    values?: any[],
+    ...values: any[]
   ): Promise<T> {
-    return await this.prisma.$queryRaw<T>(query, values);
+    return await this.prisma.$queryRaw<T>(query, ...values);
+  }
+
+  async $queryUnsafe<T = unknown>(query: string, ...values: any[]): Promise<T> {
+    return await this.prisma.$queryRawUnsafe<T>(query, ...values);
   }
 }

@@ -7,7 +7,11 @@ import * as Shared from '@common';
 import * as App from '../../application';
 import * as Domain from '../../domain';
 import * as Common from '../../common';
-import { EmailConfirmationBody, UserParams } from './view-models';
+import {
+  EmailConfirmationBody,
+  GetUsersPaginationnQuery,
+  UserParams,
+} from './view-models';
 
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
@@ -24,7 +28,7 @@ export class UserController {
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    if (requester.id !== params.userId) {
+    if (requester.id === params.userId) {
       const query = new App.GetProfileQuery(params.userId);
       const result: Either.Either<Shared.IErrorDetail, Domain.User> =
         await this.queryBus.execute(query);
@@ -55,6 +59,24 @@ export class UserController {
     const command = new App.ConfirmEmailCommand(requester, userId, code);
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
+
+    return result;
+  }
+
+  @NestCommon.Get()
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth()
+  async getAllAsAdmin(
+    @Common.HttpUser() requester: Domain.User,
+    @NestCommon.Query() query: GetUsersPaginationnQuery,
+  ) {
+    const isAdmin = new Domain.IsAdminSpec().isSatisfiedBy(requester);
+    if (!isAdmin) return Either.left(new Shared.ForbiddenException());
+
+    const result: Either.Either<
+      Shared.IErrorDetail,
+      App.GetAllAsAdminQueryResult
+    > = await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
 
     return result;
   }

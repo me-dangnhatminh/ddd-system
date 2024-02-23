@@ -14,14 +14,16 @@ export class GetProfileHandler
     query: GetProfileQuery,
   ): Promise<Either.Either<Shared.IErrorDetail, GetProfileQueryResult>> {
     const { userId } = query;
-    const sqlResult = await this.readRepository.$query`SELECT
-      id as id,
-      email as email,
-      first_name as firstName,
-      last_name as lastName,
-      role as role,
-      avatar_url as avatarUrl,
+    const sqlResult = await this.readRepository.$query<any>`
+      SELECT
+        id,
+        email,
+        first_name as "firstName",
+        last_name as "lastName",
+        role,
+        avatar_url as "avatarUrl"
       FROM users WHERE id = ${userId}`;
+
     const user = sqlResult[0];
     return Either.right(user);
   }

@@ -22,7 +22,6 @@ export class ServerApplication {
     this.buildValidatorPipe();
     this.app.use(BodyParser.json({ limit: '100mb' }));
     this.app.use(BodyParser.urlencoded({ limit: '100mb', extended: true }));
-
     this.buildAPIDocumentation();
 
     await this.app.listen(3000);
