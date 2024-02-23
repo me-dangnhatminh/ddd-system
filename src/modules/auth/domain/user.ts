@@ -1,21 +1,17 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { Either, right, left } from 'fp-ts/Either';
 import { v4 as uuid } from 'uuid';
 
-import { IErrorDetail } from '@common';
+import * as Events from './events';
 
 import { UserEmail } from './user-email';
 import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
-import {
-  EmailVerifiedEvent,
-  PasswordChangedEvent,
-  ProfileEditedEvent,
-  RegisteredUserEvent,
-  UnregisteredUserEvent,
-} from './events';
 import { AuthProvider } from './auth-provider';
+import {
+  QualifiedForEditProfileSpec,
+  QualifiedForRegistrationAdminSpec,
+} from './specs';
 
 interface IUserProps {
   id: string;
@@ -31,7 +27,7 @@ interface IUserProps {
   removedAt: Date | null;
 }
 
-export interface IDataRegisterUser {
+export interface IDataRegisterAsUser {
   firstName: string;
   lastName: string;
   email: string;
@@ -40,8 +36,8 @@ export interface IDataRegisterUser {
   avatarUrl?: string;
 }
 
-export interface IDataRegisterUserByAdmin extends IDataRegisterUser {
-  role?: UserRole;
+export interface IDataRegisterUserAsAdmin extends IDataRegisterAsUser {
+  role: UserRole;
 }
 
 export interface IDataEditProfile {
@@ -110,6 +106,10 @@ export class User extends AggregateRoot implements IUser {
     return this.props.removedAt;
   }
 
+  get isAdmin(): boolean {
+    return this.props.role === UserRole.ADMIN;
+  }
+
   protected constructor(protected props: IUserProps) {
     super();
     this.autoCommit = false;
@@ -117,20 +117,16 @@ export class User extends AggregateRoot implements IUser {
 
   public static new = (props: IUserProps): User => new User(props);
 
-  public static register(data: IDataRegisterUser): Either<IErrorDetail, User> {
-    const nameResult = UserName.create(data.firstName, data.lastName);
-    const emailResult = UserEmail.create(data.email);
-    const passwordResult = UserPassword.create(data.password);
-
-    if (nameResult._tag === 'Left') return left(nameResult.left);
-    if (emailResult._tag === 'Left') return left(emailResult.left);
-    if (passwordResult._tag === 'Left') return left(passwordResult.left);
+  public static registerAsUser(data: IDataRegisterAsUser): User {
+    const name = UserName.new(data.firstName, data.lastName);
+    const email = UserEmail.new(data.email);
+    const password = UserPassword.new(data.password);
 
     const user = new User({
       id: uuid(),
-      name: nameResult.right,
-      email: emailResult.right,
-      password: passwordResult.right,
+      name,
+      email,
+      password,
       role: UserRole.USER,
       isVerified: data.isVerified ?? false,
       createdAt: new Date(),
@@ -140,31 +136,35 @@ export class User extends AggregateRoot implements IUser {
       authProvider: AuthProvider.LOCAL,
     });
 
-    user.apply(new RegisteredUserEvent(user)); //TODO: Why user aggregate is not auto published?
-    return right(user);
+    user.apply(new Events.RegisteredUserEvent(user));
+    return user;
   }
 
-  public registerByAdmin(
-    data: IDataRegisterUserByAdmin,
-  ): Either<IErrorDetail, User> {
-    if (this.props.role !== UserRole.ADMIN)
+  /**
+   * The function `registerAdmin` registers a user as an admin if the current user is qualified,
+   * otherwise it throws an error.
+   * @param {IDataRegisterUserAsAdmin} data - The `data` parameter in the `registerAdmin` function
+   * contains the following properties:
+   * @returns A User object is being returned from the registerAdmin function.
+   */
+  public registerAdmin(data: IDataRegisterUserAsAdmin): User {
+    const qualified = new QualifiedForRegistrationAdminSpec();
+    if (!qualified.isSatisfiedBy(this))
       throw new Error(
-        'Register user by admin, this method can only be called by admin user. If you want to register user, use @register instead (check the role property to determine the user role)',
+        'Only admin can register user as admin, can check @isAdmin property',
       );
-    const nameResult = UserName.create(data.firstName, data.lastName);
-    const emailResult = UserEmail.create(data.email);
-    const passwordResult = UserPassword.create(data.password);
 
-    if (nameResult._tag === 'Left') return left(nameResult.left);
-    if (emailResult._tag === 'Left') return left(emailResult.left);
-    if (passwordResult._tag === 'Left') return left(passwordResult.left);
+    const name = UserName.new(data.firstName, data.lastName);
+    const email = UserEmail.new(data.email);
+    const password = UserPassword.new(data.password);
+    const role = data.role;
 
     const user = new User({
       id: uuid(),
-      name: nameResult.right,
-      email: emailResult.right,
-      password: passwordResult.right,
-      role: data.role ?? UserRole.USER,
+      name,
+      email,
+      password,
+      role,
       isVerified: data.isVerified ?? false,
       createdAt: new Date(),
       avatarUrl: data.avatarUrl ?? '',
@@ -173,22 +173,8 @@ export class User extends AggregateRoot implements IUser {
       authProvider: AuthProvider.LOCAL,
     });
 
-    this.apply(new RegisteredUserEvent(user));
-    return right(user);
-  }
-
-  public registersByAdmin(
-    data: IDataRegisterUserByAdmin[],
-  ): Either<IErrorDetail[], User[]> {
-    const users: User[] = [];
-    const errors: IErrorDetail[] = [];
-    for (const user of data) {
-      const result = this.registerByAdmin(user);
-      if (result._tag === 'Left') errors.push(result.left);
-      else users.push(result.right);
-    }
-    if (errors.length > 0) return left(errors);
-    return right(users);
+    user.apply(new Events.RegisteredUserEvent(user));
+    return user;
   }
 
   public unregisterByAdmin(user: User): void {
@@ -202,7 +188,11 @@ export class User extends AggregateRoot implements IUser {
     const removedAt = new Date();
     user.props.removedAt = removedAt;
     this.apply(
-      new UnregisteredUserEvent({ id: user.id, email: user.email, removedAt }),
+      new Events.UnregisteredUserEvent({
+        id: user.id,
+        email: user.email,
+        removedAt,
+      }),
     );
   }
 
@@ -210,33 +200,34 @@ export class User extends AggregateRoot implements IUser {
     return this.props.password.compare(password);
   }
 
-  public changePassword(password: string): Either<IErrorDetail, void> {
-    const result = this.props.password.changePassword(password);
-    if (result._tag === 'Left') return left(result.left);
-    this.props.password = result.right;
-    this.apply(new PasswordChangedEvent(this.id));
-    return right(undefined);
+  public changePassword(password: string): void {
+    this.props.password.changePassword(password);
+    this.apply(new Events.PasswordChangedEvent(this.id));
   }
 
-  public editProfile(data: IDataEditProfile): Either<IErrorDetail, void> {
-    if (data.firstName !== undefined) {
-      const result = UserName.create(data.firstName, this.props.name.lastName);
-      if (result._tag === 'Left') return left(result.left);
-      this.props.name = result.right;
-    }
+  /**
+   * The `editProfile` function is used to edit the profile of a user.
+   * Only the user itself can edit its profile or an admin can edit the profile of any user.
+   * @param data
+   * @param target
+   */
+  public editProfile(data: IDataEditProfile, target: User = this): void {
+    const spec = new QualifiedForEditProfileSpec();
+    if (!spec.isSatisfiedBy({ editer: this, target }))
+      throw new Error(
+        'Only the user itself can edit its profile or an admin can edit the profile of any user.',
+      );
 
-    if (data.lastName !== undefined) {
-      const result = UserName.create(this.props.name.firstName, data.lastName);
-      if (result._tag === 'Left') return left(result.left);
-      this.props.name = result.right;
+    if (data.firstName !== undefined && data.lastName !== undefined) {
+      const name = UserName.new(data.firstName, data.lastName);
+      this.props.name = name;
     }
 
     if (data.avatarUrl !== undefined) {
       this.props.avatarUrl = data.avatarUrl;
     }
 
-    this.apply(new ProfileEditedEvent(this));
-    return right(undefined);
+    this.apply(new Events.ProfileEditedEvent(this));
   }
 
   public verifyEmail(): void {
@@ -245,15 +236,6 @@ export class User extends AggregateRoot implements IUser {
         'Conflic: Email already verified, please check @isVerified property',
       );
     this.props.isVerified = true;
-    this.apply(new EmailVerifiedEvent(this));
-  }
-
-  /**
-   * Check if the requester can view the profile, if the requester is the owner of the profile or the requester is an admin, then the requester can view the profile
-   * @param requester
-   * @returns boolean
-   */
-  public canViewProfile(requester: User): boolean {
-    return requester.id === this.id || requester.role === UserRole.ADMIN;
+    this.apply(new Events.EmailVerifiedEvent(this));
   }
 }

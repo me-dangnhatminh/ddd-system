@@ -1,11 +1,12 @@
-import { IErrorDetail, ValueObject } from '@common';
-import { Either, left, right } from 'fp-ts/lib/Either';
-import { INVALID_FIRST_NAME, INVALID_LAST_NAME } from './user-errors';
+import { ValueObject } from '@common';
 
 export interface IUserNameProps {
   firstName: string;
   lastName: string;
 }
+
+const INVALID_FIRST_NAME = 'Name must be between 1 and 20 characters';
+const INVALID_LAST_NAME = 'Name must be between 1 and 20 characters';
 
 export class UserName extends ValueObject<IUserNameProps> {
   static readonly MIN_LENGTH = 1;
@@ -27,22 +28,24 @@ export class UserName extends ValueObject<IUserNameProps> {
     super(props);
   }
 
-  static create(
-    firstName: string,
-    lastName: string,
-  ): Either<IErrorDetail, UserName> {
+  /**
+   * Create a new UserName
+   * @param firstName must be between 1 and 20 characters
+   * @param lastName must be between 1 and 20 characters
+   * @returns UserName
+   */
+  static new(firstName: string, lastName: string): UserName {
     if (
       firstName.length < UserName.MIN_LENGTH ||
       firstName.length > UserName.MAX_LENGTH
     )
-      return left(INVALID_FIRST_NAME);
-
+      throw new Error(INVALID_FIRST_NAME);
     if (
       lastName.length < UserName.MIN_LENGTH ||
       lastName.length > UserName.MAX_LENGTH
     )
-      return left(INVALID_LAST_NAME);
+      throw new Error(INVALID_LAST_NAME);
 
-    return right(new UserName({ firstName, lastName }));
+    return new UserName({ firstName, lastName });
   }
 }

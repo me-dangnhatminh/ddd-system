@@ -3,7 +3,7 @@ import { IErrorDetail } from './interfaces';
 
 export class Exception extends Error implements IErrorDetail {
   constructor(
-    public readonly type: string = ErrorTypes.INTERNAL,
+    public readonly code: string = ErrorTypes.INTERNAL,
     public readonly message: string = 'Internal server error',
   ) {
     super(message);

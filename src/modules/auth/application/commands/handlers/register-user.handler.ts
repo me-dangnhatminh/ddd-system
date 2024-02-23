@@ -2,10 +2,14 @@ import * as NestCQRS from '@nestjs/cqrs';
 import * as Either from 'fp-ts/Either';
 
 import * as Shared from '@common';
-import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 
 import { RegisterUserCommand } from '../register-user.command';
+
+const CONFLICT_EMAIL: Shared.IErrorDetail = {
+  code: Shared.ErrorTypes.CONFLICT,
+  message: 'Email already exists',
+};
 
 @NestCQRS.CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
@@ -20,12 +24,9 @@ export class RegisterUserHandler
     command: RegisterUserCommand,
   ): Promise<Either.Either<Shared.IErrorDetail, void>> {
     const existingUser = await this.userRepository.getByEmail(command.email);
-    if (existingUser) return Either.left(Common.CONFLICT_EMAIL);
+    if (existingUser) return Either.left(CONFLICT_EMAIL);
 
-    const result = Domain.User.register(command);
-    if (result._tag === 'Left') return Either.left(result.left);
-
-    const user = result.right;
+    const user = Domain.User.registerAsUser(command);
     await this.userRepository.save(user);
 
     this.publisher.mergeObjectContext(user).commit();

@@ -3,19 +3,15 @@ import * as Domain from '@modules/auth';
 
 export class UserMapper {
   public static toDomain(orm: ORM.User): Domain.User {
-    const nameResult = Domain.UserName.create(orm.firstName, orm.lastName);
-    const passwordResult = Domain.UserPassword.create(orm.password);
-    const emailResult = Domain.UserEmail.create(orm.email);
-    if (nameResult._tag === 'Left') throw new Error(nameResult.left.message);
-    if (passwordResult._tag === 'Left')
-      throw new Error(passwordResult.left.message);
-    if (emailResult._tag === 'Left') throw new Error(emailResult.left.message);
+    const name = Domain.UserName.new(orm.firstName, orm.lastName);
+    const email = Domain.UserEmail.new(orm.email);
+    const password = Domain.UserPassword.new(orm.password);
 
     return Domain.User.new({
       id: orm.id,
-      name: nameResult.right,
-      email: emailResult.right,
-      password: passwordResult.right,
+      name,
+      email,
+      password,
       role: orm.role as Domain.UserRole,
       avatarUrl: orm.avatarUrl,
       authProvider: orm.authProvider as Domain.AuthProvider,

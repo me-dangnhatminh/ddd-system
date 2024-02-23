@@ -5,7 +5,8 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { INVALID_PASSWORD, UserName, UserPassword } from '../../../domain';
+import { UserName, UserPassword } from '../../../domain';
+import * as Common from '../../../common';
 
 export class RegisterUserBody {
   @IsString()
@@ -21,6 +22,8 @@ export class RegisterUserBody {
   @IsString() @IsEmail() email: string;
 
   @IsString()
-  @Matches(UserPassword.PASSWORD_REGEX, { message: INVALID_PASSWORD.message })
+  @Matches(UserPassword.PASSWORD_REGEX, {
+    message: Common.INVALID_PASSWORD.message,
+  })
   password: string;
 }

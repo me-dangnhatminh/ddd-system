@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { IDataRegisterUser } from '../../domain';
+import { IDataRegisterAsUser } from '../../domain';
 
 export class RegisterUserCommand implements ICommand {
   public readonly firstName: string;
@@ -7,7 +7,7 @@ export class RegisterUserCommand implements ICommand {
   public readonly email: string;
   public readonly password: string;
 
-  constructor(data: IDataRegisterUser) {
+  constructor(data: IDataRegisterAsUser) {
     this.firstName = data.firstName;
     this.lastName = data.lastName;
     this.email = data.email;

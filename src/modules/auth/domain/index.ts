@@ -1,9 +1,9 @@
 export * from './events';
 export * from './interfaces';
+export * from './specs';
 
 export * from './auth-provider';
 export * from './user-email';
-export * from './user-errors';
 export * from './user-jwt';
 export * from './user-name';
 export * from './user-password';

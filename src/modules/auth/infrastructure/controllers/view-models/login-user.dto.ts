@@ -1,5 +1,6 @@
 import { IsString, IsEmail, Matches } from 'class-validator';
-import { UserPassword, INVALID_PASSWORD } from '../../../domain';
+import { UserPassword } from '../../../domain';
+import { INVALID_PASSWORD } from '../../../common';
 
 export class LoginUserBody {
   @IsString() @IsEmail() email: string;

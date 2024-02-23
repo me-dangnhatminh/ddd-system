@@ -9,11 +9,6 @@ import * as Domain from '../../domain';
 import * as Common from '../../common';
 import { EmailConfirmationBody, UserParams } from './view-models';
 
-const VIEW_PROFILE_ERROR: Shared.IErrorDetail = {
-  type: Shared.ErrorTypes.FORBIDDEN,
-  message: 'You are not allowed to view this profile',
-};
-
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
 export class UserController {
@@ -29,15 +24,20 @@ export class UserController {
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    if (requester.id !== params.userId) return Either.left(VIEW_PROFILE_ERROR);
-    const canview = requester.canViewProfile(requester);
-    if (!canview) return Either.left(VIEW_PROFILE_ERROR);
+    if (requester.id !== params.userId) {
+      const query = new App.GetProfileQuery(params.userId);
+      const result: Either.Either<Shared.IErrorDetail, Domain.User> =
+        await this.queryBus.execute(query);
+      return result;
+    }
 
-    const { userId } = params;
-    const query = new App.GetProfileQuery(userId);
+    // get profile as admin
+    const isAdmin = new Domain.IsAdminSpec().isSatisfiedBy(requester);
+    if (!isAdmin) return Either.left(new Shared.ForbiddenException());
+
+    const query = new App.GetProfileAsAdminQuery(params.userId);
     const result: Either.Either<Shared.IErrorDetail, Domain.User> =
       await this.queryBus.execute(query);
-
     return result;
   }
 

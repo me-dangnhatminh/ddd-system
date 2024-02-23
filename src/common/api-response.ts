@@ -38,7 +38,7 @@ export class ApiResponse<
 
     if (!this.error) return '';
     const errors = this.error.detail?.map(
-      (error) => `[${error.type}] ${error.message}`,
+      (error) => `[${error.code}] ${error.message}`,
     );
     return errors?.join('\n') || this.error.message;
   }

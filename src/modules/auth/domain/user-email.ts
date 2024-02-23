@@ -1,6 +1,4 @@
-import { IErrorDetail, ValueObject } from '@common';
-import { Either, left, right } from 'fp-ts/Either';
-import { INVALID_EMAIL } from './user-errors';
+import { ValueObject } from '@common';
 
 export interface IUserEmailProps {
   email: string;
@@ -17,8 +15,10 @@ export class UserEmail extends ValueObject<IUserEmailProps> {
     super({ email });
   }
 
-  static create(email: string): Either<IErrorDetail, UserEmail> {
-    if (!UserEmail.EMAIL_REGEX.test(email)) return left(INVALID_EMAIL);
-    return right(new UserEmail(email));
+  static new(email: string): UserEmail {
+    if (!UserEmail.EMAIL_REGEX.test(email))
+      throw new Error('Invalid email format');
+
+    return new UserEmail(email);
   }
 }
