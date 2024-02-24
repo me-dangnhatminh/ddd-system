@@ -3,7 +3,7 @@ import * as NestCommon from '@nestjs/common';
 import * as NestCache from '@nestjs/cache-manager';
 import * as Either from 'fp-ts/Either';
 
-import * as Shared from '@common';
+import { IErrorDetail } from '@common';
 import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 
@@ -22,18 +22,14 @@ export class ConfirmEmailHandler
 
   async execute(
     command: ConfirmEmailCommand,
-  ): Promise<Either.Either<Shared.IErrorDetail, void>> {
-    const { requester, userId, code } = command;
-    if (requester.id !== userId) return Either.left(Shared.FORBIDDEN);
+  ): Promise<Either.Either<IErrorDetail, void>> {
+    const { requester, code } = command;
 
     if (!code) return this.genAndSendVerifyCode(requester);
     return this.verifyCode(requester, code);
   }
 
   private async genAndSendVerifyCode(requester: Domain.User) {
-    const isVerified = requester.isVerified;
-    if (isVerified) return Either.left(Shared.CONFLICT);
-
     const email = requester.email;
 
     const code = this.generateCode();
@@ -58,9 +54,6 @@ export class ConfirmEmailHandler
   }
 
   private async verifyCode(requester: Domain.User, code: number) {
-    const isVerified = requester.isVerified;
-    if (isVerified) return Either.left(Shared.CONFLICT);
-
     const { email } = requester;
     const codeKey = `verify-email:${email}`;
     const cachedCode = await this.cacheService.get(codeKey);

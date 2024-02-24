@@ -47,3 +47,28 @@ export class NotSpecification<T> extends Specification<T> {
     return !this.spec.isSatisfiedBy(candidate);
   }
 }
+
+// export class SubsumptionSpecification<T> extends Specification<T> {
+//   constructor(
+//     private left: Specification<T>,
+//     private right: Specification<T>,
+//   ) {
+//     super();
+//   }
+//   isSatisfiedBy(candidate: T): boolean {
+//     return (
+//       this.left.isSatisfiedBy(candidate) && !this.right.isSatisfiedBy(candidate)
+//     );
+//   }
+// }
+
+// export class CompositeSpecification<T> extends Specification<T> {
+//   private specs: Specification<T>[];
+//   constructor(...specs: Specification<T>[]) {
+//     super();
+//     this.specs = specs;
+//   }
+//   isSatisfiedBy(candidate: T): boolean {
+//     return this.specs.every((spec) => spec.isSatisfiedBy(candidate));
+//   }
+// }

@@ -8,10 +8,6 @@ import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
 import { AuthProvider } from './auth-provider';
-import {
-  QualifiedForEditProfileSpec,
-  QualifiedForRegistrationAdminSpec,
-} from './specs';
 
 interface IUserProps {
   id: string;
@@ -106,10 +102,6 @@ export class User extends AggregateRoot implements IUser {
     return this.props.removedAt;
   }
 
-  get isAdmin(): boolean {
-    return this.props.role === UserRole.ADMIN;
-  }
-
   protected constructor(protected props: IUserProps) {
     super();
     this.autoCommit = false;
@@ -140,19 +132,10 @@ export class User extends AggregateRoot implements IUser {
     return user;
   }
 
-  /**
-   * The function `registerAdmin` registers a user as an admin if the current user is qualified,
-   * otherwise it throws an error.
-   * @param {IDataRegisterUserAsAdmin} data - The `data` parameter in the `registerAdmin` function
-   * contains the following properties:
-   * @returns A User object is being returned from the registerAdmin function.
-   */
   public registerAdmin(data: IDataRegisterUserAsAdmin): User {
-    const qualified = new QualifiedForRegistrationAdminSpec();
-    if (!qualified.isSatisfiedBy(this))
-      throw new Error(
-        'Only admin can register user as admin, can check @isAdmin property',
-      );
+    const canRegister = canRegisterAsAdmin.isSatisfiedBy(this);
+    if (!canRegister)
+      throw new Error('Permission denied, please check @canRegisterAsAdmin');
 
     const name = UserName.new(data.firstName, data.lastName);
     const email = UserEmail.new(data.email);
@@ -177,23 +160,11 @@ export class User extends AggregateRoot implements IUser {
     return user;
   }
 
-  public unregisterByAdmin(user: User): void {
-    if (this.props.role !== UserRole.ADMIN)
-      throw new Error(
-        'Unregister user by admin, this method can only be called by admin user',
-      );
-    if (this.props.id === user.id)
-      throw new Error('Admin cannot unregister itself');
-
+  public unregister(): void {
     const removedAt = new Date();
-    user.props.removedAt = removedAt;
-    this.apply(
-      new Events.UnregisteredUserEvent({
-        id: user.id,
-        email: user.email,
-        removedAt,
-      }),
-    );
+    this.props.removedAt = removedAt;
+    const { id, email } = this;
+    this.apply(new Events.UnregisteredUserEvent({ id, email, removedAt }));
   }
 
   public comparePassword(password: string): boolean {
@@ -205,19 +176,7 @@ export class User extends AggregateRoot implements IUser {
     this.apply(new Events.PasswordChangedEvent(this.id));
   }
 
-  /**
-   * The `editProfile` function is used to edit the profile of a user.
-   * Only the user itself can edit its profile or an admin can edit the profile of any user.
-   * @param data
-   * @param target
-   */
-  public editProfile(data: IDataEditProfile, target: User = this): void {
-    const spec = new QualifiedForEditProfileSpec();
-    if (!spec.isSatisfiedBy({ editer: this, target }))
-      throw new Error(
-        'Only the user itself can edit its profile or an admin can edit the profile of any user.',
-      );
-
+  public editProfile(data: IDataEditProfile): void {
     if (data.firstName !== undefined && data.lastName !== undefined) {
       const name = UserName.new(data.firstName, data.lastName);
       this.props.name = name;
@@ -231,10 +190,6 @@ export class User extends AggregateRoot implements IUser {
   }
 
   public verifyEmail(): void {
-    if (this.props.isVerified)
-      throw new Error(
-        'Conflic: Email already verified, please check @isVerified property',
-      );
     this.props.isVerified = true;
     this.apply(new Events.EmailVerifiedEvent(this));
   }

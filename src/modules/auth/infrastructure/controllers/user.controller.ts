@@ -21,6 +21,24 @@ export class UserController {
     private readonly queryBus: NestCQRS.QueryBus,
   ) {}
 
+  @NestCommon.Get('')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth()
+  async getAllAsAdmin(
+    @Common.HttpUser() requester: Domain.User,
+    @NestCommon.Query() query: GetUsersPaginationnQuery,
+  ) {
+    const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
+    if (!canGet) return Either.left(Shared.FORBIDDEN);
+
+    const result: Either.Either<
+      Shared.IErrorDetail,
+      App.GetAllAsAdminQueryResult
+    > = await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
+
+    return result;
+  }
+
   @NestCommon.Get(':userId')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   @Common.HttpUserAuth()
@@ -28,6 +46,7 @@ export class UserController {
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
+    // get my profile
     if (requester.id === params.userId) {
       const query = new App.GetProfileQuery(params.userId);
       const result: Either.Either<Shared.IErrorDetail, Domain.User> =
@@ -35,15 +54,23 @@ export class UserController {
       return result;
     }
 
-    // get profile as admin
-    const isAdmin = new Domain.IsAdminSpec().isSatisfiedBy(requester);
-    if (!isAdmin) return Either.left(new Shared.ForbiddenException());
+    // get user profile as admin
+    const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
+    if (!canGet) return Either.left(Shared.FORBIDDEN);
 
     const query = new App.GetProfileAsAdminQuery(params.userId);
     const result: Either.Either<Shared.IErrorDetail, Domain.User> =
       await this.queryBus.execute(query);
     return result;
   }
+
+  @NestCommon.Get(':userId')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth({ roles: [Domain.UserRole.ADMIN] })
+  async unregisterByAdmin(
+    @NestCommon.Param() params: UserParams,
+    @Common.HttpUser() requester: Domain.User,
+  ) {}
 
   @NestCommon.Post(':userId/email/confirmation')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
@@ -53,30 +80,11 @@ export class UserController {
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    const { code } = body;
-    const { userId } = params;
+    if (requester.id !== params.userId) return Either.left(Shared.BAD_REQUEST);
 
-    const command = new App.ConfirmEmailCommand(requester, userId, code);
+    const command = new App.ConfirmEmailCommand(requester, body.code);
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
-
-    return result;
-  }
-
-  @NestCommon.Get()
-  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  @Common.HttpUserAuth()
-  async getAllAsAdmin(
-    @Common.HttpUser() requester: Domain.User,
-    @NestCommon.Query() query: GetUsersPaginationnQuery,
-  ) {
-    const isAdmin = new Domain.IsAdminSpec().isSatisfiedBy(requester);
-    if (!isAdmin) return Either.left(new Shared.ForbiddenException());
-
-    const result: Either.Either<
-      Shared.IErrorDetail,
-      App.GetAllAsAdminQueryResult
-    > = await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
 
     return result;
   }

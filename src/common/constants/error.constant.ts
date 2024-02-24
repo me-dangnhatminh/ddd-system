@@ -20,3 +20,8 @@ export const CONFLICT: IErrorDetail = {
   code: ErrorTypes.CONFLICT,
   message: 'Resource already exists',
 };
+
+export const BAD_REQUEST: IErrorDetail = {
+  code: ErrorTypes.BAD_REQUEST,
+  message: 'Bad request',
+};
