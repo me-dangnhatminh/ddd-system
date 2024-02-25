@@ -30,7 +30,7 @@ export class FormatApiResponseMiddleware implements NestMiddleware {
           return originalJson.call(
             this,
             ApiResponse.error({
-              code: mapErrorTypeToHttpCode(body.left.code),
+              code: mapErrorTypeToHttpCode(body.left.type),
               message: body.left.message,
             }),
           );

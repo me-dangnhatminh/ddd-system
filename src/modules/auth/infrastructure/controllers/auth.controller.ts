@@ -19,7 +19,12 @@ export class AuthController {
   @NestCommon.Post('register')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async register(@NestCommon.Body() dto: RegisterUserBody) {
-    const command = new App.RegisterUserCommand(dto);
+    const command = new App.RegisterUserCommand(
+      dto.firstName,
+      dto.lastName,
+      dto.email,
+      dto.password,
+    );
     const result: Either.Either<Shared.IErrorDetail, void> =
       await this.commandBus.execute(command);
 

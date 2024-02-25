@@ -8,4 +8,3 @@ export * from './specification';
 export * from './value-object';
 export * from './aggregate-root';
 export * from './api-response';
-export * from './exception';

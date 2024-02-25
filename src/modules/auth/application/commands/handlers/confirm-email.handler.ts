@@ -30,7 +30,7 @@ export class ConfirmEmailHandler
   }
 
   private async genAndSendVerifyCode(requester: Domain.User) {
-    const email = requester.email;
+    const email = requester.email.value;
 
     const code = this.generateCode();
     const codeTTL = 5; // 5 minutes
@@ -60,7 +60,7 @@ export class ConfirmEmailHandler
 
     // compare the code
     if (cachedCode !== code)
-      return Either.left(Common.INVALID_EMAIL_VERIFICATION_CODE);
+      return Either.left(Common.INVALID_VERIFICATION_CODE);
     requester.verifyEmail(); // TODO: Add event to the user entity
     // await this.cacheService.del(codeKey);
     await this.userRepository.update(requester);

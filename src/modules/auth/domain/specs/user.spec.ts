@@ -1,15 +1,16 @@
 import { Specification } from '@common';
 import { User } from '../user';
 import { UserRole } from '../user-role';
+import { Admin } from '../admin';
 
 export class UserSpecification extends Specification<User> {
-  isSatisfiedBy(candidate: User) {
+  isSatisfiedBy(candidate: User): this is User {
     return candidate.role === UserRole.USER;
   }
 }
 
 export class AdminSpecification extends Specification<User> {
-  isSatisfiedBy(candidate: User) {
+  isSatisfiedBy(candidate: User): this is Admin {
     return candidate.role === UserRole.ADMIN;
   }
 }
@@ -20,13 +21,6 @@ export class VerifiedSpecification extends Specification<User> {
   }
 }
 
-export class ActiveSpecification extends Specification<User> {
-  isSatisfiedBy(candidate: User) {
-    return candidate.removedAt === null;
-  }
-}
-
 export const isUserSpec = new UserSpecification();
 export const isAdminSpec = new AdminSpecification();
 export const isVerifiedSpec = new VerifiedSpecification();
-export const isActiveSpec = new ActiveSpecification();

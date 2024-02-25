@@ -6,7 +6,7 @@ export interface ItemSizeProps {
 }
 
 const INVALID_SIZE_FORMAT: IErrorDetail = {
-  code: ErrorTypes.INVALID_PARAMETER,
+  type: ErrorTypes.INVALID_PARAMETER,
   message: 'Invalid size format',
 };
 

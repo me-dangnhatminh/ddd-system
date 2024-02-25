@@ -5,12 +5,10 @@ export interface IUserNameProps {
   lastName: string;
 }
 
-const INVALID_FIRST_NAME = 'Name must be between 1 and 20 characters';
-const INVALID_LAST_NAME = 'Name must be between 1 and 20 characters';
-
 export class UserName extends ValueObject<IUserNameProps> {
   static readonly MIN_LENGTH = 1;
   static readonly MAX_LENGTH = 20;
+  static readonly INVALID_MESSAGE = `User name must be between ${UserName.MIN_LENGTH} and ${UserName.MAX_LENGTH} characters.`;
 
   get firstName(): string {
     return this.props.firstName;
@@ -28,24 +26,23 @@ export class UserName extends ValueObject<IUserNameProps> {
     super(props);
   }
 
-  /**
-   * Create a new UserName
-   * @param firstName must be between 1 and 20 characters
-   * @param lastName must be between 1 and 20 characters
-   * @returns UserName
-   */
   static new(firstName: string, lastName: string): UserName {
-    if (
-      firstName.length < UserName.MIN_LENGTH ||
-      firstName.length > UserName.MAX_LENGTH
-    )
-      throw new Error(INVALID_FIRST_NAME);
-    if (
-      lastName.length < UserName.MIN_LENGTH ||
-      lastName.length > UserName.MAX_LENGTH
-    )
-      throw new Error(INVALID_LAST_NAME);
+    const formated = this.format(firstName, lastName);
+    const fullName = formated.firstName + formated.lastName;
+    const isValid = this.validate(fullName);
+    if (!isValid) throw new Error(this.INVALID_MESSAGE);
 
-    return new UserName({ firstName, lastName });
+    return new UserName(formated);
+  }
+
+  private static format(firstName: string, lastName: string): IUserNameProps {
+    return {
+      firstName: firstName ? firstName.trim() : '',
+      lastName: lastName ? lastName.trim() : '',
+    };
+  }
+
+  public static validate(name: string): boolean {
+    return name.length >= this.MIN_LENGTH && name.length <= this.MAX_LENGTH;
   }
 }

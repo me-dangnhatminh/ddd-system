@@ -3,13 +3,9 @@ import * as Either from 'fp-ts/lib/Either';
 
 import * as Shared from '@common';
 import * as Domain from '../../../domain';
+import * as Common from '../../../common';
 
 import { ChangePasswordCommand } from '../change-password.command';
-
-const PASSWORD_NOT_MATCH: Shared.IErrorDetail = {
-  code: Shared.ErrorTypes.BAD_REQUEST,
-  message: 'Password not match',
-};
 
 @NestCQRS.CommandHandler(ChangePasswordCommand)
 export class ChangePasswordHandler
@@ -23,7 +19,7 @@ export class ChangePasswordHandler
     const { requester, newPassword } = command;
 
     const compare = requester.comparePassword(newPassword);
-    if (compare) return Either.left(PASSWORD_NOT_MATCH);
+    if (compare) return Either.left(Common.INVALID_PASSWORD);
 
     requester.changePassword(newPassword);
     await this.userRepository.update(requester);

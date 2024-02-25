@@ -1,5 +1,9 @@
 import { IErrorResponse } from './interfaces/error-response.interface';
 
+export type IApiResponseMeta = {
+  code: number;
+};
+
 export class ApiResponse<
   BaseData = undefined,
   BaseError extends IErrorResponse = IErrorResponse,
@@ -38,7 +42,7 @@ export class ApiResponse<
 
     if (!this.error) return '';
     const errors = this.error.detail?.map(
-      (error) => `[${error.code}] ${error.message}`,
+      (error) => `[${error.type}] ${error.message}`,
     );
     return errors?.join('\n') || this.error.message;
   }

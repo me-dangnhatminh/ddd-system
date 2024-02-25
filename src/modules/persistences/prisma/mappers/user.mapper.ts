@@ -6,35 +6,32 @@ export class UserMapper {
     const name = Domain.UserName.new(orm.firstName, orm.lastName);
     const email = Domain.UserEmail.new(orm.email);
     const password = Domain.UserPassword.new(orm.password);
-
-    return Domain.User.new({
-      id: orm.id,
+    return new Domain.User(
+      orm.id,
       name,
       email,
       password,
-      role: orm.role as Domain.UserRole,
-      avatarUrl: orm.avatarUrl,
-      authProvider: orm.authProvider as Domain.AuthProvider,
-      isVerified: orm.isVerified,
-      createdAt: orm.createdAt,
-      updatedAt: orm.updatedAt,
-      removedAt: orm.removedAt,
-    });
+      orm.role as Domain.UserRole,
+      orm.isVerified,
+      orm.avatarUrl,
+      orm.authProvider as Domain.AuthProvider,
+      orm.registeredAt,
+    );
   }
   public static toOrm(domain: Domain.User): ORM.User {
     return {
       id: domain.id,
-      firstName: domain.firstName,
-      lastName: domain.lastName,
-      email: domain.email,
-      password: domain.password,
-      role: domain.role as unknown as ORM.UserRole,
+      firstName: domain.username.firstName,
+      lastName: domain.username.lastName,
+      email: domain.email.value,
+      password: domain.password.value,
+      role: domain.role as ORM.UserRole,
+      isVerified: domain.isVerified,
       avatarUrl: domain.avatarUrl,
       authProvider: domain.authProvider,
-      isVerified: domain.isVerified,
-      createdAt: domain.createdAt,
-      updatedAt: domain.updatedAt,
-      removedAt: domain.removedAt,
+      registeredAt: domain.registeredAt,
+      updatedAt: null,
+      removedAt: null,
     };
   }
 }

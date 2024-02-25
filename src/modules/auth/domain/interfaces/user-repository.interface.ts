@@ -1,9 +1,12 @@
+import { Admin } from '../admin';
 import { User } from '../user';
 
 export abstract class UserRepository {
-  // abstract getAll(): Promise<User[]>;
-  abstract getById(id: string): Promise<User | null>;
-  abstract getByEmail(email: string): Promise<User | null>;
+  abstract getUserById(id: string): Promise<User | null>;
+  abstract getUserByEmail(email: string): Promise<User | null>;
+  abstract getAdminById(id: string): Promise<Admin | null>;
+  abstract getAdminByEmail(email: string): Promise<Admin | null>;
+
   abstract save(user: User): Promise<void>;
   abstract deleteByIds(ids: string[]): Promise<void>;
   abstract count(): Promise<number>;

@@ -7,20 +7,20 @@ export class RegisteredUserEvent implements NestCQRS.IEvent {
   public readonly firstName: string;
   public readonly lastName: string;
   public readonly role: UserRole;
-  public readonly createdAt: Date;
+  public readonly registeredAt: Date;
   constructor(data: {
     id: string;
     email: string;
     firstName: string;
     lastName: string;
     role: UserRole;
-    createdAt: Date;
+    registeredAt: Date;
   }) {
     this.id = data.id;
     this.email = data.email;
     this.firstName = data.firstName;
     this.lastName = data.lastName;
     this.role = data.role;
-    this.createdAt = data.createdAt;
+    this.registeredAt = data.registeredAt;
   }
 }

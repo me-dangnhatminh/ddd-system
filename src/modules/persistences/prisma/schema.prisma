@@ -8,13 +8,19 @@ generator client {
 }
 
 enum UserRole {
-  ADMIN
-  USER
+  user
+  admin
+  super
+
+  @@map("user_roles")
 }
 
 enum AuthProvider {
-  LOCAL
-  GOOGLE
+  local
+  google
+  facebook
+
+  @@map("auth_providers")
 }
 
 model User {
@@ -23,11 +29,11 @@ model User {
   lastName     String       @map("last_name")
   email        String       @unique @map("email")
   password     String       @map("password")
-  authProvider AuthProvider @default(LOCAL) @map("auth_provider")
-  role         UserRole     @default(USER) @map("role")
+  authProvider AuthProvider @default(local) @map("auth_provider")
+  role         UserRole     @default(user) @map("role")
   isVerified   Boolean      @default(false) @map("is_verified")
   avatarUrl    String       @default("") @map("avatar_url")
-  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp()
+  registeredAt DateTime     @default(now()) @map("registered_at") @db.Timestamp()
   updatedAt    DateTime?    @updatedAt @map("updated_at") @db.Timestamp()
   removedAt    DateTime?    @map("removed_at") @db.Timestamp()
 

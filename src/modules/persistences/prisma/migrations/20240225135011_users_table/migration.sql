@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
+CREATE TYPE "user_roles" AS ENUM ('user', 'admin', 'super');
 
 -- CreateEnum
-CREATE TYPE "AuthProvider" AS ENUM ('LOCAL', 'GOOGLE');
+CREATE TYPE "auth_providers" AS ENUM ('local', 'google', 'facebook');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -11,11 +11,11 @@ CREATE TABLE "users" (
     "last_name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "auth_provider" "AuthProvider" NOT NULL DEFAULT 'LOCAL',
-    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "auth_provider" "auth_providers" NOT NULL DEFAULT 'local',
+    "role" "user_roles" NOT NULL DEFAULT 'user',
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "avatar_url" TEXT NOT NULL DEFAULT '',
-    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "registered_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP,
     "removed_at" TIMESTAMP,
 

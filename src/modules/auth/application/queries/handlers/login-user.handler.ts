@@ -24,15 +24,15 @@ export class LoginUserHandler
   async execute(
     query: LoginUserQuery,
   ): Promise<Either.Either<Shared.IErrorDetail, LoginUserQueryResult>> {
-    const user = await this.userRepository.getByEmail(query.email);
+    const user = await this.userRepository.getUserByEmail(query.email);
 
     if (!user) return Either.left(Common.INVALID_EMAIL_OR_PASSWORD);
     const isPasswordValid = user.comparePassword(query.password);
     if (!isPasswordValid) return Either.left(Common.INVALID_EMAIL_OR_PASSWORD);
 
-    const tokenClaims: Domain.UserJWTClaims = {
+    const tokenClaims: Domain.UserClaim = {
       userId: user.id,
-      email: user.email,
+      email: user.email.value,
       role: user.role,
       isVerified: user.isVerified,
     };
