@@ -1,4 +1,4 @@
-import { ApiResponse } from '@common';
+import { IErrorResponse, Result } from '@common';
 import {
   ArgumentsHost,
   Injectable,
@@ -20,29 +20,23 @@ export class ExceptionFilter implements NestExceptionFilter {
     }
 
     // format error response
-    let errorRes = ApiResponse.fail({ code: 500, message: 'Internal error!' });
+    let errorRes: Result<never, IErrorResponse> = Result.failure({
+      code: 500,
+      message: 'Internal Server Error',
+    });
     errorRes = this.handleNestException(exception, errorRes);
-    errorRes = this.handlerApiFailed(exception, errorRes);
 
     return response.json(errorRes);
   }
 
   private handleNestException(
     exception: any,
-    errorRes: ApiResponse<never, any>,
+    errorRes: Result<never, IErrorResponse>,
   ) {
     if (!(exception instanceof HttpException)) return errorRes;
-
-    return ApiResponse.fail({
+    return Result.failure({
       code: exception.getStatus(),
       message: exception.message,
     });
-  }
-
-  private handlerApiFailed(exception: any, errorRes: ApiResponse<never, any>) {
-    if (!ApiResponse.isApiResponse(exception)) return errorRes;
-    if (ApiResponse.isSucceeded(exception)) return errorRes;
-
-    return ApiResponse.fail(exception.error);
   }
 }

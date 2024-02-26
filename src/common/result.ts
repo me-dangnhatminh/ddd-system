@@ -8,17 +8,15 @@ export interface Failure<F> {
 }
 export type Result<S = never, F = never> = Success<S> | Failure<F>;
 
-export function success<S, F = never>(): Result<S, F>;
-export function success<S, F = never>(value: S): Result<S, F>;
-export function success<S, F = never>(data?: S): Result<S | undefined, F> {
+function success<F = never>(): Result<undefined, F>;
+function success<S = never, F = never>(data: S): Result<S, F>;
+function success<S = never, F = never>(data?: S): Result<S | undefined, F> {
   return { isSuccess: true, data };
 }
 
-export function failure<S = never, F = never>(): Result<S, F>;
-export function failure<S = never, F = never>(error: F): Result<S, F>;
-export function failure<S = never, F = never>(
-  error?: F,
-): Result<S, F | undefined> {
+function failure<S = never>(): Result<S, undefined>;
+function failure<S = never, F = never>(error: F): Result<S, F>;
+function failure<S = never, F = never>(error?: F): Result<S, F | undefined> {
   return { isSuccess: false, error };
 }
 

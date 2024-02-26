@@ -34,7 +34,7 @@ export class UserController extends Common.Controller {
     const result: Common.TQueryHandlerResult<App.GetAllAsAdminQueryResult> =
       await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
 
-    return this.fromEither(result);
+    return result;
   }
 
   @NestCommon.Get(':userId')

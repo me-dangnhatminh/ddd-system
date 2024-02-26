@@ -1,4 +1,3 @@
-import { IErrorDetail } from '@common';
-import { Either } from 'fp-ts/lib/Either';
+import { IErrorDetail, Result } from '@common';
 
-export type TCommandHandlerResult = Either<IErrorDetail[], void>;
+export type TCommandHandlerResult = Result<undefined, IErrorDetail[]>;

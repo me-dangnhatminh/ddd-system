@@ -1,5 +1,4 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/lib/Either';
 import * as Shared from '@common';
 
 import {
@@ -32,6 +31,7 @@ export class GetProfileAsAdminHandler
       FROM users WHERE id = ${userId}`;
 
     const user = sqlResult[0];
-    return Either.right(new GetProfileAsAdminQueryResult(user));
+    if (!user) return Shared.Result.failure([]);
+    return Shared.Result.success(new GetProfileAsAdminQueryResult(user));
   }
 }

@@ -1,8 +1,6 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/lib/Either';
 
 import * as Shared from '@common';
-
 import {
   GetAllAsAdminQuery,
   GetAllAsAdminQueryResult,
@@ -53,7 +51,7 @@ export class GetAllAsAdminHandler
       totalPages,
       items,
     });
-    return Either.right(result);
+    return Shared.Result.success<GetAllAsAdminQueryResult>(result);
   }
 
   private convertOrderBy(orderBy: TOrderBy): string {

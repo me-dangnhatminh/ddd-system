@@ -1,5 +1,4 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/lib/Either';
 
 import * as Shared from '@common';
 
@@ -31,6 +30,7 @@ export class GetProfileHandler
       FROM users WHERE id = ${userId}`;
 
     const user = sqlResult[0]; //TODO: this return any, need to fix
-    return Either.right(new GetProfileQueryResult(user));
+    if (!user) return Shared.Result.failure([]);
+    return Shared.Result.success(new GetProfileQueryResult(user));
   }
 }

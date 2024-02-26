@@ -3,7 +3,6 @@ import * as NestCQRS from '@nestjs/cqrs';
 import * as NestSwagger from '@nestjs/swagger';
 import * as Express from 'express';
 
-import * as Either from 'fp-ts/lib/Either';
 import * as Shared from '@common';
 import * as App from '../../application';
 
@@ -46,17 +45,15 @@ export class AuthController {
     const command = new App.LoginUserCommand(dto.email, dto.password);
     const commandresult: TCommandHandlerResult =
       await this.commandBus.execute(command);
-    if (Either.isLeft(commandresult))
-      return Either.left([INVALID_EMAIL_OR_PASSWORD]);
-
+    if (Shared.isFailure(commandresult))
+      return Shared.Result.failure([INVALID_EMAIL_OR_PASSWORD]);
     const query = new App.GetAuthUserTokenQuery(dto.email);
     const queryresult: App.TGetAuthUserTokenQueryResult =
       await this.queryBus.execute(query);
 
-    if (Either.isLeft(queryresult)) return queryresult;
+    if (Shared.isFailure(queryresult)) return queryresult;
 
-    response.cookie(AUTHENTICATED_USER_TOKEN_KEY, queryresult.right);
-
-    return Either.right(undefined);
+    response.cookie(AUTHENTICATED_USER_TOKEN_KEY, queryresult.data);
+    return Shared.Result.success();
   }
 }

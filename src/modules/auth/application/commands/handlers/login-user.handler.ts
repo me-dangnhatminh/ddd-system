@@ -3,11 +3,10 @@ import * as NestJWT from '@nestjs/jwt';
 import * as NestCache from '@nestjs/cache-manager';
 import * as NestCommon from '@nestjs/common';
 
-import * as Either from 'fp-ts/lib/Either';
-
 import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 import { LoginUserCommand } from '../login-user.command';
+import { Result } from '@common';
 
 @NestCQRS.CommandHandler(LoginUserCommand)
 export class LoginUserHandler
@@ -24,9 +23,9 @@ export class LoginUserHandler
   async execute(Command: LoginUserCommand) {
     const user = await this.userRepository.getUserByEmail(Command.email);
 
-    if (!user) return Either.left([Common.INVALID_EMAIL_OR_PASSWORD]);
+    if (!user) return Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) return Either.left([Common.INVALID_EMAIL_OR_PASSWORD]);
+    if (!isValid) Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
 
     const tokenClaims: Domain.UserClaim = {
       userId: user.id,
@@ -38,6 +37,6 @@ export class LoginUserHandler
     const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' }); //TODO: config expiresIn in env
     await this.cacheService.set(cacheKey, token, 60 * 60 * 1000);
 
-    return Either.right(undefined);
+    return Result.success();
   }
 }
