@@ -1,65 +1,33 @@
-export type Result<S, F = never> = Success<S> | Failure<F>;
-export const Result = Object.freeze({ success, failure });
+export interface Success<S> {
+  isSuccess: true;
+  data: S;
+}
+export interface Failure<F> {
+  isSuccess: false;
+  error: F;
+}
+export type Result<S = never, F = never> = Success<S> | Failure<F>;
 
-/**
- * Result pattern is serialization that is used to represent the result of an operation.
- * It is a way to handle errors and exceptions in a functional way.
- * Use can research Applying Functional Principles
- */
-interface IResult<S, F> {
-  isSuccess(): this is Success<S>;
-  isFailure(): this is Failure<F>;
-  map<U>(func: (r: S | F) => U): Result<U, F> | Result<S, U>;
-  endThen<T, U>(func: (r: S | F) => Result<T, U>): Result<T, U>;
-  throwIfFailure(): void;
+export function success<S, F = never>(): Result<S, F>;
+export function success<S, F = never>(value: S): Result<S, F>;
+export function success<S, F = never>(data?: S): Result<S | undefined, F> {
+  return { isSuccess: true, data };
 }
 
-class Success<S> implements IResult<S, never> {
-  isSuccess(): this is Success<S> {
-    return true;
-  }
-  isFailure(): this is never {
-    return false;
-  }
-
-  constructor(public readonly value: S) {}
-  throwIfFailure(): void {}
-  map<U>(func: (r: S) => U): Success<U> {
-    return new Success(func(this.value));
-  }
-  endThen<T, U>(func: (r: S) => Result<T, U>): Result<T, U> {
-    return func(this.value);
-  }
+export function failure<S = never, F = never>(): Result<S, F>;
+export function failure<S = never, F = never>(error: F): Result<S, F>;
+export function failure<S = never, F = never>(
+  error?: F,
+): Result<S, F | undefined> {
+  return { isSuccess: false, error };
 }
 
-class Failure<F> implements IResult<never, F> {
-  isSuccess(): this is never {
-    return false;
-  }
-  isFailure(): this is Failure<F> {
-    return true;
-  }
-  constructor(public readonly error: F) {}
-  throwIfFailure(): void {
-    throw this.error;
-  }
-
-  map<U>(func: (r: F) => U): Failure<U> {
-    return new Failure(func(this.error));
-  }
-  endThen<T, U>(func: (r: F) => Result<T, U>): Result<T, U> {
-    return func(this.error);
-  }
+export function isSuccess<S, F>(result: Result<S, F>): result is Success<S> {
+  return result.isSuccess;
 }
 
-function success(): Success<undefined>;
-function success<U>(value: U): Success<U>;
-function success<U>(value?: U): Success<U | undefined> {
-  return new Success<U | undefined>(value);
+export function isFailure<S, F>(result: Result<S, F>): result is Failure<F> {
+  return !result.isSuccess;
 }
 
-function failure(): Failure<undefined>;
-function failure<U>(value: U): Failure<U>;
-function failure<U>(value?: U): Failure<U | undefined> {
-  return new Failure<U | undefined>(value);
-}
+export const Result = Object.freeze({ success, failure, isSuccess, isFailure });

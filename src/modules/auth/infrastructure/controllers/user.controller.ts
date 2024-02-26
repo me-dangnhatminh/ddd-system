@@ -48,13 +48,9 @@ export class UserController extends Common.Controller {
 
     if (requester.id === params.userId)
       query = new App.GetProfileQuery(params.userId);
-    else {
-      // get other's profile as admin
-      const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
-      if (!canGet) return Either.left(Shared.FORBIDDEN);
-      query = new App.GetProfileAsAdminQuery(params.userId);
-    }
+    if (!requester.isAdmin()) return Either.left([Shared.FORBIDDEN]);
 
+    query = new App.GetProfileAsAdminQuery(params.userId);
     const result: Either.Either<Shared.IErrorDetail, Domain.User> =
       await this.queryBus.execute(query);
     return result;

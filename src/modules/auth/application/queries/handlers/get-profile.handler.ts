@@ -13,9 +13,11 @@ export class GetProfileHandler
       Shared.TQueryResult<GetProfileQueryResult>
     >
 {
+  // get requester in request of express or nest request
   constructor(
     public readonly readRepository: Shared.ReadRepository, // Read side database connection
   ) {}
+
   async execute(query: GetProfileQuery) {
     const { userId } = query;
     const sqlResult = await this.readRepository.$query<any>`
