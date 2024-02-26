@@ -1,18 +1,23 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as Either from 'fp-ts/lib/Either';
+
+import * as Shared from '@common';
+
 import {
   GetAllAsAdminQuery,
   GetAllAsAdminQueryResult,
+  TGetAllAsAdminQueryResult,
   TOrderBy,
 } from '../get-all-as-admin.query';
-import { ReadRepository } from '@common';
 
-@QueryHandler(GetAllAsAdminQuery)
+@NestCQRS.QueryHandler(GetAllAsAdminQuery)
 export class GetAllAsAdminHandler
-  implements IQueryHandler<GetAllAsAdminQuery, GetAllAsAdminQueryResult>
+  implements
+    NestCQRS.IQueryHandler<GetAllAsAdminQuery, TGetAllAsAdminQueryResult>
 {
-  constructor(private readonly readRepository: ReadRepository) {}
+  constructor(private readonly readRepository: Shared.ReadRepository) {}
 
-  async execute(query: GetAllAsAdminQuery): Promise<GetAllAsAdminQueryResult> {
+  async execute(query: GetAllAsAdminQuery) {
     const { page, pageSize, search, order } = query;
     const orderBy = this.convertOrderBy(query.orderBy);
 
@@ -33,21 +38,22 @@ export class GetAllAsAdminHandler
         email,
         first_name AS "firstName",
         last_name AS "lastName",
-        created_at AS "createdAt",
+        registered_at AS "registerdAt",
         updated_at AS "updatedAt"
       FROM users
       ${searchQuery}
       ${orderByQuery}      
       ${pageSizeQuery}
     `;
-    const result = await this.readRepository.$queryUnsafe<any>(sqlquery);
+    const items = await this.readRepository.$queryUnsafe<any>(sqlquery);
 
-    return new GetAllAsAdminQueryResult({
+    const result = new GetAllAsAdminQueryResult({
       page,
       pageSize,
       totalPages,
-      items: result,
+      items,
     });
+    return Either.right(result);
   }
 
   private convertOrderBy(orderBy: TOrderBy): string {

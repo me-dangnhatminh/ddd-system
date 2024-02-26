@@ -1,49 +1,57 @@
-import { IErrorResponse } from './interfaces/error-response.interface';
+import { IErrorResponse } from './interfaces';
 
-export type IApiResponseMeta = {
-  code: number;
+export interface ApiSucceededResponse<S> {
+  isSuccess: true;
+  data: S;
+}
+
+export interface ApiFailedResponse<F> {
+  isSuccess: false;
+  error: F;
+}
+
+export type ApiResponse<S, F> = ApiSucceededResponse<S> | ApiFailedResponse<F>;
+
+const success = <S = never, F = never>(data: S): ApiResponse<S, F> => ({
+  isSuccess: true,
+  data,
+});
+
+const fail = <S = never, F extends IErrorResponse = IErrorResponse>(
+  error: F,
+): ApiResponse<S, F> => ({
+  isSuccess: false,
+  error,
+});
+
+const isSucceeded = <S, F>(
+  res: ApiResponse<S, F>,
+): res is ApiSucceededResponse<S> => res.isSuccess;
+const isFailed = <S, F>(res: ApiResponse<S, F>): res is ApiFailedResponse<F> =>
+  !res.isSuccess;
+
+const isApiResponse = (
+  res: any,
+): res is ApiResponse<unknown, IErrorResponse> => {
+  if (!res) return false;
+  if (typeof res !== 'object') return false;
+  if (!('isSuccess' in res)) return false;
+  if (typeof res.isSuccess !== 'boolean') return false;
+
+  if (res.isSuccess) return true;
+
+  if (!('error' in res)) return false;
+  if (typeof res.error !== 'object') return false;
+  if (!('code' in res.error)) return false;
+  if (!('message' in res.error)) return false;
+
+  return true;
 };
 
-export class ApiResponse<
-  BaseData = undefined,
-  BaseError extends IErrorResponse = IErrorResponse,
-> {
-  protected constructor(
-    public readonly isSuccess: boolean,
-    public readonly data?: BaseData,
-    public readonly error?: BaseError,
-  ) {
-    if (isSuccess && Boolean(error)) {
-      throw new Error(
-        'InvalidOperation: A successful response cannot contain an error.',
-      );
-    }
-    if (isSuccess) this.error = undefined;
-    if (!isSuccess) this.data = undefined;
-  }
-
-  static success(): ApiResponse<undefined, any>;
-  static success<T>(data: T): ApiResponse<T, any>;
-  static success<T>(data?: T): ApiResponse<T, any> {
-    return new ApiResponse<T, any>(true, data);
-  }
-
-  static error(): ApiResponse<undefined, IErrorResponse>;
-  static error<E extends IErrorResponse>(error: E): ApiResponse<undefined, E>;
-  static error<E extends IErrorResponse>(error?: E): ApiResponse<undefined, E> {
-    return new ApiResponse<any, E>(false, undefined, error);
-  }
-
-  getErrorDisplay(): string {
-    if (this.isSuccess)
-      throw new Error(
-        'InvalidOperation: A successful response cannot contain an error.',
-      );
-
-    if (!this.error) return '';
-    const errors = this.error.detail?.map(
-      (error) => `[${error.type}] ${error.message}`,
-    );
-    return errors?.join('\n') || this.error.message;
-  }
-}
+export const ApiResponse = Object.freeze({
+  success,
+  fail,
+  isSucceeded,
+  isFailed,
+  isApiResponse,
+});

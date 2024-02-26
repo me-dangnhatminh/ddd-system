@@ -16,27 +16,33 @@ export class ExceptionFilter implements NestExceptionFilter {
 
     if (true) {
       const message: string = `Method: ${request.method}, ${request.path}, ${exception.message}`;
-      Logger.error(message);
+      Logger.error(message, ExceptionFilter.name);
     }
 
     // format error response
-    let errorRes: ApiResponse<undefined, any> = ApiResponse.error({
-      code: 500,
-      message: 'Internal server error',
-    });
+    let errorRes = ApiResponse.fail({ code: 500, message: 'Internal error!' });
     errorRes = this.handleNestException(exception, errorRes);
+    errorRes = this.handlerApiFailed(exception, errorRes);
+
     return response.json(errorRes);
   }
 
   private handleNestException(
     exception: any,
-    apiRes: ApiResponse<undefined, any>,
+    errorRes: ApiResponse<never, any>,
   ) {
-    if (!(exception instanceof HttpException)) return apiRes;
+    if (!(exception instanceof HttpException)) return errorRes;
 
-    return ApiResponse.error({
+    return ApiResponse.fail({
       code: exception.getStatus(),
       message: exception.message,
     });
+  }
+
+  private handlerApiFailed(exception: any, errorRes: ApiResponse<never, any>) {
+    if (!ApiResponse.isApiResponse(exception)) return errorRes;
+    if (ApiResponse.isSucceeded(exception)) return errorRes;
+
+    return ApiResponse.fail(exception.error);
   }
 }

@@ -5,10 +5,11 @@ export interface UserPasswordProps {
   isHashed?: boolean;
 }
 
-const INVALID_PASSWORD = 'Password must be at least 8 characters long';
-
 export class UserPassword extends ValueObject<UserPasswordProps> {
   static readonly PASSWORD_REGEX = /^[A-Za-z\d]{8,}$/;
+  static readonly INVALID_MESSAGE =
+    'Password must be at least 8 characters long';
+
   get value(): string {
     return this.props.password;
   }
@@ -26,9 +27,7 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
    * @returns UserPassword
    */
   public static new(password: string): UserPassword {
-    if (!UserPassword.PASSWORD_REGEX.test(password))
-      throw new Error(INVALID_PASSWORD);
-
+    if (!this.validate(password)) throw new Error(UserPassword.INVALID_MESSAGE);
     return new UserPassword(password);
   }
 
@@ -36,9 +35,13 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return plainTextPassword === this.props.password;
   }
 
-  public changePassword(newPassword: string): void {
-    if (!UserPassword.PASSWORD_REGEX.test(newPassword))
-      throw new Error(INVALID_PASSWORD);
-    this.props.password = newPassword;
+  public changePassword(newpass: string): void {
+    if (!UserPassword.validate(newpass))
+      throw new Error(UserPassword.INVALID_MESSAGE);
+    this.props.password = newpass;
+  }
+
+  static validate(password: string): boolean {
+    return UserPassword.PASSWORD_REGEX.test(password);
   }
 }

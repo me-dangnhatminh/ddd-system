@@ -1,7 +1,8 @@
 import * as NestCommon from '@nestjs/common';
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/lib/Either';
 import * as NestSwagger from '@nestjs/swagger';
+
+import * as Either from 'fp-ts/lib/Either';
 
 import * as Shared from '@common';
 import * as App from '../../application';
@@ -15,28 +16,25 @@ import {
 
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
-export class UserController {
+export class UserController extends Common.Controller {
   constructor(
     private readonly commandBus: NestCQRS.CommandBus,
     private readonly queryBus: NestCQRS.QueryBus,
-  ) {}
+  ) {
+    super();
+  }
 
   @NestCommon.Get('')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  @Common.HttpUserAuth()
+  @Common.HttpUserAuth({ roles: [Domain.UserRole.ADMIN] })
   async getAllAsAdmin(
     @Common.HttpUser() requester: Domain.User,
     @NestCommon.Query() query: GetUsersPaginationnQuery,
   ) {
-    const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
-    if (!canGet) return Either.left(Shared.FORBIDDEN);
+    const result: Common.TQueryHandlerResult<App.GetAllAsAdminQueryResult> =
+      await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
 
-    const result: Either.Either<
-      Shared.IErrorDetail,
-      App.GetAllAsAdminQueryResult
-    > = await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
-
-    return result;
+    return this.fromEither(result);
   }
 
   @NestCommon.Get(':userId')
@@ -46,19 +44,17 @@ export class UserController {
     @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    // get my profile
-    if (requester.id === params.userId) {
-      const query = new App.GetProfileQuery(params.userId);
-      const result: Either.Either<Shared.IErrorDetail, Domain.User> =
-        await this.queryBus.execute(query);
-      return result;
+    let query: NestCQRS.IQuery;
+
+    if (requester.id === params.userId)
+      query = new App.GetProfileQuery(params.userId);
+    else {
+      // get other's profile as admin
+      const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
+      if (!canGet) return Either.left(Shared.FORBIDDEN);
+      query = new App.GetProfileAsAdminQuery(params.userId);
     }
 
-    // get user profile as admin
-    const canGet = Domain.isAdminSpec.isSatisfiedBy(requester);
-    if (!canGet) return Either.left(Shared.FORBIDDEN);
-
-    const query = new App.GetProfileAsAdminQuery(params.userId);
     const result: Either.Either<Shared.IErrorDetail, Domain.User> =
       await this.queryBus.execute(query);
     return result;
@@ -67,10 +63,7 @@ export class UserController {
   @NestCommon.Get(':userId')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   @Common.HttpUserAuth({ roles: [Domain.UserRole.ADMIN] })
-  async unregisterByAdmin(
-    @NestCommon.Param() params: UserParams,
-    @Common.HttpUser() requester: Domain.User,
-  ) {}
+  async unregisterByAdmin() {}
 
   @NestCommon.Post(':userId/email/confirmation')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)

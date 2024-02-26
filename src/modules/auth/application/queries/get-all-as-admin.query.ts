@@ -1,4 +1,5 @@
-import { IQuery } from '@nestjs/cqrs';
+import { TQueryResult } from '@common';
+import { IQuery, IQueryResult } from '@nestjs/cqrs';
 
 export type TOrder = 'ASC' | 'DESC';
 export type TOrderBy = 'id' | 'email' | 'fullname' | 'createdAt' | 'updatedAt';
@@ -24,7 +25,7 @@ export class GetAllAsAdminQuery implements IQuery {
   }
 }
 
-export class GetAllAsAdminQueryResult {
+export class GetAllAsAdminQueryResult implements IQueryResult {
   readonly page: number;
   readonly pageSize: number;
   readonly totalPages: number;
@@ -42,3 +43,5 @@ export class GetAllAsAdminQueryResult {
     this.items = data.items;
   }
 }
+
+export type TGetAllAsAdminQueryResult = TQueryResult<GetAllAsAdminQueryResult>;

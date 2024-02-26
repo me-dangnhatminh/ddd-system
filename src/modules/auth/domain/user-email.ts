@@ -17,9 +17,11 @@ export class UserEmail extends ValueObject<IUserEmailProps> {
   }
 
   static new(email: string): UserEmail {
-    if (!UserEmail.EMAIL_REGEX.test(email))
-      throw new Error('Invalid email format');
-
+    if (!this.validate(email)) throw new Error(this.INVALID_MESSAGE);
     return new UserEmail(email);
+  }
+
+  static validate(email: string): boolean {
+    return UserEmail.EMAIL_REGEX.test(email);
   }
 }

@@ -1,46 +1,46 @@
 import { ErrorTypes, IErrorDetail } from '@common';
 import { UserEmail } from '../../domain';
 
-export type AuthErrorType =
-  | 'invalid-email'
-  | 'invalid-password'
-  | 'invalid-email-or-password'
-  | 'conflict-email'
-  | 'conflict-verified-email'
-  | 'invalid-email-verification-type'
-  | 'invalid-verification-code';
+export type AuthErrorReason =
+  | 'email.verification'
+  | 'email.verification.invalid'
+  | 'email.verification.expired'
+  | 'email.verification.conflict'
+  | 'email.verification.not.found'
+  | 'token.invalid'
+  | 'token.not-found';
 
 export const INVALID_EMAIL: IErrorDetail = {
-  type: 'invalid-email',
+  reason: '',
   message: UserEmail.INVALID_MESSAGE,
 };
 
 export const CONFLICT_EMAIL: IErrorDetail = {
-  type: ErrorTypes.CONFLICT,
+  reason: 'conflict-email',
   message: 'Email already exists',
 };
 
 export const INVALID_PASSWORD: IErrorDetail = {
-  type: ErrorTypes.BAD_REQUEST,
+  reason: 'invalid-password',
   message: 'Invalid password',
 };
 
 export const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
-  type: ErrorTypes.UNAUTHORIZED,
+  reason: 'invalid-email-or-password',
   message: 'Invalid email or password',
 };
 
 export const CONFLICT_VERIFIED_EMAIL: IErrorDetail = {
-  type: ErrorTypes.CONFLICT,
+  reason: 'conflict-verified-email',
   message: 'Email is already verified',
 };
 
-export const INVALID_EMAIL_VERIFICATION_type: IErrorDetail = {
-  type: ErrorTypes.FORBIDDEN,
+export const INVALID_EMAIL_VERIFICATION: IErrorDetail = {
+  reason: 'invalid-email-verification',
   message: 'Confirmation type has expired or is invalid',
 };
 
 export const INVALID_VERIFICATION_CODE: IErrorDetail = {
-  type: ErrorTypes.BAD_REQUEST,
+  reason: ErrorTypes.BAD_REQUEST,
   message: 'Invalid verification code',
 };

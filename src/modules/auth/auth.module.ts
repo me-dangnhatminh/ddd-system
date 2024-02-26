@@ -13,11 +13,12 @@ const HandlersProvider: NestCommon.Provider[] = [
   App.GetAllAsAdminHandler,
   App.GetProfileAsAdminHandler,
   App.GetProfileHandler,
-  App.LoginUserHandler,
+  App.GetAuthUserTokenHandler,
   // -- Commands
   App.ChangePasswordHandler,
   App.RegisterUserHandler,
   App.ConfirmEmailHandler,
+  App.LoginUserHandler,
 ];
 
 @NestCommon.Module({
@@ -27,7 +28,4 @@ const HandlersProvider: NestCommon.Provider[] = [
 })
 export class AuthModule {
   constructor() {}
-  configure(consumer: NestCommon.MiddlewareConsumer) {
-    consumer.apply(Infra.FormatApiResponseMiddleware).forRoutes('*');
-  }
 }

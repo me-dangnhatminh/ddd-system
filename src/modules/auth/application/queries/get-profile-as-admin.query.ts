@@ -1,3 +1,4 @@
+import { TQueryResult } from '@common';
 import { IQuery } from '@nestjs/cqrs';
 
 export class GetProfileAsAdminQuery implements IQuery {
@@ -27,3 +28,6 @@ export class GetProfileAsAdminQueryResult {
     this.avatarUrl = data.avatarUrl;
   }
 }
+
+export type TGetProfileAsAdminQueryResult =
+  TQueryResult<GetProfileAsAdminQueryResult>;

@@ -29,8 +29,7 @@ export class UserName extends ValueObject<IUserNameProps> {
   static new(firstName: string, lastName: string): UserName {
     const formated = this.format(firstName, lastName);
     const fullName = formated.firstName + formated.lastName;
-    const isValid = this.validate(fullName);
-    if (!isValid) throw new Error(this.INVALID_MESSAGE);
+    if (!this.validate(fullName)) throw new Error(this.INVALID_MESSAGE);
 
     return new UserName(formated);
   }

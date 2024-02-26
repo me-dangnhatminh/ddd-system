@@ -1,12 +1,18 @@
 import * as NestCommon from '@nestjs/common';
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/lib/Either';
 import * as NestSwagger from '@nestjs/swagger';
+import * as Express from 'express';
 
+import * as Either from 'fp-ts/lib/Either';
 import * as Shared from '@common';
 import * as App from '../../application';
 
 import { RegisterUserBody, LoginUserBody } from './view-models';
+import {
+  AUTHENTICATED_USER_TOKEN_KEY,
+  INVALID_EMAIL_OR_PASSWORD,
+  TCommandHandlerResult,
+} from '../../common';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
@@ -25,7 +31,7 @@ export class AuthController {
       dto.email,
       dto.password,
     );
-    const result: Either.Either<Shared.IErrorDetail, void> =
+    const result: Shared.TCommandResult =
       await this.commandBus.execute(command);
 
     return result;
@@ -33,10 +39,24 @@ export class AuthController {
 
   @NestCommon.Post('login')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  async login(@NestCommon.Body() dto: LoginUserBody) {
-    const query = new App.LoginUserQuery(dto.email, dto.password);
-    const result: Either.Either<Shared.IErrorDetail, App.LoginUserQueryResult> =
+  async login(
+    @NestCommon.Body() dto: LoginUserBody,
+    @NestCommon.Res({ passthrough: true }) response: Express.Response,
+  ) {
+    const command = new App.LoginUserCommand(dto.email, dto.password);
+    const commandresult: TCommandHandlerResult =
+      await this.commandBus.execute(command);
+    if (Either.isLeft(commandresult))
+      return Either.left([INVALID_EMAIL_OR_PASSWORD]);
+
+    const query = new App.GetAuthUserTokenQuery(dto.email);
+    const queryresult: App.TGetAuthUserTokenQueryResult =
       await this.queryBus.execute(query);
-    return result;
+
+    if (Either.isLeft(queryresult)) return queryresult;
+
+    response.cookie(AUTHENTICATED_USER_TOKEN_KEY, queryresult.right);
+
+    return Either.right(undefined);
   }
 }
