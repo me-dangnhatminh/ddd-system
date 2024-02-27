@@ -25,7 +25,7 @@ export class LoginUserHandler
 
     if (!user) return Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
+    if (!isValid) return Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
 
     const tokenClaims: Domain.UserClaim = {
       userId: user.id,
