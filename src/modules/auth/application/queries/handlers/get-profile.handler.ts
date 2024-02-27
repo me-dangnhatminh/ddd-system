@@ -3,6 +3,7 @@ import * as NestCQRS from '@nestjs/cqrs';
 import * as Shared from '@common';
 
 import { GetProfileQuery, GetProfileQueryResult } from '../get-profile.query';
+import { left, right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetProfileQuery)
 export class GetProfileHandler
@@ -30,7 +31,7 @@ export class GetProfileHandler
       FROM users WHERE id = ${userId}`;
 
     const user = sqlResult[0]; //TODO: this return any, need to fix
-    if (!user) return Shared.Result.failure([]);
-    return Shared.Result.success(new GetProfileQueryResult(user));
+    if (!user) return left([]); //TODO: add not found error
+    return right(new GetProfileQueryResult(user));
   }
 }

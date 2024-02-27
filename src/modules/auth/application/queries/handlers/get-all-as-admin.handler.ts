@@ -7,6 +7,7 @@ import {
   TGetAllAsAdminQueryResult,
   TOrderBy,
 } from '../get-all-as-admin.query';
+import { right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetAllAsAdminQuery)
 export class GetAllAsAdminHandler
@@ -51,7 +52,7 @@ export class GetAllAsAdminHandler
       totalPages,
       items,
     });
-    return Shared.Result.success<GetAllAsAdminQueryResult>(result);
+    return right(result);
   }
 
   private convertOrderBy(orderBy: TOrderBy): string {

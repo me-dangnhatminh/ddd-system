@@ -4,15 +4,12 @@ import * as Domain from '../../../domain';
 import * as Common from '../../../common';
 
 import { ChangePasswordCommand } from '../change-password.command';
-import { Result } from '@common';
+import { left, right } from 'fp-ts/lib/Either';
+import { TCommandResult } from '@common';
 
 @NestCQRS.CommandHandler(ChangePasswordCommand)
 export class ChangePasswordHandler
-  implements
-    NestCQRS.ICommandHandler<
-      ChangePasswordCommand,
-      Common.TCommandHandlerResult
-    >
+  implements NestCQRS.ICommandHandler<ChangePasswordCommand, TCommandResult>
 {
   constructor(private readonly userRepository: Domain.UserRepository) {}
 
@@ -20,12 +17,12 @@ export class ChangePasswordHandler
     const { requester, newPassword } = command;
 
     const compare = requester.comparePassword(newPassword);
-    if (!compare) return Result.failure([Common.INVALID_PASSWORD]);
+    if (!compare) return left([Common.INVALID_PASSWORD]);
 
     requester.changePassword(newPassword);
     await this.userRepository.update(requester);
 
     requester.commit();
-    return Result.success();
+    return right(undefined);
   }
 }

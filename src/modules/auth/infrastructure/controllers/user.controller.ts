@@ -31,9 +31,9 @@ export class UserController extends Common.Controller {
     @Common.HttpUser() requester: Domain.User,
     @NestCommon.Query() query: GetUsersPaginationnQuery,
   ) {
-    const result: Common.TQueryHandlerResult<App.GetAllAsAdminQueryResult> =
-      await this.queryBus.execute(new App.GetAllAsAdminQuery(query));
-
+    const result: App.TGetAllAsAdminQueryResult = await this.queryBus.execute(
+      new App.GetAllAsAdminQuery(query),
+    );
     return result;
   }
 

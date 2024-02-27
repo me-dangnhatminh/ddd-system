@@ -6,6 +6,7 @@ import {
   GetProfileAsAdminQueryResult,
   TGetProfileAsAdminQueryResult,
 } from '../get-profile-as-admin.query';
+import { left, right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetProfileAsAdminQuery)
 export class GetProfileAsAdminHandler
@@ -31,7 +32,7 @@ export class GetProfileAsAdminHandler
       FROM users WHERE id = ${userId}`;
 
     const user = sqlResult[0];
-    if (!user) return Shared.Result.failure([]);
-    return Shared.Result.success(new GetProfileAsAdminQueryResult(user));
+    if (!user) return left([]);
+    return right(new GetProfileAsAdminQueryResult(user));
   }
 }

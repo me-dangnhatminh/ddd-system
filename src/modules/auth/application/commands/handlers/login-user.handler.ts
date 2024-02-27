@@ -6,12 +6,12 @@ import * as NestCommon from '@nestjs/common';
 import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 import { LoginUserCommand } from '../login-user.command';
-import { Result } from '@common';
+import { left, right } from 'fp-ts/lib/Either';
+import { TCommandResult } from '@common';
 
 @NestCQRS.CommandHandler(LoginUserCommand)
 export class LoginUserHandler
-  implements
-    NestCQRS.ICommandHandler<LoginUserCommand, Common.TCommandHandlerResult>
+  implements NestCQRS.ICommandHandler<LoginUserCommand, TCommandResult>
 {
   constructor(
     @NestCommon.Inject(NestCache.CACHE_MANAGER)
@@ -23,9 +23,9 @@ export class LoginUserHandler
   async execute(Command: LoginUserCommand) {
     const user = await this.userRepository.getUserByEmail(Command.email);
 
-    if (!user) return Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
+    if (!user) return left([Common.INVALID_EMAIL_OR_PASSWORD]);
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) return Result.failure([Common.INVALID_EMAIL_OR_PASSWORD]);
+    if (!isValid) return left([Common.INVALID_EMAIL_OR_PASSWORD]);
 
     const tokenClaims: Domain.UserClaim = {
       userId: user.id,
@@ -36,7 +36,6 @@ export class LoginUserHandler
     const cacheKey = Common.USER_TOKEN_CACHE_KEY_PREFIX`${user.email.value}`;
     const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' }); //TODO: config expiresIn in env
     await this.cacheService.set(cacheKey, token, 60 * 60 * 1000);
-
-    return Result.success();
+    return right(undefined);
   }
 }

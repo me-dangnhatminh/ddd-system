@@ -1,4 +1,4 @@
+import { Either } from 'fp-ts/lib/Either';
 import { IErrorDetail } from './interfaces';
-import { Result } from './result';
 
-export type TQueryResult<T = never> = Result<T, IErrorDetail[]>;
+export type TQueryResult<T = never> = Either<IErrorDetail[], T>;

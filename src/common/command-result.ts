@@ -1,4 +1,4 @@
 import { IErrorDetail } from './interfaces';
-import { Result } from './result';
+import { Either } from 'fp-ts/lib/Either';
 
-export type TCommandResult = Result<never, IErrorDetail[]>;
+export type TCommandResult<T = undefined> = Either<IErrorDetail[], T>;
