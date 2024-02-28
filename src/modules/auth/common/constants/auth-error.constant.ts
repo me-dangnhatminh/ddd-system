@@ -1,46 +1,34 @@
-import { ErrorTypes, IErrorDetail } from '@common';
-import { UserEmail } from '../../domain';
+import { Exception, ValidationError } from '@common';
 
-export type AuthErrorReason =
-  | 'email.verification'
-  | 'email.verification.invalid'
-  | 'email.verification.expired'
-  | 'email.verification.conflict'
-  | 'email.verification.not.found'
-  | 'token.invalid'
-  | 'token.not-found';
+export enum AuthErrorCode {
+  EMAIL_VALIDATION = 'email.validation',
+  EMAIL_VALIDATION_INVALID = 'email.validation.invalid',
+  EMAIL_TOKEN_EXPIRED = 'email.token.expired',
+  EMAIL_CONFLICT = 'email.conflict',
+  PASSWORD_INVALID = 'password.invalid',
+  EMAIL_OR_PASSWORD_INVALID = 'email.or.password.invalid',
+}
 
-export const INVALID_EMAIL: IErrorDetail = {
-  reason: '',
-  message: UserEmail.INVALID_MESSAGE,
-};
-
-export const CONFLICT_EMAIL: IErrorDetail = {
-  reason: 'conflict-email',
-  message: 'Email already exists',
-};
-
-export const INVALID_PASSWORD: IErrorDetail = {
-  reason: 'invalid-password',
-  message: 'Invalid password',
-};
-
-export const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
-  reason: 'invalid-email-or-password',
-  message: 'Invalid email or password',
-};
-
-export const CONFLICT_VERIFIED_EMAIL: IErrorDetail = {
-  reason: 'conflict-verified-email',
-  message: 'Email is already verified',
-};
-
-export const INVALID_EMAIL_VERIFICATION: IErrorDetail = {
-  reason: 'invalid-email-verification',
-  message: 'Confirmation type has expired or is invalid',
-};
-
-export const INVALID_VERIFICATION_CODE: IErrorDetail = {
-  reason: ErrorTypes.BAD_REQUEST,
-  message: 'Invalid verification code',
+export const AuthError: Record<AuthErrorCode, Exception> = {
+  [AuthErrorCode.EMAIL_VALIDATION]: new ValidationError(
+    AuthErrorCode.EMAIL_VALIDATION,
+    'Email is not valid',
+  ),
+  [AuthErrorCode.EMAIL_VALIDATION_INVALID]: new ValidationError(
+    AuthErrorCode.EMAIL_VALIDATION_INVALID,
+    'Email is not valid',
+  ),
+  [AuthErrorCode.EMAIL_TOKEN_EXPIRED]: new ValidationError(
+    AuthErrorCode.EMAIL_TOKEN_EXPIRED,
+    'Email token is expired',
+  ),
+  [AuthErrorCode.EMAIL_CONFLICT]: new ValidationError(
+    AuthErrorCode.EMAIL_CONFLICT,
+    'Email is already in use',
+  ),
+  [AuthErrorCode.PASSWORD_INVALID]: new ValidationError(
+    AuthErrorCode.EMAIL_VALIDATION,
+    'Email is not valid',
+  ),
+  [AuthErrorCode.EMAIL_OR_PASSWORD_INVALID]: 
 };
