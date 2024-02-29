@@ -2,7 +2,7 @@ export abstract class ValueObject<T> {
   protected props: T;
 
   constructor(props: T) {
-    this.props = { ...props };
+    this.props = Object.freeze({ ...props });
   }
 
   public equals(vo?: ValueObject<T>): boolean {

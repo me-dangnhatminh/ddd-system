@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
 import { JwtModule } from './jwt.module';
 import { CqrsModule } from './cqrs.module';
-import { CacheModule } from './cache.module';
+import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
 
 const providers = [

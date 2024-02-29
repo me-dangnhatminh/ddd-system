@@ -4,3 +4,4 @@ export * from './change-password.command';
 export * from './confirm-email.command';
 export * from './register-user.command';
 export * from './login-user.command';
+export * from './request-email-confirmation.command';

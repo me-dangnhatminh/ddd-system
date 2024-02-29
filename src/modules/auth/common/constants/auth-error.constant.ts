@@ -1,4 +1,9 @@
-import { Exception, ValidationError } from '@common';
+import {
+  AuthorizationError,
+  ConflictError,
+  Exception,
+  ValidationError,
+} from '@common';
 
 export enum AuthErrorCode {
   EMAIL_VALIDATION = 'email.validation',
@@ -22,7 +27,7 @@ export const AuthError: Record<AuthErrorCode, Exception> = {
     AuthErrorCode.EMAIL_TOKEN_EXPIRED,
     'Email token is expired',
   ),
-  [AuthErrorCode.EMAIL_CONFLICT]: new ValidationError(
+  [AuthErrorCode.EMAIL_CONFLICT]: new ConflictError(
     AuthErrorCode.EMAIL_CONFLICT,
     'Email is already in use',
   ),
@@ -30,5 +35,8 @@ export const AuthError: Record<AuthErrorCode, Exception> = {
     AuthErrorCode.EMAIL_VALIDATION,
     'Email is not valid',
   ),
-  [AuthErrorCode.EMAIL_OR_PASSWORD_INVALID]: 
+  [AuthErrorCode.EMAIL_OR_PASSWORD_INVALID]: new AuthorizationError(
+    AuthErrorCode.EMAIL_VALIDATION,
+    'Email is not valid',
+  ),
 };

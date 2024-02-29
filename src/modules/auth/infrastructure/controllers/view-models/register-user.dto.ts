@@ -6,7 +6,6 @@ import {
   MinLength,
 } from 'class-validator';
 import { UserName, UserPassword } from '../../../domain';
-import * as Common from '../../../common';
 
 export class RegisterUserBody {
   @IsString()
@@ -23,7 +22,7 @@ export class RegisterUserBody {
 
   @IsString()
   @Matches(UserPassword.PASSWORD_REGEX, {
-    message: Common.INVALID_PASSWORD.message,
+    message: 'Invalid password!', //TODO: move to common
   })
   password: string;
 }

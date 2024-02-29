@@ -87,7 +87,7 @@ export class User extends AggregateRoot implements IUser {
   }
 
   changePassword(newPassword: string): void {
-    this._password.changePassword(newPassword);
+    this._password = UserPassword.new(newPassword);
     this.apply(new Events.PasswordChangedEvent(this.id));
   }
 

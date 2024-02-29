@@ -10,7 +10,6 @@ export class GetProfileQueryResult {
   readonly firstName: string;
   readonly lastName: string;
   readonly email: string;
-  readonly role: string;
   readonly avatarUrl: string;
   constructor(data: {
     id: string;
@@ -24,7 +23,6 @@ export class GetProfileQueryResult {
     this.firstName = data.firstName;
     this.lastName = data.lastName;
     this.email = data.email;
-    this.role = data.role;
     this.avatarUrl = data.avatarUrl;
   }
 }

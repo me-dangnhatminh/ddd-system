@@ -35,12 +35,6 @@ export class UserPassword extends ValueObject<UserPasswordProps> {
     return plainTextPassword === this.props.password;
   }
 
-  public changePassword(newpass: string): void {
-    if (!UserPassword.validate(newpass))
-      throw new Error(UserPassword.INVALID_MESSAGE);
-    this.props.password = newpass;
-  }
-
   static validate(password: string): boolean {
     return UserPassword.PASSWORD_REGEX.test(password);
   }
