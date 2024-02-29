@@ -1,16 +1,15 @@
 import * as NestCache from '@nestjs/cache-manager';
-import { Module, Provider } from '@nestjs/common';
+import { Module, Provider, Global } from '@nestjs/common';
 import { CacheService } from './cache.service';
 
 const CacheProvider: Provider = {
+  provide: NestCache.CACHE_MANAGER,
   useClass: CacheService,
-  provide: CacheService,
 };
 
+@Global()
 @Module({
-  imports: [
-    NestCache.CacheModule.register({ isGlobal: true, ttl: 3600, max: 1000 }),
-  ],
+  imports: [NestCache.CacheModule.register({ ttl: 3600, max: 1000 })],
   providers: [CacheProvider],
   exports: [NestCache.CacheModule],
 })

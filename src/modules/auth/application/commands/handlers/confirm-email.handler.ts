@@ -5,6 +5,8 @@ import * as Domain from '../../../domain';
 
 import { ConfirmEmailCommand } from '../confirm-email.command';
 import { left, right } from 'fp-ts/lib/Either';
+import { Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 const INVALID_CODE: IErrorDetail = {
   code: 'invalid_code',
@@ -16,6 +18,7 @@ export class ConfirmEmailHandler
   implements NestCQRS.ICommandHandler<ConfirmEmailCommand, TCommandResult>
 {
   constructor(
+    @Inject(CACHE_MANAGER)
     private readonly cacheService: Domain.CacheService,
     private readonly userRepository: Domain.UserRepository,
     private readonly publisher: NestCQRS.EventPublisher,

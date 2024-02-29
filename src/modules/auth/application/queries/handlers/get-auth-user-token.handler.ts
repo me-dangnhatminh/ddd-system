@@ -10,6 +10,8 @@ import {
   GetAuthUserTokenQueryResult,
   TGetAuthUserTokenQueryResult,
 } from '../get-auth-user-token.query';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
 
 const TOKEN_EXPIRED: Shared.IErrorDetail = {
   code: 'token_expired',
@@ -21,7 +23,10 @@ export class GetAuthUserTokenHandler
   implements
     NestCQRS.IQueryHandler<GetAuthUserTokenQuery, TGetAuthUserTokenQueryResult>
 {
-  constructor(private readonly cacheService: Domain.CacheService) {}
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheService: Domain.CacheService,
+  ) {}
 
   async execute(query: GetAuthUserTokenQuery) {
     const { email } = query;

@@ -3,12 +3,15 @@ import { RequestEmailConfirmationCommand } from '../request-email-confirmation.c
 import * as Domain from '../../../domain';
 import { TCommandResult } from '@common';
 import { right } from 'fp-ts/lib/Either';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
 
 @CommandHandler(RequestEmailConfirmationCommand)
 export class RequestEmailConfirmationHandler
   implements ICommandHandler<RequestEmailConfirmationCommand, TCommandResult>
 {
   constructor(
+    @Inject(CACHE_MANAGER)
     private readonly cacheService: Domain.CacheService,
     private readonly eventBus: EventBus,
   ) {}
