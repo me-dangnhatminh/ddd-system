@@ -1,5 +1,5 @@
 import * as NestCache from '@nestjs/cache-manager';
-import * as AuthModule from '../auth';
+import * as AuthModule from '../auth'; //TODO: dont use AuthModule in
 
 export class CacheService
   extends NestCache.Cache

@@ -1,4 +1,4 @@
-import { IErrorResponse, Result, failure } from '@common';
+import { IErrorResponse } from '@common';
 import {
   ArgumentsHost,
   Injectable,
@@ -20,10 +20,10 @@ export class ExceptionFilter implements NestExceptionFilter {
     }
 
     // format error response
-    let errorRes: Result<unknown, IErrorResponse> = failure({
+    let errorRes: IErrorResponse = {
       code: 500,
       message: 'Internal Server Error',
-    });
+    };
     errorRes = this.handleNestException(exception, errorRes);
 
     return response.json(errorRes);
@@ -31,12 +31,21 @@ export class ExceptionFilter implements NestExceptionFilter {
 
   private handleNestException(
     exception: any,
-    errorRes: Result<unknown, IErrorResponse>,
-  ) {
+    errorRes: IErrorResponse,
+  ): IErrorResponse {
     if (!(exception instanceof HttpException)) return errorRes;
-    return failure({
+    const res: IErrorResponse = {
       code: exception.getStatus(),
       message: exception.message,
-    });
+    };
+
+    const error = exception.getResponse();
+    if (isErrorResponse(error)) return error;
+
+    return res;
   }
 }
+
+const isErrorResponse = (error: any): error is IErrorResponse => {
+  return error.code !== undefined && error.message !== undefined;
+};

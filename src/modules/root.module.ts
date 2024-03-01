@@ -1,4 +1,4 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Module, ValidationPipe } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
@@ -6,6 +6,7 @@ import { JwtModule } from './jwt.module';
 import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
+import { IErrorDetail, IErrorResponse } from '@common';
 
 const providers = [
   {
@@ -13,14 +14,18 @@ const providers = [
     useValue: new ValidationPipe({
       transform: true,
       exceptionFactory(errors) {
-        const detail = errors.map((error) => {
-          return {
-            type: `invalid_${error.property}`,
-            message: Object.values(error.constraints ?? '').join(', '),
-          };
-        });
-
-        return { code: 400, message: 'Bad Request', detail };
+        const errorResponse: IErrorResponse = {
+          code: 400,
+          message: 'Bad Request',
+          detail: errors.map((error) => {
+            const err: IErrorDetail = {
+              code: `invalid.${error.property}`,
+              message: Object.values(error.constraints ?? '').join(', '),
+            };
+            return err;
+          }),
+        };
+        return new BadRequestException(errorResponse);
       },
     }),
   },
