@@ -2,8 +2,8 @@ export * from './interfaces';
 export * from './constants';
 export * from './utils';
 
-export * from './exception';
 export * from './common-error';
+export * from './domain-error';
 export * from './entity';
 export * from './specification';
 export * from './value-object';

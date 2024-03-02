@@ -7,10 +7,11 @@ import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 import { LoginUserCommand } from '../login-user.command';
 import { left, right } from 'fp-ts/lib/Either';
-import { TCommandResult } from '@common';
+import { IErrorDetail, TCommandResult } from '@common';
 
-const INVALID_EMAIL_OR_PASSWORD = {
-  code: 'invalid_email_or_password',
+const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
+  type: 'InvalidEmailOrPassword',
+  code: 0,
   message: 'Invalid email or password',
 };
 

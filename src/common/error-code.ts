@@ -1,0 +1,7 @@
+export enum ErrorCode {
+  UNKNOWN = 0,
+  VALIDATION_FAILED = 1,
+  NOT_FOUND = 2,
+  PRECONDITION_FAILED = 3,
+  PERMISSION_DENIED = 4,
+}
