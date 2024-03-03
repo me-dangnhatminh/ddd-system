@@ -5,11 +5,7 @@ import * as Shared from '@common';
 import * as Domain from '../../../domain';
 
 import { RegisterUserCommand } from '../register-user.command';
-
-const CONFLICT_EMAIL: Shared.IErrorDetail = {
-  code: 'conflict_email',
-  message: 'Email already exists',
-};
+import { EMAIL_ALREADY_EXISTS } from 'src/modules/auth/common';
 
 @NestCQRS.CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
@@ -24,7 +20,7 @@ export class RegisterUserHandler
     command: RegisterUserCommand,
   ): Promise<Either.Either<Shared.IErrorDetail, void>> {
     const res = await this.userRepository.getUserByEmail(command.email);
-    if (res) return Either.left(CONFLICT_EMAIL);
+    if (res) return Either.left(EMAIL_ALREADY_EXISTS);
 
     const username = Domain.UserName.new(command.firstName, command.lastName);
     const email = Domain.UserEmail.new(command.email);

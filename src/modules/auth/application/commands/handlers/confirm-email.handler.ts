@@ -1,17 +1,13 @@
 import * as NestCQRS from '@nestjs/cqrs';
 
-import { IErrorDetail, TCommandResult } from '@common';
+import { TCommandResult } from '@common';
 import * as Domain from '../../../domain';
 
 import { ConfirmEmailCommand } from '../confirm-email.command';
 import { left, right } from 'fp-ts/lib/Either';
 import { Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-
-const INVALID_CODE: IErrorDetail = {
-  code: 'invalid_code',
-  message: 'Invalid code or expired',
-};
+import * as Common from '../../../common';
 
 @NestCQRS.CommandHandler(ConfirmEmailCommand)
 export class ConfirmEmailHandler
@@ -27,7 +23,8 @@ export class ConfirmEmailHandler
   async execute(command: ConfirmEmailCommand) {
     const { email, code } = command;
     const savedCode = await this.cacheService.getEmailVerificationCode(email);
-    if (!savedCode || savedCode !== code) return left([INVALID_CODE]);
+    if (!savedCode || savedCode !== code)
+      return left(Common.VERIFY_INVALID_CODE);
 
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) throw new Error('InvalidOperation: User not found');

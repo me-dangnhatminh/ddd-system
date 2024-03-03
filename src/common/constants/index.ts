@@ -1,1 +1,1 @@
-export * from './error-types.constant';
+export * from './error-type.constant';

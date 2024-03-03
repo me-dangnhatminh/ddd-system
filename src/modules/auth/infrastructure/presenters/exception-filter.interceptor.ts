@@ -1,51 +1,18 @@
-import { IErrorResponse } from '@common';
-import {
-  ArgumentsHost,
-  Injectable,
-  Logger,
-  ExceptionFilter as NestExceptionFilter,
-  HttpException,
-} from '@nestjs/common';
+import * as NestCommon from '@nestjs/common';
 
-@Injectable()
-export class ExceptionFilter implements NestExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+@NestCommon.Injectable()
+export class ExceptionFilter implements NestCommon.ExceptionFilter {
+  catch(exception: any, host: NestCommon.ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
+    //TODO: config to enable/disable logging in env
     if (true) {
       const message: string = `Method: ${request.method}, ${request.path}, ${exception.message}`;
-      Logger.error(message, ExceptionFilter.name);
+      NestCommon.Logger.error(message, ExceptionFilter.name);
     }
 
-    // format error response
-    let errorRes: IErrorResponse = {
-      code: 500,
-      message: 'Internal Server Error',
-    };
-    errorRes = this.handleNestException(exception, errorRes);
-
-    return response.json(errorRes);
-  }
-
-  private handleNestException(
-    exception: any,
-    errorRes: IErrorResponse,
-  ): IErrorResponse {
-    if (!(exception instanceof HttpException)) return errorRes;
-    const res: IErrorResponse = {
-      code: exception.getStatus(),
-      message: exception.message,
-    };
-
-    const error = exception.getResponse();
-    if (isErrorResponse(error)) return error;
-
-    return res;
+    return response.json(exception.response);
   }
 }
-
-const isErrorResponse = (error: any): error is IErrorResponse => {
-  return error.code !== undefined && error.message !== undefined;
-};

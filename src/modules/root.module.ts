@@ -6,7 +6,7 @@ import { JwtModule } from './jwt.module';
 import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
-import { IErrorDetail, IErrorResponse } from '@common';
+import { CommonErrorType, IValidationError } from '@common';
 
 const providers = [
   {
@@ -14,18 +14,17 @@ const providers = [
     useValue: new ValidationPipe({
       transform: true,
       exceptionFactory(errors) {
-        const errorResponse: IErrorResponse = {
-          code: 400,
-          message: 'Bad Request',
-          detail: errors.map((error) => {
-            const err: IErrorDetail = {
-              code: `invalid.${error.property}`,
-              message: Object.values(error.constraints ?? '').join(', '),
-            };
-            return err;
-          }),
+        const error: IValidationError = {
+          type: CommonErrorType.VALIDATION_ERROR,
+          title: "Your request parameters didn't validate.",
+          detail: 'Check your request parameters again.',
+          invalidParams: errors.map((error) => ({
+            name: error.property,
+            reason: Object.values(error.constraints ?? '').join(', '),
+          })),
         };
-        return new BadRequestException(errorResponse);
+
+        return new BadRequestException(error);
       },
     }),
   },

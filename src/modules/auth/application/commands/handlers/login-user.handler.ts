@@ -7,13 +7,7 @@ import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 import { LoginUserCommand } from '../login-user.command';
 import { left, right } from 'fp-ts/lib/Either';
-import { IErrorDetail, TCommandResult } from '@common';
-
-const INVALID_EMAIL_OR_PASSWORD: IErrorDetail = {
-  type: 'InvalidEmailOrPassword',
-  code: 0,
-  message: 'Invalid email or password',
-};
+import { TCommandResult } from '@common';
 
 @NestCQRS.CommandHandler(LoginUserCommand)
 export class LoginUserHandler
@@ -29,9 +23,9 @@ export class LoginUserHandler
   async execute(Command: LoginUserCommand) {
     const user = await this.userRepository.getUserByEmail(Command.email);
 
-    if (!user) return left([INVALID_EMAIL_OR_PASSWORD]);
+    if (!user) return left(Common.EMAIL_ALREADY_EXISTS);
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) return left([INVALID_EMAIL_OR_PASSWORD]);
+    if (!isValid) return left(Common.EMAIL_ALREADY_EXISTS);
 
     const tokenClaims: Domain.UserClaim = {
       userId: user.id,

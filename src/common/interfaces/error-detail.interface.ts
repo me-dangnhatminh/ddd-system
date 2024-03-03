@@ -1,17 +1,27 @@
 /**
- * Error detail interface.
- * @property {string} type - Error type: a unique identifier for the error type.
- * @property {string} code - Error code: a unique code for the error.
- * @property {string} message - Error message: a human-readable description of the error.
+ * Error Detail Interface - https://datatracker.ietf.org/doc/html/rfc7807
  */
+
+import { CommonErrorType } from '../constants';
+
 export interface IErrorDetail {
   type: string;
-  message: string;
-  code: number;
-  // extendedHelp?: string;
-  // sendReport?: boolean;
+  title: string;
+  detail: string;
 }
 
-export interface IErrorDetailWithField extends IErrorDetail {
-  field: string;
+export interface IValidationErrorParam {
+  name: string;
+  reason: string;
+}
+
+export interface IValidationError extends IErrorDetail {
+  type: CommonErrorType.VALIDATION_ERROR;
+  title: "Your request parameters didn't validate.";
+  invalidParams: IValidationErrorParam[];
+}
+
+export interface IInternalError extends IErrorDetail {
+  type: CommonErrorType.INTERNAL;
+  title: 'An internal error occurred.';
 }

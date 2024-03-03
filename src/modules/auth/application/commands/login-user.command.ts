@@ -6,7 +6,3 @@ export class LoginUserCommand implements ICommand {
     public readonly password: string,
   ) {}
 }
-
-export class LoginUserCommandResult {
-  constructor(public readonly accessToken: string) {}
-}

@@ -1,19 +1,16 @@
 import * as NestCQRS from '@nestjs/cqrs';
-
-import * as Domain from '../../../domain';
-
-import { ChangePasswordCommand } from '../change-password.command';
-import { IErrorDetail, TCommandResult } from '@common';
 import { left, right } from 'fp-ts/lib/Either';
 
-const INVALID_PASSWORD: IErrorDetail = {
-  code: 'invalid_password',
-  message: 'Old password does not match user password',
-};
+import * as Domain from '../../../domain';
+import * as Shared from '@common';
+import * as Common from '../../../common';
+
+import { ChangePasswordCommand } from '../change-password.command';
 
 @NestCQRS.CommandHandler(ChangePasswordCommand)
 export class ChangePasswordHandler
-  implements NestCQRS.ICommandHandler<ChangePasswordCommand, TCommandResult>
+  implements
+    NestCQRS.ICommandHandler<ChangePasswordCommand, Shared.TCommandResult>
 {
   constructor(private readonly userRepository: Domain.UserRepository) {}
 
@@ -24,7 +21,7 @@ export class ChangePasswordHandler
     if (!user) throw new Error('InvalidOperation: User not found');
 
     const compare = user.comparePassword(oldPassword);
-    if (!compare) return left([INVALID_PASSWORD]);
+    if (!compare) return left(Common.PASSWORD_INCORRECT);
 
     user.changePassword(newPassword);
     await this.userRepository.update(user);

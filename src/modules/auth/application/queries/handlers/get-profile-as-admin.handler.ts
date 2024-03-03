@@ -6,7 +6,7 @@ import {
   GetProfileAsAdminQueryResult,
   TGetProfileAsAdminQueryResult,
 } from '../get-profile-as-admin.query';
-import { left, right } from 'fp-ts/lib/Either';
+import { right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetProfileAsAdminQuery)
 export class GetProfileAsAdminHandler
@@ -32,7 +32,7 @@ export class GetProfileAsAdminHandler
       FROM users WHERE id = ${userId}`;
 
     const user = sqlResult[0];
-    if (!user) return left([]);
+    if (!user) throw new Error('User not found');
     return right(new GetProfileAsAdminQueryResult(user));
   }
 }
