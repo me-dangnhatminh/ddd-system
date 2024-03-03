@@ -1,8 +1,9 @@
 import * as shared from '@shared';
 
 export enum AuthErrorType {
+  NOT_LOGGED_IN = 'not-logged-in',
+  EMAIL_CONFLICT = 'email-conflict',
   EMAIL_OR_PASSWORD_INVALID = 'email-or-password-invalid',
-  EMAIL_ALREADY_EXISTS = 'email-already-exists',
   PASSWORD_INCORRECT = 'password-incorrect',
   VERIFY_INVALID_CODE = 'verify-invalid-code',
   TOKEN_EXPIRED = 'token-expired',
@@ -14,8 +15,8 @@ export const EMAIL_OR_PASSWORD_INVALID: shared.IErrorDetail = {
   detail: 'Check your email or password again.',
 };
 
-export const EMAIL_ALREADY_EXISTS: shared.IErrorDetail = {
-  type: AuthErrorType.EMAIL_ALREADY_EXISTS,
+export const EMAIL_CONFLICT: shared.IErrorDetail = {
+  type: AuthErrorType.EMAIL_CONFLICT,
   title: 'Email already exists.',
   detail: 'Email is already in use, please use another email.',
 };
@@ -36,4 +37,10 @@ export const TOKEN_EXPIRED: shared.IErrorDetail = {
   type: AuthErrorType.TOKEN_EXPIRED,
   title: 'Token is expired.',
   detail: 'Token is expired, please login again.',
+};
+
+export const NOT_LOGGED_IN: shared.IErrorDetail = {
+  type: AuthErrorType.NOT_LOGGED_IN,
+  title: 'Not logged in.',
+  detail: 'Please login to access this resource.',
 };

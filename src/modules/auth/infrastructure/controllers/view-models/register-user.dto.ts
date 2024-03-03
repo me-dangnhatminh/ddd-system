@@ -22,7 +22,7 @@ export class RegisterUserBody {
 
   @IsString()
   @Matches(UserPassword.PASSWORD_REGEX, {
-    message: 'Invalid password!', //TODO: move to common
+    message: UserPassword.INVALID_MESSAGE,
   })
   password: string;
 }

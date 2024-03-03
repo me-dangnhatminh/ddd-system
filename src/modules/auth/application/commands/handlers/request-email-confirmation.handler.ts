@@ -1,5 +1,4 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as NestCache from '@nestjs/cache-manager';
 import * as NestCommon from '@nestjs/common';
 import { right } from 'fp-ts/lib/Either';
 
@@ -17,7 +16,7 @@ export class RequestEmailConfirmationHandler
     >
 {
   constructor(
-    @NestCommon.Inject(NestCache.CACHE_MANAGER)
+    @NestCommon.Inject('cache-service')
     private readonly cacheService: Domain.CacheService,
     private readonly eventBus: NestCQRS.EventBus,
   ) {}

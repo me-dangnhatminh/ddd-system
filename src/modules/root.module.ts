@@ -10,27 +10,17 @@ import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
 
-const providers = [
-  {
-    provide: NestCore.APP_PIPE,
-    useValue: new NestCommon.ValidationPipe({
-      transform: true,
-      exceptionFactory(errors) {
-        const error: Shared.IValidationError = {
-          type: Shared.CommonErrorType.VALIDATION_ERROR,
-          title: "Your request parameters didn't validate.",
-          detail: 'Check your request parameters again.',
-          invalidParams: errors.map((error) => ({
-            name: error.property,
-            reason: Object.values(error.constraints ?? '').join(', '),
-          })),
-        };
+const validationPipeProvider: NestCommon.Provider = {
+  provide: NestCore.APP_PIPE,
+  useClass: Shared.ValidationPipe,
+};
 
-        return new NestCommon.BadRequestException(error);
-      },
-    }),
-  },
-];
+const exceptionFilterProvider: NestCommon.Provider = {
+  provide: NestCore.APP_FILTER,
+  useClass: Shared.ExceptionFilter,
+};
+
+const providers = [validationPipeProvider, exceptionFilterProvider];
 
 @NestCommon.Module({
   imports: [
@@ -43,4 +33,10 @@ const providers = [
   ],
   providers,
 })
-export class RootModule {}
+export class RootModule {
+  constructor() {}
+
+  configure(consumer: NestCommon.MiddlewareConsumer) {
+    consumer.apply(Shared.FormatHttpResponseMiddleware).forRoutes('*');
+  }
+}

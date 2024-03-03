@@ -2,13 +2,13 @@ import * as NestCommon from '@nestjs/common';
 import * as NestCQRS from '@nestjs/cqrs';
 import * as NestSwagger from '@nestjs/swagger';
 import * as Express from 'express';
+import { isLeft, left } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
+import * as Common from '../../common';
 import * as App from '../../application';
 
 import { RegisterUserBody, LoginUserBody } from './view-models';
-import { AUTHENTICATED_USER_TOKEN_KEY } from '../../common';
-import { isLeft, left, right } from 'fp-ts/lib/Either';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
@@ -25,7 +25,7 @@ export class AuthController {
     const result: Shared.TCommandResult =
       await this.commandBus.execute(command);
 
-    return result;
+    if (isLeft(result)) return result.left;
   }
 
   @NestCommon.Post('login')
@@ -43,9 +43,8 @@ export class AuthController {
     const queryresult: App.TGetAuthUserTokenQueryResult =
       await this.queryBus.execute(query);
 
-    if (isLeft(queryresult)) return left(queryresult.left);
-
-    response.cookie(AUTHENTICATED_USER_TOKEN_KEY, queryresult.right);
-    return right(undefined);
+    if (isLeft(queryresult)) return queryresult.left;
+    const accessToken = queryresult.right.accessToken;
+    response.header(Common.AUTHENTICATED_USER_TOKEN_KEY, accessToken);
   }
 }

@@ -5,6 +5,8 @@ export class LoginUserBody {
   @IsString() @IsEmail() email: string;
 
   @IsString()
-  @Matches(UserPassword.PASSWORD_REGEX, { message: 'Invalid password' }) //TODO: move to common
+  @Matches(UserPassword.PASSWORD_REGEX, {
+    message: UserPassword.INVALID_MESSAGE,
+  })
   password: string;
 }

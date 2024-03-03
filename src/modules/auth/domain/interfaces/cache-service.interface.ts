@@ -6,5 +6,9 @@ export abstract class CacheService {
     ttl: number, // in miliseconds
   ): Promise<void>;
   abstract getUserToken(email: string): Promise<string | undefined>;
-  abstract setUserToken(email: string, token: string): Promise<void>;
+  abstract setUserToken(
+    email: string,
+    token: string,
+    ttl: number,
+  ): Promise<void>;
 }
