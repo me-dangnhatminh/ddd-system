@@ -1,8 +1,8 @@
 import * as NestCQRS from '@nestjs/cqrs';
 import { left, right } from 'fp-ts/lib/Either';
 
+import * as Shared from '@shared';
 import * as Domain from '../../../domain';
-import * as Shared from '@common';
 import * as Common from '../../../common';
 
 import { ChangePasswordCommand } from '../change-password.command';

@@ -1,21 +1,23 @@
-import { BadRequestException, Module, ValidationPipe } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
+import * as NestCommon from '@nestjs/common';
+import * as NestCore from '@nestjs/core';
+
+import * as Shared from '@shared';
+
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
 import { JwtModule } from './jwt.module';
 import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
-import { CommonErrorType, IValidationError } from '@common';
 
 const providers = [
   {
-    provide: APP_PIPE,
-    useValue: new ValidationPipe({
+    provide: NestCore.APP_PIPE,
+    useValue: new NestCommon.ValidationPipe({
       transform: true,
       exceptionFactory(errors) {
-        const error: IValidationError = {
-          type: CommonErrorType.VALIDATION_ERROR,
+        const error: Shared.IValidationError = {
+          type: Shared.CommonErrorType.VALIDATION_ERROR,
           title: "Your request parameters didn't validate.",
           detail: 'Check your request parameters again.',
           invalidParams: errors.map((error) => ({
@@ -24,13 +26,13 @@ const providers = [
           })),
         };
 
-        return new BadRequestException(error);
+        return new NestCommon.BadRequestException(error);
       },
     }),
   },
 ];
 
-@Module({
+@NestCommon.Module({
   imports: [
     CqrsModule,
     JwtModule,

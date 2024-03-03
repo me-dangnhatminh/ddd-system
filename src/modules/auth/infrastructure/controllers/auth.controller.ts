@@ -3,7 +3,7 @@ import * as NestCQRS from '@nestjs/cqrs';
 import * as NestSwagger from '@nestjs/swagger';
 import * as Express from 'express';
 
-import * as Shared from '@common';
+import * as Shared from '@shared';
 import * as App from '../../application';
 
 import { RegisterUserBody, LoginUserBody } from './view-models';

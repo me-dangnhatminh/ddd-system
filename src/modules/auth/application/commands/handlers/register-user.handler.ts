@@ -1,7 +1,7 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Either from 'fp-ts/Either';
+import { left, right, Either } from 'fp-ts/lib/Either';
 
-import * as Shared from '@common';
+import * as Shared from '@shared';
 import * as Domain from '../../../domain';
 
 import { RegisterUserCommand } from '../register-user.command';
@@ -18,9 +18,9 @@ export class RegisterUserHandler
 
   async execute(
     command: RegisterUserCommand,
-  ): Promise<Either.Either<Shared.IErrorDetail, void>> {
+  ): Promise<Either<Shared.IErrorDetail, void>> {
     const res = await this.userRepository.getUserByEmail(command.email);
-    if (res) return Either.left(EMAIL_ALREADY_EXISTS);
+    if (res) return left(EMAIL_ALREADY_EXISTS);
 
     const username = Domain.UserName.new(command.firstName, command.lastName);
     const email = Domain.UserEmail.new(command.email);
@@ -37,6 +37,6 @@ export class RegisterUserHandler
     await this.userRepository.save(user);
 
     this.publisher.mergeObjectContext(user).commit();
-    return Either.right(undefined);
+    return right(undefined);
   }
 }

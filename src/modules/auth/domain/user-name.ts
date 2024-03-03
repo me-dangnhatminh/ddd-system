@@ -1,11 +1,11 @@
-import { ValueObject } from '@common';
+import * as Shared from '@shared';
 
 export interface IUserNameProps {
   firstName: string;
   lastName: string;
 }
 
-export class UserName extends ValueObject<IUserNameProps> {
+export class UserName extends Shared.ValueObject<IUserNameProps> {
   static readonly MIN_LENGTH = 1;
   static readonly MAX_LENGTH = 20;
   static readonly INVALID_MESSAGE = `User name must be between ${UserName.MIN_LENGTH} and ${UserName.MAX_LENGTH} characters.`;

@@ -1,4 +1,4 @@
-import { TQueryResult } from '@common';
+import * as Shared from '@shared';
 import { IQuery } from '@nestjs/cqrs';
 
 export class GetProfileAsAdminQuery implements IQuery {
@@ -30,4 +30,4 @@ export class GetProfileAsAdminQueryResult {
 }
 
 export type TGetProfileAsAdminQueryResult =
-  TQueryResult<GetProfileAsAdminQueryResult>;
+  Shared.TQueryResult<GetProfileAsAdminQueryResult>;

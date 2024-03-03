@@ -18,7 +18,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@common": ["src/common"],
+      "@shared": ["src/shared"],
       "@modules/auth": ["src/modules/auth"],
     },
   },

@@ -1,9 +1,10 @@
-import { ReadRepository } from '@common';
-import { PrismaService } from '../prisma.service';
-import { Injectable } from '@nestjs/common';
+import * as NestCommon from '@nestjs/common';
 
-@Injectable()
-export class PrismaReadRepository implements ReadRepository {
+import * as Shared from '@shared';
+import { PrismaService } from '../prisma.service';
+
+@NestCommon.Injectable()
+export class PrismaReadRepository implements Shared.ReadRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async $query<T = unknown>(

@@ -1,10 +1,10 @@
-import { ValueObject } from '@common';
+import * as Shared from '@shared';
 
 export interface IUserEmailProps {
   email: string;
 }
 
-export class UserEmail extends ValueObject<IUserEmailProps> {
+export class UserEmail extends Shared.ValueObject<IUserEmailProps> {
   static readonly EMAIL_REGEX = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
   static readonly INVALID_MESSAGE = 'Invalid email format.';
 

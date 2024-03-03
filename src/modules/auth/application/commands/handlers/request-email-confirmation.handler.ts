@@ -1,19 +1,25 @@
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { RequestEmailConfirmationCommand } from '../request-email-confirmation.command';
-import * as Domain from '../../../domain';
-import { TCommandResult } from '@common';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as NestCache from '@nestjs/cache-manager';
+import * as NestCommon from '@nestjs/common';
 import { right } from 'fp-ts/lib/Either';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject } from '@nestjs/common';
 
-@CommandHandler(RequestEmailConfirmationCommand)
+import * as Shared from '@shared';
+import * as Domain from '../../../domain';
+
+import { RequestEmailConfirmationCommand } from '../request-email-confirmation.command';
+
+@NestCQRS.CommandHandler(RequestEmailConfirmationCommand)
 export class RequestEmailConfirmationHandler
-  implements ICommandHandler<RequestEmailConfirmationCommand, TCommandResult>
+  implements
+    NestCQRS.ICommandHandler<
+      RequestEmailConfirmationCommand,
+      Shared.TCommandResult
+    >
 {
   constructor(
-    @Inject(CACHE_MANAGER)
+    @NestCommon.Inject(NestCache.CACHE_MANAGER)
     private readonly cacheService: Domain.CacheService,
-    private readonly eventBus: EventBus,
+    private readonly eventBus: NestCQRS.EventBus,
   ) {}
 
   async execute(command: RequestEmailConfirmationCommand) {

@@ -1,4 +1,5 @@
-import { Specification } from '@common';
+import * as Shared from '@shared';
+
 import { User } from './user';
 
 export class UserClaim {
@@ -12,6 +13,6 @@ export type TAccessControllList = 'admin:register';
 
 export interface IUserPolicy {
   name: TAccessControllList;
-  specification?: Specification<User>; // TODO: Change to UserClaim
+  specification?: Shared.Specification<User>; // TODO: Change to UserClaim
 }
 export type TPolicies = Readonly<{ [key in TAccessControllList]: IUserPolicy }>;

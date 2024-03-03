@@ -1,11 +1,11 @@
-import { ValueObject } from '@common';
+import * as Shared from '@shared';
 
 export interface UserPasswordProps {
   password: string;
   isHashed?: boolean;
 }
 
-export class UserPassword extends ValueObject<UserPasswordProps> {
+export class UserPassword extends Shared.ValueObject<UserPasswordProps> {
   static readonly PASSWORD_REGEX = /^[A-Za-z\d]{8,}$/;
   static readonly INVALID_MESSAGE =
     'Password must be at least 8 characters long';

@@ -1,13 +1,13 @@
 import * as NestCQRS from '@nestjs/cqrs';
+import { right } from 'fp-ts/lib/Either';
 
-import * as Shared from '@common';
+import * as Shared from '@shared';
 import {
   GetAllAsAdminQuery,
-  GetAllAsAdminQueryResult,
   TGetAllAsAdminQueryResult,
+  GetAllAsAdminQueryResult,
   TOrderBy,
 } from '../get-all-as-admin.query';
-import { right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetAllAsAdminQuery)
 export class GetAllAsAdminHandler

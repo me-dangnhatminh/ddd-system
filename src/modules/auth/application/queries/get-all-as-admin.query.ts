@@ -1,10 +1,10 @@
-import { TQueryResult } from '@common';
-import { IQuery, IQueryResult } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
+import * as Shared from '@shared';
 
 export type TOrder = 'ASC' | 'DESC';
 export type TOrderBy = 'id' | 'email' | 'fullname' | 'createdAt' | 'updatedAt';
 
-export class GetAllAsAdminQuery implements IQuery {
+export class GetAllAsAdminQuery implements NestCQRS.IQuery {
   readonly page: number;
   readonly pageSize: number;
   readonly search: string | null;
@@ -25,7 +25,7 @@ export class GetAllAsAdminQuery implements IQuery {
   }
 }
 
-export class GetAllAsAdminQueryResult implements IQueryResult {
+export class GetAllAsAdminQueryResult implements NestCQRS.IQueryResult {
   readonly page: number;
   readonly pageSize: number;
   readonly totalPages: number;
@@ -44,4 +44,5 @@ export class GetAllAsAdminQueryResult implements IQueryResult {
   }
 }
 
-export type TGetAllAsAdminQueryResult = TQueryResult<GetAllAsAdminQueryResult>;
+export type TGetAllAsAdminQueryResult =
+  Shared.TQueryResult<GetAllAsAdminQueryResult>;

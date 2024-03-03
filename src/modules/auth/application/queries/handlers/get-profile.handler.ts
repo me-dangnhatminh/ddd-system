@@ -1,9 +1,9 @@
 import * as NestCQRS from '@nestjs/cqrs';
+import { right } from 'fp-ts/lib/Either';
 
-import * as Shared from '@common';
+import * as Shared from '@shared';
 
 import { GetProfileQuery, GetProfileQueryResult } from '../get-profile.query';
-import { right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetProfileQuery)
 export class GetProfileHandler

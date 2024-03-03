@@ -2,16 +2,17 @@ import * as NestCQRS from '@nestjs/cqrs';
 import * as NestJWT from '@nestjs/jwt';
 import * as NestCache from '@nestjs/cache-manager';
 import * as NestCommon from '@nestjs/common';
+import { left, right } from 'fp-ts/lib/Either';
 
+import * as Shared from '@shared';
 import * as Common from '../../../common';
 import * as Domain from '../../../domain';
+
 import { LoginUserCommand } from '../login-user.command';
-import { left, right } from 'fp-ts/lib/Either';
-import { TCommandResult } from '@common';
 
 @NestCQRS.CommandHandler(LoginUserCommand)
 export class LoginUserHandler
-  implements NestCQRS.ICommandHandler<LoginUserCommand, TCommandResult>
+  implements NestCQRS.ICommandHandler<LoginUserCommand, Shared.TCommandResult>
 {
   constructor(
     @NestCommon.Inject(NestCache.CACHE_MANAGER)

@@ -1,4 +1,4 @@
-import { Specification } from '@common';
+import { Specification } from '@shared';
 
 export interface Claim {
   type: string;

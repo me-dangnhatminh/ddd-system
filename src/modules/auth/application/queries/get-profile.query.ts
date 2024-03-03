@@ -1,7 +1,8 @@
-import { TQueryResult } from '@common';
-import { IQuery } from '@nestjs/cqrs';
+import * as NestCQRS from '@nestjs/cqrs';
 
-export class GetProfileQuery implements IQuery {
+import * as Shared from '@shared';
+
+export class GetProfileQuery implements NestCQRS.IQuery {
   constructor(public readonly userId: string) {}
 }
 
@@ -27,4 +28,4 @@ export class GetProfileQueryResult {
   }
 }
 
-export type TGetProfileQueryResult = TQueryResult<GetProfileQueryResult>;
+export type TGetProfileQueryResult = Shared.TQueryResult<GetProfileQueryResult>;

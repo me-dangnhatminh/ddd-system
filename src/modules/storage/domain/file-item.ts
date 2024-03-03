@@ -1,4 +1,3 @@
-import { ValueObject } from '@common';
 import { Owner } from './owner';
 
 export interface FileItemProps {
@@ -12,7 +11,7 @@ export interface FileItemProps {
   updatedAt: Date;
 }
 
-export class FileItem extends ValueObject<FileItemProps> {
+export class FileItem {
   get type() {
     return this.props.type;
   }
@@ -26,7 +25,5 @@ export class FileItem extends ValueObject<FileItemProps> {
     return this.props.path;
   }
 
-  constructor(protected props: FileItemProps) {
-    super(props);
-  }
+  constructor(protected props: FileItemProps) {}
 }

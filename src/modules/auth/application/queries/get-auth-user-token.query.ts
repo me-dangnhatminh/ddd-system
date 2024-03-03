@@ -1,4 +1,4 @@
-import { TQueryResult } from '@common';
+import * as Shared from '@shared';
 import { IQuery } from '@nestjs/cqrs';
 
 export class GetAuthUserTokenQuery implements IQuery {
@@ -10,4 +10,4 @@ export class GetAuthUserTokenQueryResult {
 }
 
 export type TGetAuthUserTokenQueryResult =
-  TQueryResult<GetAuthUserTokenQueryResult>;
+  Shared.TQueryResult<GetAuthUserTokenQueryResult>;

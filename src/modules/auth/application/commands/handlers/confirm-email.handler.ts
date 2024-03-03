@@ -1,20 +1,21 @@
 import * as NestCQRS from '@nestjs/cqrs';
+import * as NestCommon from '@nestjs/common';
+import * as NestCache from '@nestjs/cache-manager';
+import { left, right } from 'fp-ts/lib/Either';
 
-import { TCommandResult } from '@common';
+import * as Shared from '@shared';
 import * as Domain from '../../../domain';
+import * as Common from '../../../common';
 
 import { ConfirmEmailCommand } from '../confirm-email.command';
-import { left, right } from 'fp-ts/lib/Either';
-import { Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import * as Common from '../../../common';
 
 @NestCQRS.CommandHandler(ConfirmEmailCommand)
 export class ConfirmEmailHandler
-  implements NestCQRS.ICommandHandler<ConfirmEmailCommand, TCommandResult>
+  implements
+    NestCQRS.ICommandHandler<ConfirmEmailCommand, Shared.TCommandResult>
 {
   constructor(
-    @Inject(CACHE_MANAGER)
+    @NestCommon.Inject(NestCache.CACHE_MANAGER)
     private readonly cacheService: Domain.CacheService,
     private readonly userRepository: Domain.UserRepository,
     private readonly publisher: NestCQRS.EventPublisher,

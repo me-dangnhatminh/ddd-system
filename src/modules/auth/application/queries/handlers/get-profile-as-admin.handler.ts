@@ -1,12 +1,13 @@
 import * as NestCQRS from '@nestjs/cqrs';
-import * as Shared from '@common';
+import { right } from 'fp-ts/lib/Either';
+
+import * as Shared from '@shared';
 
 import {
   GetProfileAsAdminQuery,
   GetProfileAsAdminQueryResult,
   TGetProfileAsAdminQueryResult,
 } from '../get-profile-as-admin.query';
-import { right } from 'fp-ts/lib/Either';
 
 @NestCQRS.QueryHandler(GetProfileAsAdminQuery)
 export class GetProfileAsAdminHandler
