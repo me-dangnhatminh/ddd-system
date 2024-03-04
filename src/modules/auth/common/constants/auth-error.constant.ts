@@ -7,6 +7,8 @@ export enum AuthErrorType {
   PASSWORD_INCORRECT = 'password-incorrect',
   VERIFY_INVALID_CODE = 'verify-invalid-code',
   TOKEN_EXPIRED = 'token-expired',
+  ALREADY_VERIFIED = 'already-verified',
+  CODE_REQUIRED_FOR_CONFIRMATION = 'code-required-confirmation',
 }
 
 export const EMAIL_OR_PASSWORD_INVALID: shared.IErrorDetail = {
@@ -43,4 +45,16 @@ export const NOT_LOGGED_IN: shared.IErrorDetail = {
   type: AuthErrorType.NOT_LOGGED_IN,
   title: 'Not logged in.',
   detail: 'Please login to access this resource.',
+};
+
+export const ALREADY_VERIFIED: shared.IErrorDetail = {
+  type: AuthErrorType.ALREADY_VERIFIED,
+  title: 'Already verified.',
+  detail: 'Your email is already verified.',
+};
+
+export const CODE_REQUIRED_FOR_CONFIRMATION: shared.IErrorDetail = {
+  type: AuthErrorType.CODE_REQUIRED_FOR_CONFIRMATION,
+  title: 'Code is required.',
+  detail: 'Code is required for email confirmation (act is "conf").',
 };

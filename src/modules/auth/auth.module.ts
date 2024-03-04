@@ -14,6 +14,7 @@ const HandlersProvider: NestCommon.Provider[] = [
   App.RegisterUserHandler,
   App.ConfirmEmailHandler,
   App.LoginUserHandler,
+  App.RequestEmailConfirmationHandler,
 ];
 
 @NestCommon.Module({

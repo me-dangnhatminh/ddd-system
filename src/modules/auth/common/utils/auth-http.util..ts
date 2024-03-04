@@ -7,6 +7,8 @@ const ErrorTypeToHttpStatus: Record<AuthErrorType, number> = {
   [AuthErrorType.PASSWORD_INCORRECT]: 401,
   [AuthErrorType.VERIFY_INVALID_CODE]: 401,
   [AuthErrorType.TOKEN_EXPIRED]: 401,
+  [AuthErrorType.ALREADY_VERIFIED]: 400,
+  [AuthErrorType.CODE_REQUIRED_FOR_CONFIRMATION]: 400,
 };
 
 export const getHttpStatusFromErrorType = (

@@ -8,7 +8,7 @@ import * as App from '../../application';
 import * as Domain from '../../domain';
 import * as Common from '../../common';
 
-import { EmailConfirmationBody, UserParams } from './view-models';
+import { EmailConfirmationBody } from './view-models';
 
 @NestCommon.Controller('users')
 @NestSwagger.ApiTags('users')
@@ -31,23 +31,30 @@ export class UserController {
     };
   }
 
-  @NestCommon.Post(':userId/email/confirmation')
+  @NestCommon.Post('me/email/confirmation')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   @Common.HttpUserAuth()
   async confirmEmail(
     @NestCommon.Body() body: EmailConfirmationBody,
-    @NestCommon.Param() params: UserParams,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    if (requester.id !== params.userId)
-      return `userId ${params.userId} does not match requester's id ${requester.id}`;
-    if (requester.isVerified) return `You is already verified`;
+    if (requester.isVerified) return Common.ALREADY_VERIFIED;
+    const email = requester.email.value;
+    const command = new App.ConfirmEmailCommand(email, body.code);
+    const result: Shared.TCommandResult =
+      await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
+    return result.right;
+  }
 
-    let command: NestCQRS.ICommand;
-    if (!body.code)
-      command = new App.RequestEmailConfirmationCommand(requester.email.value);
-    else command = new App.ConfirmEmailCommand(requester.id, body.code);
+  @NestCommon.Post('me/email/confirmation/request')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth()
+  async requestEmailConfirmation(@Common.HttpUser() requester: Domain.User) {
+    if (requester.isVerified) return Common.ALREADY_VERIFIED;
+    const email = requester.email.value;
 
+    const command = new App.RequestEmailConfirmationCommand(email);
     const result: Shared.TCommandResult =
       await this.commandBus.execute(command);
     if (isLeft(result)) return result.left;
