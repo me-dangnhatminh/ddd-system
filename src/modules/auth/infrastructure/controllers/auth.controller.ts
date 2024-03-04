@@ -2,7 +2,7 @@ import * as NestCommon from '@nestjs/common';
 import * as NestCQRS from '@nestjs/cqrs';
 import * as NestSwagger from '@nestjs/swagger';
 import * as Express from 'express';
-import { isLeft, left } from 'fp-ts/lib/Either';
+import { isLeft } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
 import * as Common from '../../common';
@@ -37,7 +37,7 @@ export class AuthController {
     const command = new App.LoginUserCommand(dto.email, dto.password);
     const commandresult: Shared.TCommandResult =
       await this.commandBus.execute(command);
-    if (isLeft(commandresult)) left(commandresult.left);
+    if (isLeft(commandresult)) return commandresult.left;
 
     const query = new App.GetAuthUserTokenQuery(dto.email);
     const queryresult: App.TGetAuthUserTokenQueryResult =

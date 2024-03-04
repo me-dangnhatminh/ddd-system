@@ -5,7 +5,7 @@ export class UserMapper {
   public static toDomain(orm: ORM.User): Domain.User {
     const name = Domain.UserName.new(orm.firstName, orm.lastName);
     const email = Domain.UserEmail.new(orm.email);
-    const password = Domain.UserPassword.new(orm.password);
+    const password = Domain.UserPassword.new(orm.password, true);
     return new Domain.User(
       orm.id,
       name,
