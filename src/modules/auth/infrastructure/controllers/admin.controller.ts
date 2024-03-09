@@ -18,7 +18,7 @@ export class AdminController {
 
   @NestCommon.Get(':userId')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  @Common.HttpUserAuth()
+  @Common.HttpUserAuth({ roles: [Domain.UserRole.ADMIN] })
   async getProfile(@NestCommon.Param() params: UserParams) {
     const query = new App.GetProfileQuery(params.userId);
     const result: App.TGetProfileQueryResult =
@@ -26,4 +26,9 @@ export class AdminController {
     if (isLeft(result)) return result.left;
     return result.right;
   }
+
+  @NestCommon.Post()
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  @Common.HttpUserAuth({ roles: [Domain.UserRole.ADMIN] })
+  async registerUser() {}
 }

@@ -23,9 +23,9 @@ export class LoginUserHandler
   async execute(Command: LoginUserCommand) {
     const user = await this.userRepository.getUserByEmail(Command.email);
 
-    if (!user) return left(Common.EMAIL_OR_PASSWORD_INVALID);
+    if (!user) return left(Common.INVALID_CREDENTIALS);
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) return left(Common.EMAIL_OR_PASSWORD_INVALID);
+    if (!isValid) return left(Common.INVALID_CREDENTIALS);
 
     const email = user.email.value;
     const tokenClaims: Domain.UserClaim = {

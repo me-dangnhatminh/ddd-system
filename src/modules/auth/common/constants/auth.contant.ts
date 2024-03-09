@@ -1,5 +1,5 @@
 export const AUTHENTICATED_USER_KEY = 'user';
-export const AUTHENTICATED_USER_TOKEN_KEY = 'x-user-token';
+export const AUTHENTICATED_USER_TOKEN_KEY = 'x-access-token';
 
 /**
  * @returns user-token:${value}

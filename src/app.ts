@@ -20,9 +20,16 @@ export class ServerApplication {
   public async run() {
     this.app.use(BodyParser.json({ limit: '100mb' }));
     this.app.use(BodyParser.urlencoded({ limit: '100mb', extended: true }));
+    this.buildCQRS();
     this.buildAPIDocumentation();
 
     await this.app.listen(3000);
+  }
+
+  private buildCQRS(): void {
+    const origin = 'http://localhost:5173';
+    const methods = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
+    this.app.enableCors({ origin, methods, credentials: true });
   }
 
   private buildAPIDocumentation(): void {

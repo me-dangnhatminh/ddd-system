@@ -28,7 +28,7 @@ export class AuthController {
     if (isLeft(result)) return result.left;
   }
 
-  @NestCommon.Post('login')
+  @NestCommon.Post('signin')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async login(
     @NestCommon.Body() dto: LoginUserBody,
@@ -45,6 +45,6 @@ export class AuthController {
 
     if (isLeft(queryresult)) return queryresult.left;
     const accessToken = queryresult.right.accessToken;
-    response.header(Common.AUTHENTICATED_USER_TOKEN_KEY, accessToken);
+    response.setHeader(Common.AUTHENTICATED_USER_TOKEN_KEY, accessToken);
   }
 }

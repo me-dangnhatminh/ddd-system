@@ -1,9 +1,9 @@
 import * as shared from '@shared';
 
 export enum AuthErrorType {
+  INVALID_CREDENTIALS = 'invalid-credentials',
   NOT_LOGGED_IN = 'not-logged-in',
   EMAIL_CONFLICT = 'email-conflict',
-  EMAIL_OR_PASSWORD_INVALID = 'email-or-password-invalid',
   PASSWORD_INCORRECT = 'password-incorrect',
   VERIFY_INVALID_CODE = 'verify-invalid-code',
   TOKEN_EXPIRED = 'token-expired',
@@ -11,9 +11,9 @@ export enum AuthErrorType {
   CODE_REQUIRED_FOR_CONFIRMATION = 'code-required-confirmation',
 }
 
-export const EMAIL_OR_PASSWORD_INVALID: shared.IErrorDetail = {
-  type: AuthErrorType.EMAIL_OR_PASSWORD_INVALID,
-  title: 'Email or password is invalid.',
+export const INVALID_CREDENTIALS: shared.IErrorDetail = {
+  type: AuthErrorType.INVALID_CREDENTIALS,
+  title: 'Invalid credentials.',
   detail: 'Check your email or password again.',
 };
 
