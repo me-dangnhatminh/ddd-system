@@ -21,7 +21,7 @@ export class ChangePasswordHandler
     if (!user) throw new Error('InvalidOperation: User not found');
 
     const compare = user.comparePassword(oldPassword);
-    if (!compare) return left(Common.PASSWORD_INCORRECT);
+    if (!compare) return left(Common.AuthInvalidCredentials);
 
     user.changePassword(newPassword);
     await this.userRepository.update(user);

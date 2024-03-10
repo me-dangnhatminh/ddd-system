@@ -38,7 +38,7 @@ export class UserController {
     @NestCommon.Body() body: EmailConfirmationBody,
     @Common.HttpUser() requester: Domain.User,
   ) {
-    if (requester.isVerified) return Common.ALREADY_VERIFIED;
+    if (requester.isVerified) return Common.AuthVerifiedEmail;
     const email = requester.email.value;
     const command = new App.ConfirmEmailCommand(email, body.code);
     const result: Shared.TCommandResult =
@@ -51,7 +51,7 @@ export class UserController {
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   @Common.HttpUserAuth()
   async requestEmailConfirmation(@Common.HttpUser() requester: Domain.User) {
-    if (requester.isVerified) return Common.ALREADY_VERIFIED;
+    if (requester.isVerified) return Common.AuthVerifiedEmail;
     const email = requester.email.value;
 
     const command = new App.RequestEmailConfirmationCommand(email);

@@ -23,8 +23,7 @@ export class ConfirmEmailHandler
   async execute(command: ConfirmEmailCommand) {
     const { email, code } = command;
     const savedCode = await this.cacheService.getEmailVerificationCode(email);
-    if (!savedCode || savedCode !== code)
-      return left(Common.VERIFY_INVALID_CODE);
+    if (savedCode !== code) return left(Common.AuthEmailCodeInvalid);
 
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) throw new Error('InvalidOperation: User not found');

@@ -1,16 +1,15 @@
 import * as NestCQRS from '@nestjs/cqrs';
+import { Inject } from '@nestjs/common';
+import { left, right } from 'fp-ts/lib/Either';
 
 import * as Domain from '../../../domain';
-
-import { left, right } from 'fp-ts/lib/Either';
+import * as Common from '../../../common';
 
 import {
   GetAuthUserTokenQuery,
   GetAuthUserTokenQueryResult,
   TGetAuthUserTokenQueryResult,
 } from '../get-auth-user-token.query';
-import { Inject } from '@nestjs/common';
-import { TOKEN_EXPIRED } from '../../../common';
 
 @NestCQRS.QueryHandler(GetAuthUserTokenQuery)
 export class GetAuthUserTokenHandler
@@ -25,7 +24,7 @@ export class GetAuthUserTokenHandler
   async execute(query: GetAuthUserTokenQuery) {
     const { email } = query;
     const token = await this.cacheService.getUserToken(email);
-    if (!token) return left(TOKEN_EXPIRED);
+    if (!token) return left(Common.AuthSignInTokenInvalid);
 
     const result = new GetAuthUserTokenQueryResult(token);
     return right(result);

@@ -24,8 +24,4 @@ const HandlersProvider: NestCommon.Provider[] = [
 })
 export class AuthModule {
   constructor() {}
-
-  configure(consumer: NestCommon.MiddlewareConsumer) {
-    consumer.apply(Infra.FormatResponseMiddleware).forRoutes('*');
-  }
 }
