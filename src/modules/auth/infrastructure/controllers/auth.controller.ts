@@ -44,7 +44,10 @@ export class AuthController {
       await this.queryBus.execute(query);
 
     if (isLeft(queryresult)) return queryresult.left;
+
     const accessToken = queryresult.right.accessToken;
-    response.setHeader(Common.AUTHENTICATED_USER_TOKEN_KEY, accessToken);
+    const headerkey = Common.AUTHENTICATED_USER_TOKEN_KEY;
+    response.header('Access-Control-Expose-Headers', headerkey);
+    response.setHeader(headerkey, accessToken);
   }
 }
