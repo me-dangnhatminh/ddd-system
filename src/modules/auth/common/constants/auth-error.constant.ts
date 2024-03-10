@@ -1,7 +1,7 @@
 import { IErrorDetail } from '@shared';
 
 export enum AuthErrorType {
-  AUTH_UserNotExists = 'AUTH_UserNotExists',
+  Auth_UserNotExists = 'Auth_UserNotExists',
   Auth_InvalidCredentials = 'Auth_InvalidCredentials',
   Auth_EmailExists = 'Auth_EmailExists',
   Auth_EmailConflict = 'Auth_EmailConflict',
@@ -25,7 +25,7 @@ export const AuthEmailExists: IErrorDetail = {
 };
 
 export const AuthUserNotExists: IErrorDetail = {
-  type: AuthErrorType.AUTH_UserNotExists,
+  type: AuthErrorType.Auth_UserNotExists,
   title: 'User not exists',
   detail: 'User not exists',
 };

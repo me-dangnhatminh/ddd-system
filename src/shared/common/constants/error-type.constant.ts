@@ -1,4 +1,4 @@
 export enum CommonErrorType {
-  INTERNAL = 'internal',
-  VALIDATION_ERROR = 'validation-error',
+  Internal = 'Internal',
+  ValidationError = 'ValidationError',
 }

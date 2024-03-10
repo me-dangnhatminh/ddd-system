@@ -16,12 +16,12 @@ export interface IValidationErrorParam {
 }
 
 export interface IValidationError extends IErrorDetail {
-  type: CommonErrorType.VALIDATION_ERROR;
+  type: CommonErrorType.ValidationError;
   title: "Your request parameters didn't validate.";
   invalidParams: IValidationErrorParam[];
 }
 
 export interface IInternalError extends IErrorDetail {
-  type: CommonErrorType.INTERNAL;
+  type: CommonErrorType.Internal;
   title: 'An internal error occurred.';
 }

@@ -7,7 +7,7 @@ export class ValidationPipe extends NestCommon.ValidationPipe {
       transform: true,
       exceptionFactory(errors) {
         const error: IValidationError = {
-          type: CommonErrorType.VALIDATION_ERROR,
+          type: CommonErrorType.ValidationError,
           title: "Your request parameters didn't validate.",
           detail: 'Check your request parameters again.',
           invalidParams: errors.map((error) => ({
