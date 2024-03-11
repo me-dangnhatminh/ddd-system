@@ -18,7 +18,7 @@ export class AuthController {
     private readonly queryBus: NestCQRS.QueryBus,
   ) {}
 
-  @NestCommon.Post('register')
+  @NestCommon.Post('signup')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async register(@NestCommon.Body() dto: RegisterUserBody) {
     const command = new App.RegisterUserCommand(dto);

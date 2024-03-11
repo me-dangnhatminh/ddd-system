@@ -5,7 +5,7 @@ export enum AuthErrorType {
   Auth_InvalidCredentials = 'Auth_InvalidCredentials',
   Auth_EmailExists = 'Auth_EmailExists',
   Auth_EmailConflict = 'Auth_EmailConflict',
-  AUTH_EmailCodeInvalid = 'AUTH_EmailCodeInvalid',
+  Auth_EmailCodeInvalid = 'Auth_EmailCodeInvalid',
   Auth_SignInTokenInvalid = 'Auth_SignInTokenInvalid',
   Auth_NotSignedIn = 'Auth_NotSignedIn',
   Auth_NotConfirmed = 'Auth_NotConfirmed',
@@ -43,7 +43,7 @@ export const AuthNotSignedIn: IErrorDetail = {
 };
 
 export const AuthEmailCodeInvalid: IErrorDetail = {
-  type: AuthErrorType.AUTH_EmailCodeInvalid,
+  type: AuthErrorType.Auth_EmailCodeInvalid,
   title: 'Email code invalid',
   detail: 'Code is invalid or expired, please request a new code',
 };
