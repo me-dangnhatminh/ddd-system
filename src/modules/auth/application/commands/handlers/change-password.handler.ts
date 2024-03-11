@@ -3,7 +3,7 @@ import { left, right } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
 import * as Domain from '../../../domain';
-import * as Common from '../../../common';
+import { AuthError } from '../../../common';
 
 import { ChangePasswordCommand } from '../change-password.command';
 
@@ -21,7 +21,7 @@ export class ChangePasswordHandler
     if (!user) throw new Error('InvalidOperation: User not found');
 
     const compare = user.comparePassword(oldPassword);
-    if (!compare) return left(Common.AuthInvalidCredentials);
+    if (!compare) return left(.AuthInvalidCredentials);
 
     user.changePassword(newPassword);
     await this.userRepository.update(user);

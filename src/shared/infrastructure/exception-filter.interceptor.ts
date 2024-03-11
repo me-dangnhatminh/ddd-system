@@ -1,5 +1,5 @@
 import * as NestCommon from '@nestjs/common';
-import { InternalError } from '../common';
+import { AppError } from '../common';
 
 @NestCommon.Injectable()
 export class ExceptionFilter implements NestCommon.ExceptionFilter {
@@ -8,7 +8,7 @@ export class ExceptionFilter implements NestCommon.ExceptionFilter {
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
-    let res: any = InternalError;
+    let res: any = AppError.unknown();
     res = this.handleNestException(exception, res);
 
     //TODO: config to enable/disable logging in env
