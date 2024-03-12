@@ -1,12 +1,11 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { UserClaim, UserRepository } from '@modules/auth';
-import * as Common from '../../common';
 import { JwtService } from '@nestjs/jwt';
+import {
+  AUTHENTICATED_USER_KEY,
+  AUTHENTICATED_USER_TOKEN_KEY,
+  AuthErrors,
+} from '../../common';
 
 @Injectable()
 export class HttpUserLocalAuthGuard implements CanActivate {
@@ -17,17 +16,15 @@ export class HttpUserLocalAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers[Common.AUTHENTICATED_USER_TOKEN_KEY];
-    if (token === undefined)
-      throw new UnauthorizedException(Common.AuthNotSignedIn);
+    const token = request.headers[AUTHENTICATED_USER_TOKEN_KEY];
+    if (token === undefined) throw AuthErrors.notSignedIn();
     const userJWT = this.jwtService.decode<UserClaim>(token);
-    if (!userJWT)
-      throw new UnauthorizedException(Common.AuthSignInTokenInvalid);
+    if (!userJWT) throw AuthErrors.notSignedIn();
 
     const user = await this.userRepository.getUserById(userJWT.userId);
     if (!user) throw new Error('InvalidOperation: User not found');
 
-    request[Common.AUTHENTICATED_USER_KEY] = user;
+    request[AUTHENTICATED_USER_KEY] = user;
     return true;
   }
 }

@@ -3,9 +3,9 @@ import { left, right, Either } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
 import * as Domain from '../../../domain';
-import * as Common from '../../../common';
 
 import { RegisterUserCommand } from '../register-user.command';
+import { AuthErrors } from '../../../common';
 
 @NestCQRS.CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler
@@ -20,7 +20,7 @@ export class RegisterUserHandler
     command: RegisterUserCommand,
   ): Promise<Either<Shared.IErrorDetail, void>> {
     const res = await this.userRepository.getUserByEmail(command.email);
-    if (res) return left(Common.AuthEmailExists);
+    if (res) return left(AuthErrors.emailExits(command.email));
 
     const username = Domain.UserName.new(command.firstName, command.lastName);
     const email = Domain.UserEmail.new(command.email);

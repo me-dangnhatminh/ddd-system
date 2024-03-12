@@ -8,7 +8,10 @@ export class ExceptionFilter implements NestCommon.ExceptionFilter {
     const request = ctx.getRequest();
     const response = ctx.getResponse();
 
-    let res: any = AppError.unknown();
+    let res: any =
+      exception instanceof AppError
+        ? AppError.fromError(exception)
+        : AppError.unknown();
     res = this.handleNestException(exception, res);
 
     //TODO: config to enable/disable logging in env

@@ -17,6 +17,3 @@ export class AuthValidationError extends AuthError implements IValidationError {
     super(type, title, detail);
   }
 }
-
-// Not enough accounts
-

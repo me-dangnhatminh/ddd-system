@@ -1,46 +1,77 @@
 import { AuthErrorType } from './auth-error-type.constant';
 import { AuthError } from '../auth-error';
 
-// export const UserNotExists: (email: string) => IErrorDetail = (email) => ()
+const userNotExits = (email: string) => {
+  return new AuthError(
+    AuthErrorType.UserNotExists,
+    'User not exists',
+    `User with email ${email} not exists`,
+  );
+};
 
-// export const AuthInvalidCredentials: IErrorDetail = {
-//   type: AuthErrorType.Auth_InvalidCredentials,
-//   title: 'Invalid credentials',
-//   detail: 'Email or password is incorrect',
-// };
+const emailExits = (email: string) => {
+  return new AuthError(
+    AuthErrorType.EmailExists,
+    'Email exists',
+    `User with email ${email} already exists`,
+  );
+};
 
-// export const AuthEmailExists: IErrorDetail = {
-//   type: AuthErrorType.Auth_EmailExists,
-//   title: 'Email exists',
-//   detail: 'Email used, please use another email',
-// };
+const permissionDenied = () => {
+  return new AuthError(
+    AuthErrorType.PermissionDenied,
+    'Permission denied',
+    'Permission denied',
+  );
+};
 
-// export const AuthUserNotExists: IErrorDetail = {
-//   type: AuthErrorType.Auth_UserNotExists,
-//   title: 'User not exists',
-//   detail: 'User not exists',
-// };
+const invalidCredentials = () => {
+  return new AuthError(
+    AuthErrorType.InvalidCredentials,
+    'Invalid credentials',
+    'Email or password is incorrect',
+  );
+};
 
-// export const AuthSignInTokenInvalid: IErrorDetail = {
-//   type: AuthErrorType.Auth_SignInTokenInvalid,
-//   title: 'Token invalid',
-//   detail: 'Sign In token is invalid',
-// };
+const invalidSignInToken = () => {
+  return new AuthError(
+    AuthErrorType.InvalidSignInToken,
+    'Invalid sign in token',
+    'Sign in token is invalid',
+  );
+};
 
-// export const AuthNotSignedIn: IErrorDetail = {
-//   type: AuthErrorType.Auth_NotSignedIn,
-//   title: 'Not signed in',
-//   detail: 'User is not signed in, please sign in',
-// };
+const notSignedIn = () => {
+  return new AuthError(
+    AuthErrorType.NotSignedIn,
+    'Not signed in',
+    'User is not signed in, please sign in',
+  );
+};
 
-// export const AuthEmailCodeInvalid: IErrorDetail = {
-//   type: AuthErrorType.Auth_EmailCodeInvalid,
-//   title: 'Email code invalid',
-//   detail: 'Code is invalid or expired, please request a new code',
-// };
+const emailCodeInvalid = () => {
+  return new AuthError(
+    AuthErrorType.EmailCodeInvalid,
+    'Email code invalid',
+    'Code is invalid or expired, please request a new code',
+  );
+};
 
-// export const AuthVerifiedEmail: IErrorDetail = {
-//   type: AuthErrorType.Auth_VerifiedEmail,
-//   title: 'Email verified',
-//   detail: 'Email is already verified',
-// };
+const emailVerified = () => {
+  return new AuthError(
+    AuthErrorType.EmailVerified,
+    'Email verified',
+    'Email is already verified',
+  );
+};
+
+export const AuthErrors = {
+  userNotExits,
+  emailExits,
+  permissionDenied,
+  invalidCredentials,
+  invalidSignInToken,
+  notSignedIn,
+  emailCodeInvalid,
+  emailVerified,
+};

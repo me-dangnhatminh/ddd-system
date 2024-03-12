@@ -4,9 +4,9 @@ import { left, right } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
 import * as Domain from '../../../domain';
-import * as Common from '../../../common';
 
 import { ConfirmEmailCommand } from '../confirm-email.command';
+import { AuthErrors } from '../../../common';
 
 @NestCQRS.CommandHandler(ConfirmEmailCommand)
 export class ConfirmEmailHandler
@@ -23,7 +23,7 @@ export class ConfirmEmailHandler
   async execute(command: ConfirmEmailCommand) {
     const { email, code } = command;
     const savedCode = await this.cacheService.getEmailVerificationCode(email);
-    if (savedCode !== code) return left(Common.AuthEmailCodeInvalid);
+    if (savedCode !== code) return left(AuthErrors.emailCodeInvalid());
 
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) throw new Error('InvalidOperation: User not found');

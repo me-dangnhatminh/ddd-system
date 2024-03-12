@@ -3,13 +3,13 @@ import { Inject } from '@nestjs/common';
 import { left, right } from 'fp-ts/lib/Either';
 
 import * as Domain from '../../../domain';
-import * as Common from '../../../common';
 
 import {
   GetAuthUserTokenQuery,
   GetAuthUserTokenQueryResult,
   TGetAuthUserTokenQueryResult,
 } from '../get-auth-user-token.query';
+import { AuthErrors } from '../../../common';
 
 @NestCQRS.QueryHandler(GetAuthUserTokenQuery)
 export class GetAuthUserTokenHandler
@@ -24,7 +24,7 @@ export class GetAuthUserTokenHandler
   async execute(query: GetAuthUserTokenQuery) {
     const { email } = query;
     const token = await this.cacheService.getUserToken(email);
-    if (!token) return left(Common.AuthSignInTokenInvalid);
+    if (!token) return left(AuthErrors.invalidSignInToken());
 
     const result = new GetAuthUserTokenQueryResult(token);
     return right(result);

@@ -4,10 +4,10 @@ import * as NestCommon from '@nestjs/common';
 import { left, right } from 'fp-ts/lib/Either';
 
 import * as Shared from '@shared';
-import * as Common from '../../../common';
 import * as Domain from '../../../domain';
 
 import { LoginUserCommand } from '../login-user.command';
+import { AuthErrors } from '../../../common';
 
 @NestCQRS.CommandHandler(LoginUserCommand)
 export class LoginUserHandler
@@ -23,9 +23,9 @@ export class LoginUserHandler
   async execute(Command: LoginUserCommand) {
     const user = await this.userRepository.getUserByEmail(Command.email);
 
-    if (!user) return left(Common.AuthInvalidCredentials);
+    if (!user) return left(AuthErrors.invalidCredentials());
     const isValid = user.comparePassword(Command.password);
-    if (!isValid) return left(Common.AuthInvalidCredentials);
+    if (!isValid) return left(AuthErrors.invalidCredentials());
 
     const email = user.email.value;
     const tokenClaims: Domain.UserClaim = {
