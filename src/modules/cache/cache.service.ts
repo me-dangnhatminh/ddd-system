@@ -10,7 +10,7 @@ export const USER_TOKEN_CACHE_KEY_PREFIX = Object.freeze(
 );
 
 @Injectable()
-export class CacheService implements AuthModule.CacheService {
+export class CacheService implements AuthModule.UserCacheService {
   constructor(
     @Inject(NestCache.CACHE_MANAGER)
     private readonly cacheManager: NestCache.Cache,

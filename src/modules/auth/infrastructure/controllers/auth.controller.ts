@@ -4,50 +4,70 @@ import * as NestSwagger from '@nestjs/swagger';
 import * as Express from 'express';
 import { isLeft } from 'fp-ts/lib/Either';
 
-import * as Shared from '@shared';
-import * as Common from '../../common';
-import * as App from '../../application';
-
-import { RegisterUserBody, LoginUserBody } from './view-models';
+import { SignInUserBody } from './view-models';
+import { UserPassword, UserRepository } from '../../domain';
+import { SignInUserCommand, GetAuthUserTokenQuery } from '../../application';
+import { AUTH_USER_TOKEN_KEY, AuthErrors } from '../../common';
+import {
+  EmailValidityChecksBody,
+  PasswordValidityChecksBody,
+  SignUpUserBody,
+} from './view-models/signup-user.dto';
+import { SignUpUserCommand } from '../../application/commands/signup-user.command';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
 export class AuthController {
   constructor(
+    private readonly userRepository: UserRepository,
     private readonly commandBus: NestCQRS.CommandBus,
     private readonly queryBus: NestCQRS.QueryBus,
   ) {}
 
   @NestCommon.Post('signup')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  async register(@NestCommon.Body() dto: RegisterUserBody) {
-    const command = new App.RegisterUserCommand(dto);
-    const result: Shared.TCommandResult =
-      await this.commandBus.execute(command);
-
+  async signUp(@NestCommon.Body() dto: SignUpUserBody) {
+    const command = new SignUpUserCommand(dto);
+    const result = await this.commandBus.execute(command);
     if (isLeft(result)) return result.left;
   }
 
   @NestCommon.Post('signin')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async login(
-    @NestCommon.Body() dto: LoginUserBody,
+    @NestCommon.Body() dto: SignInUserBody,
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {
-    const command = new App.LoginUserCommand(dto.email, dto.password);
-    const commandresult: Shared.TCommandResult =
-      await this.commandBus.execute(command);
-    if (isLeft(commandresult)) return commandresult.left;
+    const command = new SignInUserCommand(dto);
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
 
-    const query = new App.GetAuthUserTokenQuery(dto.email);
-    const queryresult: App.TGetAuthUserTokenQueryResult =
-      await this.queryBus.execute(query);
+    const getTokenQuery = new GetAuthUserTokenQuery(dto.email);
+    const queryR = await this.queryBus.execute(getTokenQuery);
+    if (isLeft(queryR)) return queryR.left;
 
-    if (isLeft(queryresult)) return queryresult.left;
+    const token = queryR.right;
+    response.cookie(AUTH_USER_TOKEN_KEY, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+  }
 
-    const accessToken = queryresult.right.accessToken;
-    const headerkey = Common.AUTHENTICATED_USER_TOKEN_KEY;
-    response.header('Access-Control-Expose-Headers', headerkey);
-    response.setHeader(headerkey, accessToken);
+  @NestCommon.Post('email-validity-checks')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async checkEmailValidity(@NestCommon.Body() dto: EmailValidityChecksBody) {
+    const email = dto.value;
+    const user = await this.userRepository.getUserByEmail(email);
+    if (user) return AuthErrors.emailExits(email);
+  }
+
+  @NestCommon.Get('password-validity-checks')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async checkPasswordValidity(
+    @NestCommon.Body() dto: PasswordValidityChecksBody,
+  ) {
+    const password = dto.value;
+    UserPassword.validate(password);
   }
 }

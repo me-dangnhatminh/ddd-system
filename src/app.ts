@@ -2,6 +2,7 @@ import * as NestExpress from '@nestjs/platform-express';
 import * as NestCore from '@nestjs/core';
 import * as BodyParser from 'body-parser';
 import * as NestSwagger from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 import { RootModule } from './modules/root.module';
 
@@ -20,6 +21,7 @@ export class ServerApplication {
   public async run() {
     this.app.use(BodyParser.json({ limit: '100mb' }));
     this.app.use(BodyParser.urlencoded({ limit: '100mb', extended: true }));
+    this.app.use(cookieParser());
     this.buildCQRS();
     this.buildAPIDocumentation();
 

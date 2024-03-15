@@ -3,9 +3,10 @@ import { UserClaim, UserRepository } from '@modules/auth';
 import { JwtService } from '@nestjs/jwt';
 import {
   AUTHENTICATED_USER_KEY,
-  AUTHENTICATED_USER_TOKEN_KEY,
+  AUTH_USER_TOKEN_KEY,
   AuthErrors,
 } from '../../common';
+import { Request } from 'express';
 
 @Injectable()
 export class HttpUserLocalAuthGuard implements CanActivate {
@@ -15,8 +16,8 @@ export class HttpUserLocalAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = request.headers[AUTHENTICATED_USER_TOKEN_KEY];
+    const request: Request = context.switchToHttp().getRequest();
+    const token = request.cookies[AUTH_USER_TOKEN_KEY];
     if (token === undefined) throw AuthErrors.notSignedIn();
     const userJWT = this.jwtService.decode<UserClaim>(token);
     if (!userJWT) throw AuthErrors.notSignedIn();

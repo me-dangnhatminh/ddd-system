@@ -18,7 +18,7 @@ export class GetAuthUserTokenHandler
 {
   constructor(
     @Inject('cache-service')
-    private readonly cacheService: Domain.CacheService,
+    private readonly cacheService: Domain.UserCacheService,
   ) {}
 
   async execute(query: GetAuthUserTokenQuery) {
@@ -27,6 +27,6 @@ export class GetAuthUserTokenHandler
     if (!token) return left(AuthErrors.invalidSignInToken());
 
     const result = new GetAuthUserTokenQueryResult(token);
-    return right(result);
+    return right(result.accessToken);
   }
 }

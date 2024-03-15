@@ -6,7 +6,6 @@ import { IDataEditProfile, IDataRegisterUser, IUser } from './user.abstract';
 import { UserRole } from './user-role';
 import { AuthProvider } from './auth-provider';
 import { UserEmail } from './user-email';
-import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { Admin } from './admin';
 
@@ -15,8 +14,8 @@ export class User extends AggregateRoot implements IUser {
     return this._id;
   }
 
-  get username(): UserName {
-    return this._username;
+  get name(): string {
+    return this._name;
   }
 
   get email(): UserEmail {
@@ -53,29 +52,29 @@ export class User extends AggregateRoot implements IUser {
 
   constructor(
     private _id: string,
-    private _username: UserName,
+    private _name: string,
     private _email: UserEmail,
     private _password: UserPassword,
     private _role: UserRole,
+    private _authProvider: AuthProvider,
     private _isVerified: boolean,
     private _avatarUrl: string,
-    private _authProvider: AuthProvider,
     private _registerAt: Date,
   ) {
     super();
     this.autoCommit = false;
   }
 
-  static registerUser(data: IDataRegisterUser): User {
+  static signUpUser(data: IDataRegisterUser): User {
     const user = new User(
       uuid(),
-      data.username,
-      data.email,
-      data.password,
+      data.name ?? '',
+      UserEmail.new(data.email),
+      UserPassword.new(data.password),
       UserRole.USER,
-      data.isVerified,
-      data.avatarUrl,
-      data.authProvider,
+      data.authProvider ?? AuthProvider.LOCAL,
+      data.isVerified ?? false,
+      data.avatarUrl ?? '',
       new Date(),
     );
     this.applyRegisteredUserEvent(user);
@@ -92,8 +91,7 @@ export class User extends AggregateRoot implements IUser {
   }
 
   editProfile(data: IDataEditProfile): void {
-    this._username = data.username ?? this.username;
-    this._email = data.email ?? this.email;
+    this._name = data.name ?? this.name;
     this._avatarUrl = data.avatarUrl ?? this.avatarUrl;
     //TODO: Apply event
   }
@@ -103,8 +101,7 @@ export class User extends AggregateRoot implements IUser {
     this.apply(
       new Events.EmailVerifiedEvent({
         email: this.email.value,
-        firstName: this.username.firstName,
-        lastName: this.username.lastName,
+        name: this.name,
       }),
     );
   }
@@ -114,8 +111,7 @@ export class User extends AggregateRoot implements IUser {
       new Events.RegisteredUserEvent({
         id: user.id,
         email: user.email.value,
-        firstName: user.username.firstName,
-        lastName: user.username.lastName,
+        name: user.name,
         role: user.role,
         registeredAt: user.registeredAt,
       }),

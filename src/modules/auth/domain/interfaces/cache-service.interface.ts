@@ -1,4 +1,4 @@
-export abstract class CacheService {
+export abstract class UserCacheService {
   abstract getEmailVerificationCode(email: string): Promise<number | undefined>;
   abstract setEmailVerificationCode(
     email: string,

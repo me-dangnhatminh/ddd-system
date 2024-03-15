@@ -11,9 +11,9 @@ const HandlersProvider: NestCommon.Provider[] = [
   App.GetAuthUserTokenHandler,
   // -- Commands
   App.ChangePasswordHandler,
-  App.RegisterUserHandler,
+  App.SignUpUserHandler,
+  App.SignInUserHandler,
   App.ConfirmEmailHandler,
-  App.LoginUserHandler,
   App.RequestEmailConfirmationHandler,
 ];
 

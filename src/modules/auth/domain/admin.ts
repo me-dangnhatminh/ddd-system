@@ -2,23 +2,27 @@ import { v4 as uuid } from 'uuid';
 import { User } from './user';
 import { IAdmin, IDataEditProfile, IDataRegisterUser } from './user.abstract';
 import { UserRole } from './user-role';
+import { AuthProvider } from './auth-provider';
+import { UserEmail } from './user-email';
+import { UserPassword } from './user-password';
 
 export class Admin extends User implements IAdmin {
-  registerAdmin(data: IDataRegisterUser): Admin {
-    const user = new User(
+  signUpAdmin(data: IDataRegisterUser): Admin {
+    const admin = new User(
       uuid(),
-      data.username,
-      data.email,
-      data.password,
+      data.name ?? '',
+      UserEmail.new(data.email),
+      UserPassword.new(data.password),
       UserRole.ADMIN,
-      data.isVerified,
-      data.avatarUrl,
-      data.authProvider,
+      data.authProvider ?? AuthProvider.LOCAL,
+      data.isVerified ?? false,
+      data.avatarUrl ?? '',
       new Date(),
     );
-    if (!user.isAdmin())
+
+    if (!admin.isAdmin())
       throw new Error(`InvalidOperation: user is not an admin`);
-    return user;
+    return admin;
   }
 
   editUser(user: User, data: IDataEditProfile): void {

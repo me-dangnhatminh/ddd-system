@@ -10,14 +10,14 @@ export class RegisteredUserSubscription
 {
   constructor(private readonly mailer: NestMailer.MailerService) {}
   async handle(event: AuthModule.RegisteredUserEvent) {
-    const { email, firstName, lastName } = event;
+    const { email, name } = event;
     await this.mailer
       .sendMail({
         to: email,
         subject: 'Welcome to the app',
         template: 'welcome',
-        context: { name: `${firstName} ${lastName}` },
-        html: `<h1>Welcome to the app, ${firstName} ${lastName}!</h1>`,
+        context: { name },
+        html: `<h1>Welcome to the app, ${name}!</h1>`,
       })
       .catch((error) =>
         NestCommon.Logger.error(

@@ -24,10 +24,10 @@ export class UserController {
   async getMe(@Common.HttpUser() user: Domain.User) {
     return {
       id: user.id,
-      firstName: user.username.firstName,
-      lastName: user.username.lastName,
+      name: user.name,
       email: user.email.value,
       isVerified: user.isVerified,
+      avatarUrl: user.avatarUrl,
     };
   }
 

@@ -7,8 +7,7 @@ CREATE TYPE "auth_providers" AS ENUM ('local', 'google', 'facebook');
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "first_name" TEXT NOT NULL,
-    "last_name" TEXT NOT NULL,
+    "name" TEXT NOT NULL DEFAULT '',
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "auth_provider" "auth_providers" NOT NULL DEFAULT 'local',

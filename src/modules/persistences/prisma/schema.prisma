@@ -25,8 +25,7 @@ enum AuthProvider {
 
 model User {
   id           String       @id @default(uuid()) @map("id")
-  firstName    String       @map("first_name")
-  lastName     String       @map("last_name")
+  name         String       @default("") @map("name")
   email        String       @unique @map("email")
   password     String       @map("password")
   authProvider AuthProvider @default(local) @map("auth_provider")

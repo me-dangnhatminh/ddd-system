@@ -9,13 +9,12 @@ export class EmailVerifiedSubscription
 {
   constructor(private readonly mailer: NestMailer.MailerService) {}
   async handle(event: AuthModule.EmailVerifiedEvent) {
-    const { email, firstName, lastName } = event;
+    const { email, name } = event;
     await this.mailer.sendMail({
       to: email,
       subject: 'Welcome to our platform!',
       template: 'email-verified',
-      context: { firstName, lastName },
-      html: `<h1>Welcome to our platform, ${firstName} ${lastName}!</h1>`,
+      html: `<h1>Welcome to our platform, ${name} !</h1>`,
     });
   }
 }

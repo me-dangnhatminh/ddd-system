@@ -1,27 +1,25 @@
 import { AuthProvider } from './auth-provider';
 import { UserEmail } from './user-email';
-import { UserName } from './user-name';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
 
 export interface IDataRegisterUser {
-  username: UserName;
-  email: UserEmail;
-  password: UserPassword;
-  isVerified: boolean;
-  avatarUrl: string;
-  authProvider: AuthProvider;
+  email: string;
+  password: string;
+  name?: string;
+  avatarUrl?: string;
+  isVerified?: boolean;
+  authProvider?: AuthProvider;
 }
 
 export interface IDataEditProfile {
-  username: UserName;
-  email: UserEmail;
+  name: string;
   avatarUrl: string;
 }
 
 export interface IUser {
   id: string;
-  username: UserName;
+  name: string;
   email: UserEmail;
   password: UserPassword;
   role: UserRole;
@@ -37,7 +35,6 @@ export interface IUser {
 }
 
 export interface IAdmin extends IUser {
-  registerAdmin(data: IDataRegisterUser): IAdmin;
+  signUpAdmin(data: IDataRegisterUser): IAdmin;
   editUser(user: IUser, data: IDataEditProfile): void;
-  unregisterUser(user: IUser): void;
 }
