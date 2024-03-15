@@ -62,7 +62,7 @@ export class AuthController {
     if (user) return AuthErrors.emailExits(email);
   }
 
-  @NestCommon.Get('password-validity-checks')
+  @NestCommon.Post('password-validity-checks')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async checkPasswordValidity(
     @NestCommon.Body() dto: PasswordValidityChecksBody,
