@@ -39,8 +39,8 @@ export class AuthController {
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {
     const command = new SignInUserCommand(dto);
-    const result = await this.commandBus.execute(command);
-    if (isLeft(result)) return result.left;
+    const commandR = await this.commandBus.execute(command);
+    if (isLeft(commandR)) return commandR.left;
 
     const getTokenQuery = new GetAuthUserTokenQuery(dto.email);
     const queryR = await this.queryBus.execute(getTokenQuery);
@@ -68,6 +68,7 @@ export class AuthController {
     @NestCommon.Body() dto: PasswordValidityChecksBody,
   ) {
     const password = dto.value;
-    UserPassword.validate(password);
+    const isValid = UserPassword.validate(password);
+    if (!isValid) return AuthErrors.passwordInvalid();
   }
 }

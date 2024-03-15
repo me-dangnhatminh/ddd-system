@@ -1,5 +1,6 @@
 import { AuthErrorType } from './auth-error-type.constant';
 import { AuthError } from '../auth-error';
+import { UserPassword } from '../../domain';
 
 const userNotExits = (email: string) => {
   return new AuthError(
@@ -13,7 +14,15 @@ const emailExits = (email: string) => {
   return new AuthError(
     AuthErrorType.EmailExists,
     'Email exists',
-    `User with email ${email} already exists`,
+    `${email} already exists`,
+  );
+};
+
+const passwordInvalid = () => {
+  return new AuthError(
+    AuthErrorType.PasswordInvalid,
+    'Password invalid',
+    UserPassword.INVALID_MESSAGE,
   );
 };
 
@@ -74,4 +83,5 @@ export const AuthErrors = {
   notSignedIn,
   emailCodeInvalid,
   emailVerified,
+  passwordInvalid,
 };

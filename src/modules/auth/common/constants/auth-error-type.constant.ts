@@ -1,4 +1,5 @@
 export enum AuthErrorType {
+  PasswordInvalid = 'password-invalid',
   UserNotExists = 'user-not-exists',
   PermissionDenied = 'user-permission-denied',
   InvalidCredentials = 'invalid-credentials',
