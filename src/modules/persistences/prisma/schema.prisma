@@ -25,16 +25,18 @@ enum AuthProvider {
 
 model User {
   id           String       @id @default(uuid()) @map("id")
-  name         String       @default("") @map("name")
+  username     String       @unique @map("username") @db.VarChar(24)
   email        String       @unique @map("email")
   password     String       @map("password")
   authProvider AuthProvider @default(local) @map("auth_provider")
   role         UserRole     @default(user) @map("role")
   isVerified   Boolean      @default(false) @map("is_verified")
-  avatarUrl    String       @default("") @map("avatar_url")
-  registeredAt DateTime     @default(now()) @map("registered_at") @db.Timestamp()
-  updatedAt    DateTime?    @updatedAt @map("updated_at") @db.Timestamp()
-  removedAt    DateTime?    @map("removed_at") @db.Timestamp()
+
+  name         String    @default("") @map("name")
+  avatarUrl    String    @default("") @map("avatar_url")
+  registeredAt DateTime  @default(now()) @map("registered_at") @db.Timestamp()
+  updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamp()
+  removedAt    DateTime? @map("removed_at") @db.Timestamp()
 
   @@map("users")
 }

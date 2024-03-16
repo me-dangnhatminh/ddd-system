@@ -2,10 +2,12 @@ import { AuthProvider } from './auth-provider';
 import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
 import { UserRole } from './user-role';
+import { Username } from './username';
 
 export interface IDataRegisterUser {
   email: string;
   password: string;
+  username: string;
   name?: string;
   avatarUrl?: string;
   isVerified?: boolean;
@@ -18,15 +20,19 @@ export interface IDataEditProfile {
 }
 
 export interface IUser {
+  // auth ------------------------
   id: string;
-  name: string;
+  username: Username;
   email: UserEmail;
   password: UserPassword;
   role: UserRole;
   isVerified: boolean;
-  avatarUrl: string;
   authProvider: AuthProvider;
+  // profile ---------------------
+  name: string;
+  avatarUrl: string;
   registeredAt: Date;
+  // methods ---------------------
   isAdmin(): this is IAdmin;
   comparePassword(password: string): boolean;
   changePassword(newPassword: string): void;

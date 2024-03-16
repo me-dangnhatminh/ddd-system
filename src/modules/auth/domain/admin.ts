@@ -5,21 +5,22 @@ import { UserRole } from './user-role';
 import { AuthProvider } from './auth-provider';
 import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
+import { Username } from './username';
 
 export class Admin extends User implements IAdmin {
   signUpAdmin(data: IDataRegisterUser): Admin {
     const admin = new User(
       uuid(),
-      data.name ?? '',
+      Username.new(data.username),
       UserEmail.new(data.email),
-      UserPassword.new(data.password),
+      UserPassword.new(data.password, true),
       UserRole.ADMIN,
       data.authProvider ?? AuthProvider.LOCAL,
       data.isVerified ?? false,
+      data.name ?? '',
       data.avatarUrl ?? '',
       new Date(),
     );
-
     if (!admin.isAdmin())
       throw new Error(`InvalidOperation: user is not an admin`);
     return admin;

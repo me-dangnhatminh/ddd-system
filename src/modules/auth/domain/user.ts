@@ -8,42 +8,38 @@ import { AuthProvider } from './auth-provider';
 import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
 import { Admin } from './admin';
+import { Username } from './username';
 
 export class User extends AggregateRoot implements IUser {
   get id(): string {
     return this._id;
   }
-
-  get name(): string {
-    return this._name;
+  get username(): Username {
+    return this._username;
   }
-
   get email(): UserEmail {
     return this._email;
   }
-
   get password(): UserPassword {
     return this._password;
   }
-
   get role(): UserRole {
     return this._role;
   }
-
   get isVerified(): boolean {
     return this._isVerified;
   }
-
-  get avatarUrl(): string {
-    return this._avatarUrl;
-  }
-
   get authProvider(): AuthProvider {
     return this._authProvider;
   }
-
+  get name(): string {
+    return this._name;
+  }
+  get avatarUrl(): string {
+    return this._avatarUrl;
+  }
   get registeredAt(): Date {
-    return this._registerAt;
+    return this._registeredAt;
   }
 
   isAdmin(): this is Admin {
@@ -52,14 +48,15 @@ export class User extends AggregateRoot implements IUser {
 
   constructor(
     private _id: string,
-    private _name: string,
+    private _username: Username,
     private _email: UserEmail,
     private _password: UserPassword,
     private _role: UserRole,
     private _authProvider: AuthProvider,
     private _isVerified: boolean,
+    private _name: string,
     private _avatarUrl: string,
-    private _registerAt: Date,
+    private _registeredAt: Date,
   ) {
     super();
     this.autoCommit = false;
@@ -68,12 +65,13 @@ export class User extends AggregateRoot implements IUser {
   static signUpUser(data: IDataRegisterUser): User {
     const user = new User(
       uuid(),
-      data.name ?? '',
+      Username.new(data.username),
       UserEmail.new(data.email),
       UserPassword.new(data.password),
       UserRole.USER,
       data.authProvider ?? AuthProvider.LOCAL,
       data.isVerified ?? false,
+      data.name ?? '',
       data.avatarUrl ?? '',
       new Date(),
     );

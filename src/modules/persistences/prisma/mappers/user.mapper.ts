@@ -3,17 +3,18 @@ import * as Domain from '@modules/auth';
 
 export class UserMapper {
   public static toDomain(orm: ORM.User): Domain.User {
-    const name = orm.name;
+    const username = Domain.Username.new(orm.name);
     const email = Domain.UserEmail.new(orm.email);
     const password = Domain.UserPassword.new(orm.password, true);
     return new Domain.User(
       orm.id,
-      name,
+      username,
       email,
       password,
-      orm.role as Domain.UserRole,
-      orm.authProvider as Domain.AuthProvider,
+      Domain.UserRole[orm.role],
+      Domain.AuthProvider[orm.authProvider],
       orm.isVerified,
+      orm.name,
       orm.avatarUrl,
       orm.registeredAt,
     );
@@ -21,13 +22,14 @@ export class UserMapper {
   public static toOrm(domain: Domain.User): ORM.User {
     return {
       id: domain.id,
-      name: domain.name,
+      username: domain.username.value,
       email: domain.email.value,
       password: domain.password.value,
-      role: domain.role as ORM.UserRole,
+      role: domain.role,
       isVerified: domain.isVerified,
-      avatarUrl: domain.avatarUrl,
       authProvider: domain.authProvider,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
       registeredAt: domain.registeredAt,
       updatedAt: null,
       removedAt: null,
