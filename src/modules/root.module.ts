@@ -9,6 +9,7 @@ import { JwtModule } from './jwt.module';
 import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
+import { BrokenMessageModule } from './broken-message/broken-message.module';
 
 const validationPipeProvider: NestCommon.Provider = {
   provide: NestCore.APP_PIPE,
@@ -24,6 +25,7 @@ const providers = [validationPipeProvider, exceptionFilterProvider];
 
 @NestCommon.Module({
   imports: [
+    BrokenMessageModule,
     CqrsModule,
     JwtModule,
     CacheModule,

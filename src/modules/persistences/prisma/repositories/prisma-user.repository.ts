@@ -5,7 +5,7 @@ import { UserMapper } from '../mappers';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PrismaUserRepository implements UserModule.UserRepository {
+export class PrismaUserRepository implements UserModule.IUserRepository {
   constructor(private readonly prismaService: PrismaService) {}
   userExits(by: { email?: string; username?: string }): Promise<boolean> {
     return this.prismaService.user

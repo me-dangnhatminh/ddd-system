@@ -4,15 +4,17 @@ import * as Infra from './infrastructure';
 import * as App from './application';
 
 const HandlersProvider: NestCommon.Provider[] = [
+  // -- Services
+  App.AuthService,
+  // -- Events
   // -- Queries
   App.GetAllAsAdminHandler,
   App.GetProfileAsAdminHandler,
   App.GetProfileHandler,
-  App.GetAuthUserTokenHandler,
+  App.SignInUserHandler,
   // -- Commands
   App.ChangePasswordHandler,
   App.SignUpUserHandler,
-  App.SignInUserHandler,
   App.ConfirmEmailHandler,
   App.RequestEmailConfirmationHandler,
 ];

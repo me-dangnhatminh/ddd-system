@@ -1,25 +1,17 @@
-import { left, right } from 'fp-ts/lib/Either';
-import { Inject } from '@nestjs/common';
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
+import { left, right } from 'fp-ts/lib/Either';
 
-import { SignInUserCommand } from '../signin-user.command';
-import {
-  UserCacheService,
-  SignedInUserEvent,
-  UserRepository,
-  UserClaim,
-} from '../../../domain';
+import { IUserRepository } from '../../../domain';
 import { AuthErrors } from '../../../common';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from '../../auth.service';
+import { SignInUserCommand } from '../signin-user.command';
 
 @CommandHandler(SignInUserCommand)
 export class SignInUserHandler implements ICommandHandler<SignInUserCommand> {
   constructor(
-    @Inject('cache-service')
-    private readonly userCacheService: UserCacheService,
-    private readonly userRepository: UserRepository,
+    private readonly authService: AuthService,
+    private readonly userRepository: IUserRepository,
     private readonly publisher: EventPublisher,
-    private readonly jwtService: JwtService,
   ) {}
 
   async execute(command: SignInUserCommand) {
@@ -28,20 +20,7 @@ export class SignInUserHandler implements ICommandHandler<SignInUserCommand> {
     const valid = user.comparePassword(command.password);
     if (!valid) return left(AuthErrors.invalidCredentials());
 
-    const email = user.email.value;
-    const tokenClaims: UserClaim = {
-      userId: user.id,
-      email,
-      role: user.role,
-      isVerified: user.isVerified,
-    };
-
-    const token = this.jwtService.sign(tokenClaims, { expiresIn: '1h' }); //TODO: config expiresIn in env
-    await this.userCacheService.setUserToken(email, token, 60 * 60 * 1000);
-
-    const signedEvent = new SignedInUserEvent({ email: user.email.value });
-    user.apply(signedEvent);
-
+    await this.authService.genAndSaveAuthToken(user.toClaim());
     this.publisher.mergeObjectContext(user).commit();
     return right(undefined);
   }

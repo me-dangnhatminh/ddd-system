@@ -1,7 +1,7 @@
 import { Admin } from '../admin';
 import { User } from '../user';
 
-export abstract class UserRepository {
+export abstract class IUserRepository {
   abstract getUserById(id: string): Promise<User | null>;
   abstract getUserByUsername(username: string): Promise<User | null>;
   abstract getUserByEmail(email: string): Promise<User | null>;

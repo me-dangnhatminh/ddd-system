@@ -9,6 +9,7 @@ import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
 import { Admin } from './admin';
 import { Username } from './username';
+import { UserClaim } from './user-claim';
 
 export class User extends AggregateRoot implements IUser {
   get id(): string {
@@ -75,12 +76,15 @@ export class User extends AggregateRoot implements IUser {
       data.avatarUrl ?? '',
       new Date(),
     );
-    this.applyRegisteredUserEvent(user);
+    this.applySignedUpUserEvent(user);
     return user;
   }
 
   comparePassword(password: string): boolean {
-    return this.password.compare(password);
+    const valid = this.password.compare(password);
+    if (!valid) return false;
+    this.applySignedInUserEvent(this);
+    return true;
   }
 
   changePassword(newPassword: string): void {
@@ -94,6 +98,15 @@ export class User extends AggregateRoot implements IUser {
     //TODO: Apply event
   }
 
+  toClaim(): UserClaim {
+    return {
+      sub: this.id,
+      email: this.email.value,
+      role: this.role,
+      isVerified: this.isVerified,
+    };
+  }
+
   verifyEmail(): void {
     this._isVerified = true;
     this.apply(
@@ -104,14 +117,25 @@ export class User extends AggregateRoot implements IUser {
     );
   }
 
-  private static applyRegisteredUserEvent(user: User): void {
+  private static applySignedUpUserEvent(user: User): void {
     user.apply(
-      new Events.RegisteredUserEvent({
+      new Events.SignedUpUserEvent({
         id: user.id,
         email: user.email.value,
-        name: user.name,
         role: user.role,
-        registeredAt: user.registeredAt,
+        isVerified: user.isVerified,
+        username: user.username.value,
+      }),
+    );
+  }
+
+  private applySignedInUserEvent(user: User): void {
+    user.apply(
+      new Events.SignedInUserEvent({
+        id: user.id,
+        email: user.email.value,
+        role: user.role,
+        isVerified: user.isVerified,
       }),
     );
   }

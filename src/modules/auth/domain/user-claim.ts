@@ -3,7 +3,7 @@ import * as Shared from '@shared';
 import { User } from './user';
 
 export class UserClaim {
-  userId: string;
+  sub: string;
   email: string;
   isVerified: boolean;
   role: string;

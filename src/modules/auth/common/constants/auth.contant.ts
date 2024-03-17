@@ -11,3 +11,6 @@ export const USER_TOKEN_CACHE_KEY_PREFIX = Object.freeze(
     return `user-token-cache-key:${value}`;
   },
 );
+// setup quene name constant
+const SIGNED_IN_USER_QN = 'user-signedin';
+const SIGNED_UP_USER_QN = 'user-signedup';

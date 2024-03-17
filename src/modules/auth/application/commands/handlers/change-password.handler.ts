@@ -12,7 +12,7 @@ export class ChangePasswordHandler
   implements
     NestCQRS.ICommandHandler<ChangePasswordCommand, Shared.TCommandResult>
 {
-  constructor(private readonly userRepository: Domain.UserRepository) {}
+  constructor(private readonly userRepository: Domain.IUserRepository) {}
 
   async execute(command: ChangePasswordCommand) {
     const { userId, oldPassword, newPassword } = command;

@@ -16,7 +16,7 @@ export class RequestEmailConfirmationHandler
     >
 {
   constructor(
-    @NestCommon.Inject('cache-service')
+    @NestCommon.Inject('CACHE_MANAGER')
     private readonly cacheService: Domain.UserCacheService,
     private readonly eventBus: NestCQRS.EventBus,
   ) {}

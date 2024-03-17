@@ -14,9 +14,9 @@ export class ConfirmEmailHandler
     NestCQRS.ICommandHandler<ConfirmEmailCommand, Shared.TCommandResult>
 {
   constructor(
-    @NestCommon.Inject('cache-service')
+    @NestCommon.Inject('CACHE_MANAGER')
     private readonly cacheService: Domain.UserCacheService,
-    private readonly userRepository: Domain.UserRepository,
+    private readonly userRepository: Domain.IUserRepository,
     private readonly publisher: NestCQRS.EventPublisher,
   ) {}
 

@@ -1,6 +1,6 @@
 import * as Shared from '@shared';
 
-import { UserRepository } from '@modules/auth';
+import { IUserRepository } from '@modules/auth';
 import { Global, Module, Provider, Scope } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
 import {
@@ -21,7 +21,7 @@ const ReadRepositoryProvider: Provider = {
 };
 
 const UserRepositoryProvider: Provider = {
-  provide: UserRepository,
+  provide: IUserRepository,
   useClass: PrismaUserRepository,
   scope: Scope.DEFAULT,
 };

@@ -5,8 +5,12 @@ import * as Express from 'express';
 import { isLeft } from 'fp-ts/lib/Either';
 
 import { SignInUserBody } from './view-models';
-import { UserPassword, UserRepository } from '../../domain';
-import { SignInUserCommand, GetAuthUserTokenQuery } from '../../application';
+import { UserPassword, IUserRepository } from '../../domain';
+import {
+  AuthService,
+  SignInUserCommand,
+  SignUpUserCommand,
+} from '../../application';
 import { AUTH_USER_TOKEN_KEY, AuthErrors } from '../../common';
 import {
   EmailValidityChecksBody,
@@ -14,23 +18,28 @@ import {
   SignUpUserBody,
   UsernameValidityChecksBody,
 } from './view-models/signup-user.dto';
-import { SignUpUserCommand } from '../../application/commands/signup-user.command';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
 export class AuthController {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly authService: AuthService,
+    private readonly userRepository: IUserRepository,
     private readonly commandBus: NestCQRS.CommandBus,
-    private readonly queryBus: NestCQRS.QueryBus,
   ) {}
 
   @NestCommon.Post('signup')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  async signUp(@NestCommon.Body() dto: SignUpUserBody) {
-    const command = new SignUpUserCommand(dto);
-    const result = await this.commandBus.execute(command);
-    if (isLeft(result)) return result.left;
+  async signUp(
+    @NestCommon.Body() dto: SignUpUserBody,
+    @NestCommon.Res({ passthrough: true }) response: Express.Response,
+  ) {
+    const signUpCommand = new SignUpUserCommand(dto);
+    const signUpResult = await this.commandBus.execute(signUpCommand);
+    if (isLeft(signUpResult)) return signUpResult.left;
+
+    const token = await this.authService.getAuthToken(dto.email);
+    this.formatAuthResponse(response, token);
   }
 
   @NestCommon.Post('signin')
@@ -40,19 +49,11 @@ export class AuthController {
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {
     const command = new SignInUserCommand(dto);
-    const commandR = await this.commandBus.execute(command);
-    if (isLeft(commandR)) return commandR.left;
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
 
-    const getTokenQuery = new GetAuthUserTokenQuery(dto.email);
-    const queryR = await this.queryBus.execute(getTokenQuery);
-    if (isLeft(queryR)) return queryR.left;
-
-    const token = queryR.right;
-    response.cookie(AUTH_USER_TOKEN_KEY, token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    const token = await this.authService.getAuthToken(dto.email);
+    this.formatAuthResponse(response, token);
   }
 
   @NestCommon.Post('email-validity-checks')
@@ -78,5 +79,13 @@ export class AuthController {
   ) {
     const user = await this.userRepository.getUserByUsername(dto.username);
     if (user) return AuthErrors.usernameAlreadyExists(dto.username);
+  }
+
+  private async formatAuthResponse(res: Express.Response, token: string) {
+    res.cookie(AUTH_USER_TOKEN_KEY, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UserClaim, UserRepository } from '@modules/auth';
+import { UserClaim, IUserRepository } from '@modules/auth';
 import { JwtService } from '@nestjs/jwt';
 import {
   AUTHENTICATED_USER_KEY,
@@ -12,7 +12,7 @@ import { Request } from 'express';
 export class HttpUserLocalAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: IUserRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -22,7 +22,7 @@ export class HttpUserLocalAuthGuard implements CanActivate {
     const userJWT = this.jwtService.decode<UserClaim>(token);
     if (!userJWT) throw AuthErrors.notSignedIn();
 
-    const user = await this.userRepository.getUserById(userJWT.userId);
+    const user = await this.userRepository.getUserById(userJWT.sub);
     if (!user) throw new Error('InvalidOperation: User not found');
 
     request[AUTHENTICATED_USER_KEY] = user;
