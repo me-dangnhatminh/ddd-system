@@ -1,11 +1,15 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class EmailValidityChecksBody {
-  @IsEmail() @IsNotEmpty() value: string;
+  @IsEmail() @IsNotEmpty() email: string;
 }
 
 export class PasswordValidityChecksBody {
-  @IsNotEmpty() value: string;
+  @IsString() @IsNotEmpty() password: string;
+}
+
+export class UsernameValidityChecksBody {
+  @IsString() @IsNotEmpty() username;
 }
 
 export class SignUpUserBody {

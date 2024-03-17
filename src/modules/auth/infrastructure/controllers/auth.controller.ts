@@ -12,6 +12,7 @@ import {
   EmailValidityChecksBody,
   PasswordValidityChecksBody,
   SignUpUserBody,
+  UsernameValidityChecksBody,
 } from './view-models/signup-user.dto';
 import { SignUpUserCommand } from '../../application/commands/signup-user.command';
 
@@ -57,9 +58,8 @@ export class AuthController {
   @NestCommon.Post('email-validity-checks')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async checkEmailValidity(@NestCommon.Body() dto: EmailValidityChecksBody) {
-    const email = dto.value;
-    const user = await this.userRepository.getUserByEmail(email);
-    if (user) return AuthErrors.emailExits(email);
+    const user = await this.userRepository.getUserByEmail(dto.email);
+    if (user) return AuthErrors.emailAlreadyExists(dto.email);
   }
 
   @NestCommon.Post('password-validity-checks')
@@ -67,8 +67,16 @@ export class AuthController {
   async checkPasswordValidity(
     @NestCommon.Body() dto: PasswordValidityChecksBody,
   ) {
-    const password = dto.value;
-    const isValid = UserPassword.validate(password);
+    const isValid = UserPassword.validate(dto.password);
     if (!isValid) return AuthErrors.passwordInvalid();
+  }
+
+  @NestCommon.Post('username-validity-checks')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async checkUsernameValidity(
+    @NestCommon.Body() dto: UsernameValidityChecksBody,
+  ) {
+    const user = await this.userRepository.getUserByUsername(dto.username);
+    if (user) return AuthErrors.usernameAlreadyExists(dto.username);
   }
 }

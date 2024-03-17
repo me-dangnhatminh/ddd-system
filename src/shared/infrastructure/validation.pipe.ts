@@ -6,14 +6,16 @@ export class ValidationPipe extends NestCommon.ValidationPipe {
     super({
       transform: true,
       exceptionFactory(errors) {
+        const details = errors.map((error) => ({
+          name: error.property,
+          reason: Object.values(error.constraints ?? '').join(', '),
+        }));
+        const mess = details.map((d) => d.reason).join(', ');
         const error = new ValidationError(
           'validation-error',
           "Your request parameters didn't validate.",
-          'Check your request parameters again.',
-          errors.map((error) => ({
-            name: error.property,
-            reason: Object.values(error.constraints ?? '').join(', '),
-          })),
+          mess,
+          details,
         );
         return error;
       },

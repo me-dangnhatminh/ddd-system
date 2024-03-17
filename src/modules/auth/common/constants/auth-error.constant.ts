@@ -2,6 +2,14 @@ import { AuthErrorType } from './auth-error-type.constant';
 import { AuthError } from '../auth-error';
 import { UserPassword } from '../../domain';
 
+const userAlreadyExists = () => {
+  return new AuthError(
+    AuthErrorType.UserAlreadyExists,
+    'User exists',
+    'User already exists, check email or username',
+  );
+};
+
 const userNotExits = (email: string) => {
   return new AuthError(
     AuthErrorType.UserNotExists,
@@ -10,11 +18,19 @@ const userNotExits = (email: string) => {
   );
 };
 
-const emailExits = (email: string) => {
+const emailAlreadyExists = (email: string) => {
   return new AuthError(
-    AuthErrorType.EmailExists,
+    AuthErrorType.EmailAlreadyExists,
     'Email exists',
     `${email} already exists`,
+  );
+};
+
+const usernameAlreadyExists = (username: string) => {
+  return new AuthError(
+    AuthErrorType.UsernameAlreadyExists,
+    'Username exists',
+    `${username} used, please use another username`,
   );
 };
 
@@ -75,8 +91,10 @@ const emailVerified = () => {
 };
 
 export const AuthErrors = {
+  userAlreadyExists,
   userNotExits,
-  emailExits,
+  emailAlreadyExists,
+  usernameAlreadyExists,
   permissionDenied,
   invalidCredentials,
   invalidSignInToken,

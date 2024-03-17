@@ -11,9 +11,8 @@ export class SignUpUserHandler implements ICommandHandler<SignUpUserCommand> {
     private readonly publisher: EventPublisher,
   ) {}
   async execute(command: SignUpUserCommand) {
-    const { email } = command;
-    const user = await this.userRepository.getUserByEmail(email);
-    if (user) return left(AuthErrors.emailExits(email));
+    const exits = await this.userRepository.userExits(command);
+    if (exits) return left(AuthErrors.userAlreadyExists());
     const newUser = User.signUpUser(command);
     await this.userRepository.save(newUser);
     this.publisher.mergeObjectContext(newUser).commit();

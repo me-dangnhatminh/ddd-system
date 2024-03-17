@@ -10,7 +10,7 @@ export interface UserPasswordProps {
 export class UserPassword extends Shared.ValueObject<UserPasswordProps> {
   static readonly PASSWORD_REGEX = /^[A-Za-z\d]{8,}$/;
   static readonly INVALID_MESSAGE =
-    'Password must be at least 8 characters long';
+    'password must be at least 8 characters long';
 
   get value(): string {
     return this.props.password;

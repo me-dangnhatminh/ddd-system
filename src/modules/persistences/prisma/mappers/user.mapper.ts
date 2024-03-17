@@ -3,7 +3,7 @@ import * as Domain from '@modules/auth';
 
 export class UserMapper {
   public static toDomain(orm: ORM.User): Domain.User {
-    const username = Domain.Username.new(orm.name);
+    const username = Domain.Username.new(orm.username);
     const email = Domain.UserEmail.new(orm.email);
     const password = Domain.UserPassword.new(orm.password, true);
     return new Domain.User(

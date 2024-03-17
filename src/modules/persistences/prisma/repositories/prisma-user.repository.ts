@@ -7,6 +7,22 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PrismaUserRepository implements UserModule.UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
+  userExits(by: { email?: string; username?: string }): Promise<boolean> {
+    return this.prismaService.user
+      .findFirst({
+        where: { OR: [{ email: by.email }, { username: by.username }] },
+      })
+      .then((user) => {
+        if (!user) return false;
+        return true;
+      });
+  }
+
+  getUserByUsername(username: string): Promise<UserModule.User | null> {
+    return this.prismaService.user
+      .findUnique({ where: { username } })
+      .then((user) => (user ? UserMapper.toDomain(user) : null));
+  }
   getUserById(id: string): Promise<UserModule.User | null> {
     return this.prismaService.user
       .findUnique({ where: { id } })
