@@ -15,8 +15,8 @@ const HandlersProvider: NestCommon.Provider[] = [
   // -- Commands
   App.ChangePasswordHandler,
   App.SignUpUserHandler,
-  App.ConfirmEmailHandler,
-  App.RequestEmailConfirmationHandler,
+  App.VerifyEmailCodeHandler,
+  App.RequestEmailVerificationHandler,
 ];
 
 @NestCommon.Module({

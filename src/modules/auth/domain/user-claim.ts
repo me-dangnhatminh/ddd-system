@@ -9,6 +9,12 @@ export class UserClaim {
   role: string;
 }
 
+export class CodeVerifClaim {
+  email: string;
+  code: string;
+  expensedIn: number;
+}
+
 export type TAccessControllList = 'admin:register';
 
 export interface IUserPolicy {

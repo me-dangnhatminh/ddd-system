@@ -19,6 +19,8 @@ export class SignUpUserHandler implements ICommandHandler<SignUpUserCommand> {
     await this.userRepository.save(newUser);
 
     await this.authService.genAndSaveAuthToken(newUser.toClaim());
+    this.authService.requestEmailVerification(newUser.email.value); // don't await
+
     this.publisher.mergeObjectContext(newUser).commit();
     return right(undefined);
   }

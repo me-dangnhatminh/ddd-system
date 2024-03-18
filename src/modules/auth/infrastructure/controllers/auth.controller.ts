@@ -8,6 +8,7 @@ import { SignInUserBody } from './view-models';
 import { UserPassword, IUserRepository } from '../../domain';
 import {
   AuthService,
+  RequestEmailVerificationCommand,
   SignInUserCommand,
   SignUpUserCommand,
 } from '../../application';
@@ -15,9 +16,12 @@ import { AUTH_USER_TOKEN_KEY, AuthErrors } from '../../common';
 import {
   EmailValidityChecksBody,
   PasswordValidityChecksBody,
+  RequestEmailVerificationBody,
   SignUpUserBody,
   UsernameValidityChecksBody,
+  ValidationEmailCodeBody,
 } from './view-models/signup-user.dto';
+import { VerifyEmailCodeCommand } from '../../application/commands/verify-email-code.command';
 
 @NestCommon.Controller('auth')
 @NestSwagger.ApiTags('auth')
@@ -54,6 +58,26 @@ export class AuthController {
 
     const token = await this.authService.getAuthToken(dto.email);
     this.formatAuthResponse(response, token);
+  }
+
+  // send verification email
+  @NestCommon.Post('email/confirmation/request')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async requestEmailConfirmation(
+    @NestCommon.Body() body: RequestEmailVerificationBody,
+  ) {
+    const command = new RequestEmailVerificationCommand(body);
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
+  }
+
+  // email verify
+  @NestCommon.Post('email/confirmation/verify')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async verifyEmailCode(@NestCommon.Body() body: ValidationEmailCodeBody) {
+    const command = new VerifyEmailCodeCommand(body);
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
   }
 
   @NestCommon.Post('email-validity-checks')

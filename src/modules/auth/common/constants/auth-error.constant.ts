@@ -25,6 +25,13 @@ const emailAlreadyExists = (email: string) => {
     `${email} already exists`,
   );
 };
+const emailAlreadyVerified = () => {
+  return new AuthError(
+    AuthErrorType.EmailAlreadyVerified,
+    'Email verified',
+    'Email already verified',
+  );
+};
 
 const usernameAlreadyExists = (username: string) => {
   return new AuthError(
@@ -74,19 +81,11 @@ const notSignedIn = () => {
   );
 };
 
-const emailCodeInvalid = () => {
+const invalidEmailCode = () => {
   return new AuthError(
-    AuthErrorType.EmailCodeInvalid,
+    AuthErrorType.InvalidEmailCode,
     'Email code invalid',
     'Code is invalid or expired, please request a new code',
-  );
-};
-
-const emailVerified = () => {
-  return new AuthError(
-    AuthErrorType.EmailVerified,
-    'Email verified',
-    'Email is already verified',
   );
 };
 
@@ -94,12 +93,12 @@ export const AuthErrors = {
   userAlreadyExists,
   userNotExits,
   emailAlreadyExists,
+  emailAlreadyVerified,
   usernameAlreadyExists,
   permissionDenied,
   invalidCredentials,
   invalidSignInToken,
   notSignedIn,
-  emailCodeInvalid,
-  emailVerified,
+  invalidEmailCode,
   passwordInvalid,
 };
