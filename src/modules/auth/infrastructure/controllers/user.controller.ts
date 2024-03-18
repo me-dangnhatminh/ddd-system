@@ -19,8 +19,9 @@ export class UserController {
   async getMe(@Common.HttpUser() user: Domain.User) {
     return {
       id: user.id,
-      name: user.name,
       email: user.email.value,
+      username: user.username.value,
+      name: user.name,
       isVerified: user.isVerified,
       avatarUrl: user.avatarUrl,
     };

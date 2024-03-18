@@ -85,7 +85,7 @@ const invalidEmailCode = () => {
   return new AuthError(
     AuthErrorType.InvalidEmailCode,
     'Email code invalid',
-    'Code is invalid or expired, please request a new code',
+    'Code is invalid or expired!',
   );
 };
 

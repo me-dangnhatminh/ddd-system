@@ -60,7 +60,15 @@ export class AuthController {
     this.formatAuthResponse(response, token);
   }
 
-  // send verification email
+  // sign out
+  @NestCommon.Post('signout')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async signOut(
+    @NestCommon.Res({ passthrough: true }) response: Express.Response,
+  ) {
+    response.clearCookie(AUTH_USER_TOKEN_KEY);
+  }
+
   @NestCommon.Post('email/confirmation/request')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async requestEmailConfirmation(
@@ -71,7 +79,6 @@ export class AuthController {
     if (isLeft(result)) return result.left;
   }
 
-  // email verify
   @NestCommon.Post('email/confirmation/verify')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async verifyEmailCode(@NestCommon.Body() body: ValidationEmailCodeBody) {

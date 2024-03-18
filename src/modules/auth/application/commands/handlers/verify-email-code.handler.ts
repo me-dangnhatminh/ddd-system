@@ -17,11 +17,13 @@ export class VerifyEmailCodeHandler
   async execute(command: VerifyEmailCodeCommand): Promise<TCommandResult> {
     const { email, code } = command;
     const user = await this.userRepository.getUserByEmail(email);
-    if (!user) throw new Error('InvalidOperation: User not found');
+    if (!user) return left(AuthErrors.userNotExits(email));
     if (user.isVerified) return left(AuthErrors.emailAlreadyVerified());
     const isValid = await this.authService.verifyEmailCode(email, code);
     if (!isValid) return left(AuthErrors.invalidEmailCode());
 
+    user.verifyEmail();
+    await this.userRepository.update(user);
     return right(undefined);
   }
 }

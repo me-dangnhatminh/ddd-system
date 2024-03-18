@@ -23,7 +23,7 @@ export class HttpUserLocalAuthGuard implements CanActivate {
     if (!userJWT) throw AuthErrors.notSignedIn();
 
     const user = await this.userRepository.getUserById(userJWT.sub);
-    if (!user) throw new Error('InvalidOperation: User not found');
+    if (!user) throw new Error('InvalidOperation: User not found'); // TODO: fix
 
     request[AUTHENTICATED_USER_KEY] = user;
     return true;
