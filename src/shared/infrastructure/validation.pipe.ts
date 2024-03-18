@@ -1,5 +1,5 @@
 import * as NestCommon from '@nestjs/common';
-import { ValidationError } from '../common';
+import { AppError } from '../common';
 
 export class ValidationPipe extends NestCommon.ValidationPipe {
   constructor() {
@@ -10,14 +10,13 @@ export class ValidationPipe extends NestCommon.ValidationPipe {
           name: error.property,
           reason: Object.values(error.constraints ?? '').join(', '),
         }));
-        const mess = details.map((d) => d.reason).join(', ');
-        const error = new ValidationError(
-          'validation-error',
-          "Your request parameters didn't validate.",
-          mess,
-          details,
-        );
-        return error;
+
+        return AppError.validationError({
+          type: 'validation-error',
+          title: "Your request parameters didn't validate.",
+          detail: details.map((d) => d.reason).join(', '),
+          errors: details,
+        });
       },
     });
   }

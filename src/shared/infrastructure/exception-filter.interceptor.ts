@@ -1,30 +1,41 @@
 import * as NestCommon from '@nestjs/common';
 import { AppError } from '../common';
+import { Request, Response } from 'express';
 
 @NestCommon.Injectable()
 export class ExceptionFilter implements NestCommon.ExceptionFilter {
   catch(exception: any, host: NestCommon.ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const request = ctx.getRequest();
-    const response = ctx.getResponse();
+    const request: Request = ctx.getRequest();
+    const response: Response = ctx.getResponse();
 
-    let res: any =
-      exception instanceof AppError
-        ? AppError.fromError(exception)
-        : AppError.unknown();
+    let res: AppError = AppError.unknown();
+    res = this.handeAppError(exception, res);
     res = this.handleNestException(exception, res);
 
-    //TODO: config to enable/disable logging in env
-    if (true) {
-      const message: string = `Method: ${request.method}, ${request.path}, ${exception.message}`;
-      NestCommon.Logger.error(message, ExceptionFilter.name);
-    }
+    this.logError(res, request); // TODO: log error
 
     return response.json(res);
   }
 
-  private handleNestException(exception: any, response: any): any {
+  private logError(exception: AppError, request: Request): void {
+    const message: string = `Method: ${request.method}, ${request.path}, ${exception.message}`;
+    NestCommon.Logger.error(message, ExceptionFilter.name);
+  }
+
+  private handeAppError(exception: unknown, res: AppError): AppError {
+    if (!(exception instanceof AppError)) return res;
+    return exception;
+  }
+
+  private handleNestException(
+    exception: unknown,
+    response: AppError,
+  ): AppError {
     if (!(exception instanceof NestCommon.HttpException)) return response;
-    return exception.getResponse();
+    const error = exception.getResponse();
+    if (error instanceof AppError) return error;
+
+    return response;
   }
 }

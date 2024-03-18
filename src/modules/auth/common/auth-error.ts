@@ -1,19 +1,8 @@
-import { AppError, IValidationError } from '@shared';
-import { AuthErrorType } from './constants/auth-error-type.constant';
+import { AppError, IErrorDetail } from '@shared';
+import { AuthErrorType } from './constants';
 
-export class AuthError extends AppError {
-  constructor(type: AuthErrorType, title: string, detail: string) {
-    super(type, title, detail);
-  }
+export interface IAuthErrorDetail extends IErrorDetail {
+  type: AuthErrorType;
 }
 
-export class AuthValidationError extends AuthError implements IValidationError {
-  constructor(
-    public type: AuthErrorType,
-    public title: string,
-    public detail: string,
-    public errors: { name: string; reason: string }[],
-  ) {
-    super(type, title, detail);
-  }
-}
+export class AuthError extends AppError {}

@@ -37,8 +37,4 @@ const providers = [validationPipeProvider, exceptionFilterProvider];
 })
 export class RootModule {
   constructor() {}
-
-  configure(consumer: NestCommon.MiddlewareConsumer) {
-    consumer.apply(Shared.FormatHttpResponseMiddleware).forRoutes('*');
-  }
 }

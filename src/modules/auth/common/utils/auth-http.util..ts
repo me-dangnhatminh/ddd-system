@@ -1,18 +1,23 @@
-// import { AuthErrorType } from '../constants';
+import { AuthErrorType } from '../constants';
+import { HttpStatus } from '@nestjs/common';
 
-// const ErrorTypeToHttpStatus: Record<AuthErrorType, number> = {
-//   [AuthErrorType.NOT_LOGGED_IN]: 401,
-//   [AuthErrorType.INVALID_CREDENTIALS]: 401,
-//   [AuthErrorType.EMAIL_CONFLICT]: 409,
-//   [AuthErrorType.PASSWORD_INCORRECT]: 401,
-//   [AuthErrorType.VERIFY_INVALID_CODE]: 401,
-//   [AuthErrorType.TOKEN_EXPIRED]: 401,
-//   [AuthErrorType.ALREADY_VERIFIED]: 400,
-//   [AuthErrorType.CODE_REQUIRED_FOR_CONFIRMATION]: 400,
-// };
+const ErrorTypeToHttpStatus: Record<AuthErrorType, number> = {
+  [AuthErrorType.UserAlreadyExists]: HttpStatus.CONFLICT,
+  [AuthErrorType.UserNotExists]: HttpStatus.NOT_FOUND,
+  [AuthErrorType.EmailAlreadyExists]: HttpStatus.CONFLICT,
+  [AuthErrorType.EmailAlreadyVerified]: HttpStatus.CONFLICT,
+  [AuthErrorType.PasswordInvalid]: HttpStatus.BAD_REQUEST,
+  [AuthErrorType.UsernameAlreadyExists]: HttpStatus.CONFLICT,
+  [AuthErrorType.UsernameInvalid]: HttpStatus.BAD_REQUEST,
+  [AuthErrorType.InvalidCredentials]: HttpStatus.UNAUTHORIZED,
+  [AuthErrorType.InvalidEmailCode]: HttpStatus.BAD_REQUEST,
+  [AuthErrorType.PermissionDenied]: HttpStatus.FORBIDDEN,
+  [AuthErrorType.NotSignedIn]: HttpStatus.UNAUTHORIZED,
+  [AuthErrorType.InvalidSignInToken]: HttpStatus.UNAUTHORIZED,
+};
 
-// export const getHttpStatusFromErrorType = (
-//   type: string,
-// ): number | undefined => {
-//   return ErrorTypeToHttpStatus[type] ?? undefined;
-// };
+export const getHttpStatusFromErrorType = (
+  type: string,
+): number | undefined => {
+  return ErrorTypeToHttpStatus[type] ?? undefined;
+};

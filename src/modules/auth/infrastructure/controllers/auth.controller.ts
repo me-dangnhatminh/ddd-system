@@ -48,7 +48,7 @@ export class AuthController {
 
   @NestCommon.Post('signin')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
-  async login(
+  async signIn(
     @NestCommon.Body() dto: SignInUserBody,
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {

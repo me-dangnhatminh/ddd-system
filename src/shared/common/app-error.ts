@@ -1,43 +1,23 @@
-import { IErrorDetail, IValidationError, IInvalidParam } from './interfaces';
+import { IErrorDetail, IValidationError } from './interfaces';
 
-export class AppError extends Error implements IErrorDetail {
-  constructor(
-    public type: string,
-    public title: string,
-    public detail: string,
-  ) {
-    super(detail);
+export class AppError<T extends IErrorDetail = IErrorDetail> extends Error {
+  constructor(public readonly error: T) {
+    super(error.detail);
+  }
+
+  static new<T extends IErrorDetail>(error: T): AppError<T> {
+    return new AppError(error);
   }
 
   static unknown(
-    type = 'about:blank',
-    title = 'An unknown error occurred.',
-    detail = 'An unknown error occurred.',
-  ): AppError {
-    return new AppError(type, title, detail);
+    type = 'auto:blank',
+    title = 'An unknown error occurred',
+    detail = 'An unknown error occurred',
+  ): AppError<IErrorDetail> {
+    return new AppError({ type, title, detail });
   }
 
-  static fromError(detail: IErrorDetail): AppError {
-    return new AppError(detail.type, detail.title, detail.detail);
-  }
-}
-
-export class ValidationError extends AppError implements IValidationError {
-  constructor(
-    public type: string,
-    public title: string,
-    public detail: string,
-    public errors: IInvalidParam[],
-  ) {
-    super(type, title, detail);
-  }
-
-  static fromError(detail: IValidationError): ValidationError {
-    return new ValidationError(
-      detail.type,
-      detail.title,
-      detail.detail,
-      detail.errors,
-    );
+  static validationError<T extends IValidationError>(error: T): AppError<T> {
+    return new AppError<T>(error);
   }
 }
