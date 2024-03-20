@@ -99,14 +99,14 @@ export class AuthController {
     if (isLeft(result)) return result.left;
   }
 
-  @NestCommon.Post('email-validity-checks')
+  @NestCommon.Post('email/validity-checks')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async checkEmailValidity(@NestCommon.Body() dto: EmailValidityChecksBody) {
     const user = await this.userRepository.getUserByEmail(dto.email);
     if (user) return AuthErrors.emailAlreadyExists(dto.email);
   }
 
-  @NestCommon.Post('password-validity-checks')
+  @NestCommon.Post('password/validity-checks')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async checkPasswordValidity(
     @NestCommon.Body() dto: PasswordValidityChecksBody,
@@ -115,21 +115,13 @@ export class AuthController {
     if (!isValid) return AuthErrors.passwordInvalid();
   }
 
-  @NestCommon.Post('username-validity-checks')
+  @NestCommon.Post('username/validity-checks')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async checkUsernameValidity(
     @NestCommon.Body() dto: UsernameValidityChecksBody,
   ) {
     const user = await this.userRepository.getUserByUsername(dto.username);
     if (user) return AuthErrors.usernameAlreadyExists(dto.username);
-  }
-
-  private async formatAuthResponse(res: Express.Response, token: string) {
-    res.cookie(AUTH_USER_TOKEN_KEY, token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
   }
 
   @NestCommon.Post('password/rest/request')
@@ -148,5 +140,13 @@ export class AuthController {
     const command = new VerifyPasswordResetTokenCommand(body);
     const result = await this.commandBus.execute(command);
     if (isLeft(result)) return result.left;
+  }
+
+  private async formatAuthResponse(res: Express.Response, token: string) {
+    res.cookie(AUTH_USER_TOKEN_KEY, token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
   }
 }

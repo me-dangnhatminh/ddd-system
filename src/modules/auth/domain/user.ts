@@ -104,21 +104,21 @@ export class User extends AggregateRoot implements IUser {
       email: this.email.value,
       role: this.role,
       isVerified: this.isVerified,
-      expiredAt: Date.now() + 60 * 60 * 24, // 24 hours
+      expiredAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours (in milliseconds)
     };
   }
 
   toEmailVerifyClaim(): EmailVerificationClaim {
     return {
       email: this.email.value,
-      expiredAt: Date.now() + 5 * 60, // 5 minutes
+      expiredAt: Date.now() + 5 * 60 * 1000, // 5 minutes (in milliseconds)
     };
   }
 
   toPasswordResetClaim(): EmailVerificationClaim {
     return {
       email: this.email.value,
-      expiredAt: Date.now() + 60 * 60, // 1 hour
+      expiredAt: Date.now() + 60 * 60 * 1000, // 1 hour (in milliseconds)
     };
   }
 

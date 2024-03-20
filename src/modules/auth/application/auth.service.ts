@@ -23,7 +23,7 @@ const isPasswordResetClaim = (claim: any): claim is PasswordResetClaim => {
   return (
     typeof claim === 'object' &&
     typeof claim.email === 'string' &&
-    typeof claim.expensedIn === 'number'
+    typeof claim.expiredAt === 'number'
   );
 };
 
@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
   ) {}
   async genAndSaveAuthToken(claim: UserClaim): Promise<string> {
     const { email, expiredAt } = claim;
-    const expiresIn = (expiredAt - Date.now()) / 1000; // convert to seconds
+    const expiresIn = Math.floor((expiredAt - Date.now()) / 1000); // convert to seconds
     const token = this.jwtService.sign(claim, { expiresIn });
     await this.cacheService.set(`auth-token:${email}`, token, expiresIn);
     return token;
@@ -59,7 +59,7 @@ export class AuthService implements IAuthService {
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit code
     const ttlMilisecond = claim.expiredAt - Date.now();
     const key = `email-verify-code:${claim.email}`;
-    this.cacheService.set(key, code, ttlMilisecond);
+    await this.cacheService.set(key, code, ttlMilisecond);
     return code;
   }
   async validateEmailVerificationCode(

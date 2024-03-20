@@ -13,13 +13,13 @@ export class ExceptionFilter implements NestCommon.ExceptionFilter {
     res = this.handeAppError(exception, res);
     res = this.handleNestException(exception, res);
 
-    this.logError(res, request); // TODO: log error
+    this.logError(exception, request); // TODO: log error
 
     return response.json(res);
   }
 
-  private logError(exception: AppError, request: Request): void {
-    const message: string = `Method: ${request.method}, ${request.path}, ${exception.message}`;
+  private logError(exception: any, request: Request): void {
+    const message: string = `Method: ${request.method}, ${request.path}, ${exception}`;
     NestCommon.Logger.error(message, ExceptionFilter.name);
   }
 
