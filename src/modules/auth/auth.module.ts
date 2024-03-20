@@ -5,10 +5,16 @@ import * as App from './application';
 import { NextFunction, Response } from 'express';
 import { AppError } from '@shared';
 import { getHttpStatusFromErrorType } from './common/utils/auth-http.util.';
+import { IAuthService } from './domain';
+
+const AuthServiceProvider: NestCommon.Provider = {
+  provide: IAuthService,
+  useClass: App.AuthService,
+};
 
 const HandlersProvider: NestCommon.Provider[] = [
   // -- Services
-  App.AuthService,
+  AuthServiceProvider,
   // -- Events
   // -- Queries
   App.GetAllAsAdminHandler,

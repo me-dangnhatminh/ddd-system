@@ -7,12 +7,17 @@ export class UserClaim {
   email: string;
   isVerified: boolean;
   role: string;
+  expiredAt: number;
 }
 
-export class CodeVerifClaim {
+export class EmailVerificationClaim {
   email: string;
-  code: string;
-  expensedIn: number;
+  expiredAt: number;
+}
+
+export class PasswordResetClaim {
+  email: string;
+  expiredAt: number;
 }
 
 export type TAccessControllList = 'admin:register';

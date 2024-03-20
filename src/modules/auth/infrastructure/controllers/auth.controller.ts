@@ -5,18 +5,21 @@ import * as Express from 'express';
 import { isLeft } from 'fp-ts/lib/Either';
 
 import { SignInUserBody } from './view-models';
-import { UserPassword, IUserRepository } from '../../domain';
+import { UserPassword, IUserRepository, IAuthService } from '../../domain';
 import {
-  AuthService,
   RequestEmailVerificationCommand,
+  RequestPasswordResetCommand,
   SignInUserCommand,
   SignUpUserCommand,
+  VerifyPasswordResetTokenCommand,
 } from '../../application';
 import { AUTH_USER_TOKEN_KEY, AuthErrors } from '../../common';
 import {
   EmailValidityChecksBody,
   PasswordValidityChecksBody,
   RequestEmailVerificationBody,
+  RequestPasswordResetBody,
+  ResetPasswordBody,
   SignUpUserBody,
   UsernameValidityChecksBody,
   ValidationEmailCodeBody,
@@ -27,7 +30,7 @@ import { VerifyEmailCodeCommand } from '../../application/commands/verify-email-
 @NestSwagger.ApiTags('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: IAuthService,
     private readonly userRepository: IUserRepository,
     private readonly commandBus: NestCQRS.CommandBus,
   ) {}
@@ -38,11 +41,16 @@ export class AuthController {
     @NestCommon.Body() dto: SignUpUserBody,
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {
+    // Sign up user, generate token and set it in the response
     const signUpCommand = new SignUpUserCommand(dto);
     const signUpResult = await this.commandBus.execute(signUpCommand);
     if (isLeft(signUpResult)) return signUpResult.left;
 
+    // Get token and set it in the response
     const token = await this.authService.getAuthToken(dto.email);
+    if (!token) throw new Error('Token not found');
+
+    // Set token in the response
     this.formatAuthResponse(response, token);
   }
 
@@ -52,15 +60,19 @@ export class AuthController {
     @NestCommon.Body() dto: SignInUserBody,
     @NestCommon.Res({ passthrough: true }) response: Express.Response,
   ) {
+    // Sign in user, generate token and set it in the response
     const command = new SignInUserCommand(dto);
     const result = await this.commandBus.execute(command);
     if (isLeft(result)) return result.left;
 
+    // Get token and set it in the response
     const token = await this.authService.getAuthToken(dto.email);
+    // Token must be save in SignInUserCommand, if not, this is error and throw
+    if (!token) throw new Error('Token not found');
+
     this.formatAuthResponse(response, token);
   }
 
-  // sign out
   @NestCommon.Post('signout')
   @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
   async signOut(
@@ -118,5 +130,23 @@ export class AuthController {
       secure: true,
       sameSite: 'strict',
     });
+  }
+
+  @NestCommon.Post('password/rest/request')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async requestPasswordReset(
+    @NestCommon.Body() body: RequestPasswordResetBody,
+  ) {
+    const command = new RequestPasswordResetCommand(body);
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return AuthErrors.requestPasswrodFailed();
+  }
+
+  @NestCommon.Post('password/rest/verify')
+  @NestCommon.HttpCode(NestCommon.HttpStatus.OK)
+  async verifyPasswordResetToken(@NestCommon.Body() body: ResetPasswordBody) {
+    const command = new VerifyPasswordResetTokenCommand(body);
+    const result = await this.commandBus.execute(command);
+    if (isLeft(result)) return result.left;
   }
 }

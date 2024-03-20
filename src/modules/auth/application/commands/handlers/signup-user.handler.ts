@@ -1,26 +1,32 @@
-import { User, IUserRepository } from '../../../domain';
+import { User, IUserRepository, IAuthService } from '../../../domain';
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { SignUpUserCommand } from '../signup-user.command';
 import { AuthErrors } from 'src/modules/auth/common';
 import { left, right } from 'fp-ts/lib/Either';
-import { AuthService } from '../../auth.service';
 
 @CommandHandler(SignUpUserCommand)
 export class SignUpUserHandler implements ICommandHandler<SignUpUserCommand> {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: IAuthService,
     private readonly userRepository: IUserRepository,
     private readonly publisher: EventPublisher,
   ) {}
   async execute(command: SignUpUserCommand) {
+    // validate user exits
     const exits = await this.userRepository.userExits(command);
     if (exits) return left(AuthErrors.userAlreadyExists());
     const newUser = User.signUpUser(command);
     await this.userRepository.save(newUser);
 
-    await this.authService.genAndSaveAuthToken(newUser.toClaim());
-    this.authService.requestEmailVerification(newUser.email.value); // don't await
+    // save auth token to cache
+    await this.authService.genAndSaveAuthToken(newUser.toUserClaim());
 
+    // send email verification code
+    const claim = newUser.toEmailVerifyClaim();
+    const code = await this.authService.generateEmailVerificationCode(claim);
+    this.authService.sendEmailVerificationCode(claim.email, code);
+
+    // commit user to event store
     this.publisher.mergeObjectContext(newUser).commit();
     return right(undefined);
   }

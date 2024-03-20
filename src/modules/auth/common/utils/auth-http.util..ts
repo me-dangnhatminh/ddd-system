@@ -14,6 +14,9 @@ const ErrorTypeToHttpStatus: Record<AuthErrorType, number> = {
   [AuthErrorType.PermissionDenied]: HttpStatus.FORBIDDEN,
   [AuthErrorType.NotSignedIn]: HttpStatus.UNAUTHORIZED,
   [AuthErrorType.InvalidSignInToken]: HttpStatus.UNAUTHORIZED,
+  [AuthErrorType.EmailNotVerified]: HttpStatus.FORBIDDEN,
+  [AuthErrorType.RequestPasswordFailed]: HttpStatus.BAD_REQUEST,
+  [AuthErrorType.InvalidResetPasswordToken]: HttpStatus.BAD_REQUEST,
 };
 
 export const getHttpStatusFromErrorType = (

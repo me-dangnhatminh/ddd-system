@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { TCommandResult } from '@shared';
 import { VerifyEmailCodeCommand } from '../verify-email-code.command';
-import { IUserRepository } from '../../../domain';
-import { AuthService } from '../../auth.service';
+import { IAuthService, IUserRepository } from '../../../domain';
 import { AuthErrors } from '../../../common';
 import { left, right } from 'fp-ts/lib/Either';
 
@@ -11,7 +10,7 @@ export class VerifyEmailCodeHandler
   implements ICommandHandler<VerifyEmailCodeCommand, TCommandResult>
 {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: IAuthService,
     private readonly userRepository: IUserRepository,
   ) {}
   async execute(command: VerifyEmailCodeCommand): Promise<TCommandResult> {
@@ -19,7 +18,10 @@ export class VerifyEmailCodeHandler
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) return left(AuthErrors.userNotExits(email));
     if (user.isVerified) return left(AuthErrors.emailAlreadyVerified());
-    const isValid = await this.authService.verifyEmailCode(email, code);
+    const isValid = await this.authService.validateEmailVerificationCode(
+      email,
+      code,
+    );
     if (!isValid) return left(AuthErrors.invalidEmailCode());
 
     user.verifyEmail();

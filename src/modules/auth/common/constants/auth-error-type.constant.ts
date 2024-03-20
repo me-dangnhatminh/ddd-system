@@ -3,6 +3,7 @@ export enum AuthErrorType {
   UserNotExists = 'user-not-exists',
   EmailAlreadyExists = 'email-already-exists',
   EmailAlreadyVerified = 'email-already-verified',
+  EmailNotVerified = 'email-not-verified',
   PasswordInvalid = 'password-invalid',
   UsernameAlreadyExists = 'username-already-exists',
   UsernameInvalid = 'username-invalid',
@@ -11,4 +12,6 @@ export enum AuthErrorType {
   PermissionDenied = 'user-permission-denied',
   NotSignedIn = 'not-signed-in',
   InvalidSignInToken = 'invalid-sign-in-token',
+  RequestPasswordFailed = 'request-password-failed',
+  InvalidResetPasswordToken = 'invalid-reset-password-token',
 }

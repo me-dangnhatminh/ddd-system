@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsJWT,
   IsNotEmpty,
   IsNumberString,
   IsString,
@@ -35,4 +36,13 @@ export class ValidationEmailCodeBody {
   code: string;
 
   @IsEmail() @IsNotEmpty() email: string;
+}
+
+export class RequestPasswordResetBody {
+  @IsEmail() @IsNotEmpty() email: string;
+}
+
+export class ResetPasswordBody {
+  @IsNotEmpty() @IsString() password: string;
+  @IsNotEmpty() @IsJWT() token: string;
 }

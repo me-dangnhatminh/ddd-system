@@ -9,7 +9,7 @@ import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
 import { Admin } from './admin';
 import { Username } from './username';
-import { UserClaim } from './user-claim';
+import { EmailVerificationClaim, UserClaim } from './user-claim';
 
 export class User extends AggregateRoot implements IUser {
   get id(): string {
@@ -98,12 +98,27 @@ export class User extends AggregateRoot implements IUser {
     //TODO: Apply event
   }
 
-  toClaim(): UserClaim {
+  toUserClaim(): UserClaim {
     return {
       sub: this.id,
       email: this.email.value,
       role: this.role,
       isVerified: this.isVerified,
+      expiredAt: Date.now() + 60 * 60 * 24, // 24 hours
+    };
+  }
+
+  toEmailVerifyClaim(): EmailVerificationClaim {
+    return {
+      email: this.email.value,
+      expiredAt: Date.now() + 5 * 60, // 5 minutes
+    };
+  }
+
+  toPasswordResetClaim(): EmailVerificationClaim {
+    return {
+      email: this.email.value,
+      expiredAt: Date.now() + 60 * 60, // 1 hour
     };
   }
 

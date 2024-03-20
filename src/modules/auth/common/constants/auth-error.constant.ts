@@ -88,11 +88,37 @@ const invalidEmailCode = () => {
   });
 };
 
+const emailNotVerified = () => {
+  return AuthError.new({
+    type: AuthErrorType.EmailNotVerified,
+    title: 'Email not verified',
+    detail: 'Email not verified',
+  });
+};
+
+const requestPasswrodFailed = () => {
+  return AuthError.new({
+    type: AuthErrorType.RequestPasswordFailed,
+    title: 'Request password failed',
+    detail: 'Email not signed up or not verified',
+  });
+};
+
+const invalidResetPasswordToken = () => {
+  return AuthError.new({
+    type: AuthErrorType.InvalidResetPasswordToken,
+    title: 'Reset password token invalid',
+    detail: 'Reset password token invalid',
+  });
+};
+
 export const AuthErrors = {
   userAlreadyExists,
+  requestPasswrodFailed,
   userNotExits,
   emailAlreadyExists,
   emailAlreadyVerified,
+  emailNotVerified,
   usernameAlreadyExists,
   permissionDenied,
   invalidCredentials,
@@ -100,4 +126,5 @@ export const AuthErrors = {
   notSignedIn,
   invalidEmailCode,
   passwordInvalid,
+  invalidResetPasswordToken,
 };
