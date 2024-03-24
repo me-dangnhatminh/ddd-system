@@ -2,6 +2,7 @@ import {
   IAnonymousOfRoom,
   IGuestOfRoom,
 } from './participant-of-room.interface';
+import { IParticipant } from './participant.interface';
 
 export enum RoomStates {
   Open = 'open',
@@ -16,12 +17,8 @@ export enum RoomTypes {
 
 export interface IRoomSettings {
   maxParticipants: number;
-  signedInRequired: boolean;
+  // signedInRequired: boolean;
   roomType: RoomTypes;
-}
-
-export interface IPublicRoomSettings extends IRoomSettings {
-  type: RoomTypes.Public;
 }
 
 export abstract class IRoom {
@@ -29,17 +26,31 @@ export abstract class IRoom {
   protected name: string;
   protected settings: IRoomSettings;
   protected state: RoomStates;
+  protected participants: Map<IParticipant['id'], IParticipant>;
+
+  abstract getParticipant(partId: string): IParticipantOfRoom;
 }
 
-export abstract class IPrivateRoom extends IRoom {
-  protected settings: IRoomSettings & { roomType: RoomTypes.Private };
+export abstract class IParticipantOfRoom extends IRoom {
+  protected info: IParticipant;
 }
 
 export abstract class IPublicRoom extends IRoom {
-  public id: string;
-  public name: string;
-  public state: RoomStates;
-  public settings: IPublicRoomSettings;
+  abstract registerPart(part: IParticipant): IParticipantOfRoom;
+}
 
-  abstract joinRoom(part: IAnonymousOfRoom | IGuestOfRoom): void;
+export abstract class IOwerOfRoom extends IRoom {
+  abstract kickPart(part: IGuestOfRoom | IAnonymousOfRoom): void;
+  abstract banPart(part: IGuestOfRoom | IAnonymousOfRoom): void;
+  abstract unbanPart(part: IAnonymousOfRoom): void;
+
+  abstract closeRoom(): void;
+  abstract lockRoom(): void;
+  abstract unlockRoom(): void;
+}
+
+export class Room {
+  static registerPart(par: IParticipant): IParticipantOfRoom {
+    throw new Error('Method not implemented.');
+  }
 }

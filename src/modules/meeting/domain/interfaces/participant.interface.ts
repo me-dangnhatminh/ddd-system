@@ -9,7 +9,6 @@ export abstract class IParticipant {
   id: string;
   name: string;
   role: ParticipantRole;
-  signedIn: boolean;
 }
 
 export abstract class IOwer extends IParticipant {
@@ -32,7 +31,6 @@ export abstract class IAnonymous extends IParticipant {
 export interface ICreateParticipantData {
   name: string;
   role: ParticipantRole;
-  signedIn: boolean;
 }
 
 export interface ICreateOwnerData extends ICreateParticipantData {
