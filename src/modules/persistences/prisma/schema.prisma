@@ -38,5 +38,39 @@ model User {
   updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamp()
   removedAt    DateTime? @map("removed_at") @db.Timestamp()
 
+  Meeting Meeting[]
+
   @@map("users")
+}
+
+// ---------- meeting domain ---------- //
+model Meeting {
+  id          String   @id @default(uuid()) @map("id")
+  friendlyId  String   @unique @map("friendly_id") @db.VarChar(8)
+  title       String   @map("title")
+  description String   @map("description")
+  startedAt   DateTime @map("started_at") @db.Timestamp()
+  endedAt     DateTime @map("ended_at") @db.Timestamp()
+  ownerId     String   @map("owner_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp()
+  removedAt DateTime? @map("removed_at") @db.Timestamp()
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("meetings")
+}
+
+model Participant {
+  id       String @id @default(uuid()) @map("id")
+  name     String @map("name")
+  email    String @map("email")
+  password String @map("password")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp()
+  removedAt DateTime? @map("removed_at") @db.Timestamp()
+
+  @@map("participants")
 }

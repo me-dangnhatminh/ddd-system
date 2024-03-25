@@ -6,9 +6,8 @@ export enum ParticipantRole {
 }
 
 export abstract class IParticipant {
-  id: string;
-  name: string;
-  role: ParticipantRole;
+  abstract id: string;
+  abstract name: string;
 }
 
 export abstract class IOwer extends IParticipant {
