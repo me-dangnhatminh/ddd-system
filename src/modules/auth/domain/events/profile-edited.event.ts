@@ -1,19 +1,12 @@
 import { IEvent } from '@nestjs/cqrs';
 
 export class ProfileEditedEvent implements IEvent {
-  public readonly id: string;
-  public readonly firstName: string;
-  public readonly lastName: string;
-  public readonly avatarUrl: string;
-  constructor(data: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    avatarUrl: string;
-  }) {
-    this.id = data.id;
-    this.firstName = data.firstName;
-    this.lastName = data.lastName;
-    this.avatarUrl = data.avatarUrl;
+  public readonly email: string;
+  public readonly name?: string;
+  public readonly avatarUrl?: string;
+  constructor(params: { email: string; name?: string; avatarUrl?: string }) {
+    if (params.name) this.name = params.name;
+    if (params.avatarUrl) this.avatarUrl = params.avatarUrl;
+    this.email = params.email;
   }
 }

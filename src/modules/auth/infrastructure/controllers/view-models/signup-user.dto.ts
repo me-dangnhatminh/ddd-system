@@ -1,9 +1,9 @@
 import {
   IsEmail,
-  IsJWT,
   IsNotEmpty,
   IsNumberString,
   IsString,
+  IsUUID,
   Length,
 } from 'class-validator';
 
@@ -43,6 +43,7 @@ export class RequestPasswordResetBody {
 }
 
 export class ResetPasswordBody {
+  @IsEmail() @IsNotEmpty() email: string;
+  @IsNotEmpty() @IsUUID() sid: string;
   @IsNotEmpty() @IsString() password: string;
-  @IsNotEmpty() @IsJWT() token: string;
 }

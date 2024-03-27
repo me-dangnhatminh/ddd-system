@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UserClaim, IUserRepository } from '@modules/auth';
+import { IUserRepository, IAuthService } from '@modules/auth';
 import { JwtService } from '@nestjs/jwt';
 import {
   AUTHENTICATED_USER_KEY,
@@ -13,17 +13,19 @@ export class HttpUserLocalAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userRepository: IUserRepository,
+    private readonly authService: IAuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const token = request.cookies[AUTH_USER_TOKEN_KEY];
     if (token === undefined) throw AuthErrors.notSignedIn();
-    const userJWT = this.jwtService.decode<UserClaim>(token);
-    if (!userJWT) throw AuthErrors.notSignedIn();
 
-    const user = await this.userRepository.getUserById(userJWT.sub);
-    if (!user) throw new Error('InvalidOperation: User not found'); // TODO: fix
+    const claim = await this.authService.validateAuthToken(token);
+    if (!claim) throw AuthErrors.invalidSignInToken();
+
+    const user = await this.userRepository.getUserById(claim.email);
+    if (!user) throw new Error('InvalidOperation: User not found');
 
     request[AUTHENTICATED_USER_KEY] = user;
     return true;

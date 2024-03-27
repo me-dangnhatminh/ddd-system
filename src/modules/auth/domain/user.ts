@@ -99,7 +99,13 @@ export class User extends AggregateRoot implements IUser {
   editProfile(data: IDataEditProfile): void {
     this._name = data.name ?? this.name;
     this._avatarUrl = data.avatarUrl ?? this.avatarUrl;
-    //TODO: Apply event
+    this.apply(
+      new Events.ProfileEditedEvent({
+        email: this.email.value,
+        name: data.name,
+        avatarUrl: data.avatarUrl,
+      }),
+    );
   }
 
   toUserClaim(): UserClaim {

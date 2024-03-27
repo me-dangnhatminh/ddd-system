@@ -1,8 +1,10 @@
 import { IErrorDetail, IValidationError } from './interfaces';
 
 export class AppError<T extends IErrorDetail = IErrorDetail> extends Error {
-  constructor(public readonly error: T) {
+  public readonly error: T;
+  constructor(error: T) {
     super(error.detail);
+    this.error = error;
   }
 
   static new<T extends IErrorDetail>(error: T): AppError<T> {

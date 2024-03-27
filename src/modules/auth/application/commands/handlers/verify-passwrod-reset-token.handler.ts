@@ -15,9 +15,10 @@ export class VerifyPasswordResetTokenHandler
     private readonly publisher: EventPublisher,
   ) {}
   async execute(command: VerifyPasswordResetTokenCommand): Promise<any> {
-    const { token } = command;
-    const claim = await this.authService.validPassResetToken(token);
-    if (!claim) return left(AuthErrors.invalidResetPasswordToken());
+    const { email, sid } = command;
+    const claim = await this.authService.getPassResetClaim(email);
+    if (!claim || claim.sid !== sid)
+      return left(AuthErrors.invalidResetPasswordToken());
 
     const user = await this.userRepository.getUserByEmail(claim.email);
     if (!user) throw new Error('User not found');

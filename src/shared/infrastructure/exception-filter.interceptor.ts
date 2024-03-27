@@ -1,9 +1,13 @@
 import * as NestCommon from '@nestjs/common';
 import { AppError } from '../common';
 import { Request, Response } from 'express';
+import { AppConfig } from './app.config';
+import { ConfigService } from '@nestjs/config';
 
 @NestCommon.Injectable()
 export class ExceptionFilter implements NestCommon.ExceptionFilter {
+  constructor(private readonly appConfig: ConfigService<AppConfig, true>) {}
+
   catch(exception: any, host: NestCommon.ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request: Request = ctx.getRequest();
@@ -13,12 +17,14 @@ export class ExceptionFilter implements NestCommon.ExceptionFilter {
     res = this.handeAppError(exception, res);
     res = this.handleNestException(exception, res);
 
-    this.logError(exception, request); // TODO: log error
+    this.logError(exception, request);
 
     return response.json(res);
   }
 
   private logError(exception: any, request: Request): void {
+    const logEnabled = this.appConfig.get('LOG_ENABLED');
+    if (!logEnabled) return;
     const message: string = `Method: ${request.method}, ${request.path}, ${exception}`;
     NestCommon.Logger.error(message, ExceptionFilter.name);
   }

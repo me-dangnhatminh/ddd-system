@@ -1,3 +1,9 @@
+/**
+ *  Calculate the time difference between the current time and the given time.
+ * @param at
+ * @param options
+ * @returns {number} The time difference in seconds.
+ */
 const toExpiresIn = (
   at: number | Date,
   options: { now?: Date } = {},

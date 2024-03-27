@@ -19,7 +19,6 @@ const HandlersProvider: NestCommon.Provider[] = [
   // -- Queries
   App.GetAllAsAdminHandler,
   App.GetProfileAsAdminHandler,
-  App.GetProfileHandler,
   App.SignInUserHandler,
   // -- Commands
   App.ChangePasswordHandler,
@@ -43,10 +42,7 @@ export class AuthModule {
           if (body instanceof AppError) {
             const error = body.error;
             const status = getHttpStatusFromErrorType(error.type);
-            if (status) {
-              res.status(status);
-              error['status'] = status; // TODO: not sure
-            }
+            if (status) error['status'] = status; // override status
             res.setHeader('Content-Type', 'application/problem+json'); // RFC 7807, TODO: move to a constant
             return originalJson.call(this, error);
           }
