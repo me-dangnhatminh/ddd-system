@@ -3,9 +3,10 @@ import * as NestCore from '@nestjs/core';
 
 import * as Shared from '@shared';
 
+import { ConfigModule } from './config.module';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
-import { JwtModule } from './jwt.module';
+import { JwtModule } from './jwt/jwt.module';
 import { CqrsModule } from './cqrs.module';
 import { CacheModule } from './cache/cache.module';
 import { PersistencesModule } from './persistences/persistences.module';
@@ -25,6 +26,7 @@ const providers = [validationPipeProvider, exceptionFilterProvider];
 
 @NestCommon.Module({
   imports: [
+    ConfigModule,
     BrokenMessageModule,
     CqrsModule,
     JwtModule,

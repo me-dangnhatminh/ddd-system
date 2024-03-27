@@ -2,6 +2,8 @@ import * as NestMailer from '@nestjs-modules/mailer';
 import * as NestCommon from '@nestjs/common';
 
 import * as App from './application';
+import { ConfigService } from '@nestjs/config';
+import { MailerConfig } from './mailer.config';
 
 const subscriptions: NestCommon.Provider[] = [
   App.VerifyEmailCodeGeneratedSubscription,
@@ -10,16 +12,21 @@ const subscriptions: NestCommon.Provider[] = [
 @NestCommon.Global()
 @NestCommon.Module({
   imports: [
-    NestMailer.MailerModule.forRoot({
-      transport: {
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: { user: 'alison30@ethereal.email', pass: 'heyMGBAGdkpHKwfzNB' },
-      },
+    NestMailer.MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (mailerConfig: ConfigService<MailerConfig, true>) => ({
+        transport: {
+          host: mailerConfig.get('SMTP_HOST'),
+          port: mailerConfig.get('SMTP_PORT'),
+          auth: {
+            user: mailerConfig.get('SMTP_USER'),
+            pass: mailerConfig.get('SMTP_PASS'),
+          },
+        },
+      }),
     }),
   ],
   providers: [...subscriptions],
-  exports: [],
 })
 export class MailerModule implements NestCommon.OnApplicationBootstrap {
   constructor(private readonly mailerService: NestMailer.MailerService) {}

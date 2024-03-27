@@ -24,8 +24,8 @@ export class RequestEmailVerificationHandler
     if (!user) return left(AuthErrors.userNotExits(command.email));
     const claim = user.toEmailVerifyClaim();
 
-    const code = await this.authService.generateEmailVerificationCode(claim);
-    this.authService.sendEmailVerificationCode(claim.email, code); // TODO: send not async
+    await this.authService.saveEmailVerifyClaim(claim);
+    this.authService.sendEmailVerification(claim); // send email async
 
     return right(undefined);
   }

@@ -9,7 +9,11 @@ import { UserEmail } from './user-email';
 import { UserPassword } from './user-password';
 import { Admin } from './admin';
 import { Username } from './username';
-import { EmailVerificationClaim, UserClaim } from './user-claim';
+import {
+  EmailVerificationClaim,
+  PassResetClaim,
+  UserClaim,
+} from './user-claim';
 
 export class User extends AggregateRoot implements IUser {
   get id(): string {
@@ -111,25 +115,24 @@ export class User extends AggregateRoot implements IUser {
   toEmailVerifyClaim(): EmailVerificationClaim {
     return {
       email: this.email.value,
+      code: Math.floor(100000 + Math.random() * 900000).toString(), // 6 digit code
       expiredAt: Date.now() + 5 * 60 * 1000, // 5 minutes (in milliseconds)
     };
   }
 
-  toPasswordResetClaim(): EmailVerificationClaim {
+  toPassResetClaim(): PassResetClaim {
     return {
       email: this.email.value,
-      expiredAt: Date.now() + 60 * 60 * 1000, // 1 hour (in milliseconds)
+      sid: uuid(),
+      expiredAt: Date.now() + 5 * 60 * 1000, // 5 minutes (in milliseconds)
     };
   }
 
   verifyEmail(): void {
     this._isVerified = true;
-    this.apply(
-      new Events.EmailVerifiedEvent({
-        email: this.email.value,
-        name: this.name,
-      }),
-    );
+    const email = this.email.value;
+    const name = this.name;
+    this.apply(new Events.EmailVerifiedEvent({ email, name }));
   }
 
   private static applySignedUpUserEvent(user: User): void {

@@ -29,7 +29,6 @@ const HandlersProvider: NestCommon.Provider[] = [
 ];
 
 @NestCommon.Module({
-  imports: [],
   controllers: [Infra.UserController, Infra.AuthController],
   providers: [...HandlersProvider],
 })

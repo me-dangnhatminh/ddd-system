@@ -16,15 +16,15 @@ export class VerifyPasswordResetTokenHandler
   ) {}
   async execute(command: VerifyPasswordResetTokenCommand): Promise<any> {
     const { token } = command;
-    const claim = await this.authService.validatePasswordResetToken(token);
+    const claim = await this.authService.validPassResetToken(token);
     if (!claim) return left(AuthErrors.invalidResetPasswordToken());
 
-    const email = claim.email;
     const user = await this.userRepository.getUserByEmail(claim.email);
-    if (!user) return left(AuthErrors.userNotExits(email));
+    if (!user) throw new Error('User not found');
 
     user.changePassword(command.password);
     await this.userRepository.update(user);
+
     this.publisher.mergeObjectContext(user).commit();
     return right(undefined);
   }

@@ -5,16 +5,19 @@ import * as NestSwagger from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 
 import { RootModule } from './modules/root.module';
+import { AppConfig } from './shared/infrastructure';
+import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 
 export class ServerApplication {
-  private constructor(
-    public readonly app: NestExpress.NestExpressApplication,
-  ) {}
+  private appConfig: ConfigService<AppConfig, true>;
+  private constructor(public readonly app: NestExpress.NestExpressApplication) {
+    this.appConfig = this.app.get(ConfigService);
+  }
+
   static async create(): Promise<ServerApplication> {
-    const app =
-      await NestCore.NestFactory.create<NestExpress.NestExpressApplication>(
-        RootModule,
-      );
+    const app: NestExpress.NestExpressApplication =
+      await NestCore.NestFactory.create(RootModule);
     return new ServerApplication(app);
   }
 
@@ -25,12 +28,16 @@ export class ServerApplication {
     this.buildCQRS();
     this.buildAPIDocumentation();
 
-    await this.app.listen(3000);
+    // run the server
+    const host = this.appConfig.get('API_HOST');
+    const port = this.appConfig.get('API_PORT');
+    const mess = `Server running on http://${host}:${port}`;
+    await this.app.listen(port, () => Logger.log(mess, ServerApplication.name));
   }
 
   private buildCQRS(): void {
-    const origin = 'http://localhost:5173';
-    const methods = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
+    const origin = this.appConfig.get('CORS_ORIGIN');
+    const methods = this.appConfig.get('CORS_METHOD');
     this.app.enableCors({ origin, methods, credentials: true });
   }
 
@@ -44,7 +51,6 @@ export class ServerApplication {
         .setTitle(title)
         .setDescription(description)
         .setVersion(version)
-        .addBearerAuth({ type: 'apiKey', in: 'header', name: 'x-access-token' })
         .build();
 
     const document: NestSwagger.OpenAPIObject =

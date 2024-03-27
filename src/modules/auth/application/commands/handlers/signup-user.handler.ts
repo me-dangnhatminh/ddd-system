@@ -22,9 +22,7 @@ export class SignUpUserHandler implements ICommandHandler<SignUpUserCommand> {
     await this.authService.genAndSaveAuthToken(newUser.toUserClaim());
 
     // send email verification code
-    const claim = newUser.toEmailVerifyClaim();
-    const code = await this.authService.generateEmailVerificationCode(claim);
-    this.authService.sendEmailVerificationCode(claim.email, code);
+    await this.authService.saveEmailVerifyClaim(newUser.toEmailVerifyClaim());
 
     // commit user to event store
     this.publisher.mergeObjectContext(newUser).commit();

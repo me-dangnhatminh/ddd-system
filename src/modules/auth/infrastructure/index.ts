@@ -1,3 +1,4 @@
+export * from './configs';
 export * from './controllers';
 export * from './guards';
 export * from './decorators';

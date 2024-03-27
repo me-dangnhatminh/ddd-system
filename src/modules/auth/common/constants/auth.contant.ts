@@ -1,16 +1,20 @@
 export const AUTHENTICATED_USER_KEY = 'user';
 export const AUTH_USER_TOKEN_KEY = 'x-access-token';
 
-/**
- * @returns user-token:${value}
- * @example USER_TOKEN_CACHE_KEY_PREFIX`${"demo@gmail"}` return user-token:demo@gmail
- * @example USER_TOKEN_CACHE_KEY_PREFIX`abc xyz ${"demo@gmail"}` return user-token:demo@gmail
- */
-export const USER_TOKEN_CACHE_KEY_PREFIX = Object.freeze(
+export const USER_CLAIM_KEY_PREFIX = Object.freeze(
   (strings: TemplateStringsArray, value: string) => {
-    return `user-token-cache-key:${value}`;
+    return `user-claim:${value}`;
   },
 );
-// setup quene name constant
-const SIGNED_IN_USER_QN = 'user-signedin';
-const SIGNED_UP_USER_QN = 'user-signedup';
+
+export const AUTH_TOKEN_KEY_PREFIX = Object.freeze(
+  (strings: TemplateStringsArray, value: string) => {
+    return `auth-token:${value}`;
+  },
+);
+
+export const EMAIL_CLAIM_KEY_PREFIX = Object.freeze(
+  (strings: TemplateStringsArray, value: string) => {
+    return `email-code-cache-key:${value}`;
+  },
+);
